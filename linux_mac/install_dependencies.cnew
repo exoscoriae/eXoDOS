@@ -354,7 +354,6 @@ function goupdate
             printf "\n\n"
             exit 1
         fi
-        chmod +x install_dependencies.cnew
         echo "$universal_depmac_sum" | sha256sum --check
         if [ $? != 0 ]
         then
@@ -368,6 +367,14 @@ function goupdate
             if [ $? != 0 ]
             then
                 printf "\n\e[1;31;47mError replacing install_dependencies.command.\e[0m\n\n"
+                read -s -n 1 -p "Press any key to abort."
+                printf "\n\n"
+                exit 1
+            fi
+            chmod +x install_dependencies.command
+            if [ $? != 0 ]
+            then
+                printf "\n\e[1;31;47mError making install_dependencies.command executable.\e[0m\n\n"
                 read -s -n 1 -p "Press any key to abort."
                 printf "\n\n"
                 exit 1
