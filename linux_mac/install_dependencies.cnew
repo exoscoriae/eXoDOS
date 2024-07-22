@@ -354,6 +354,7 @@ function goupdate
             printf "\n\n"
             exit 1
         fi
+        chmod +x install_dependencies.cnew
         echo "$universal_depmac_sum" | sha256sum --check
         if [ $? != 0 ]
         then
