@@ -1,6 +1,6 @@
 Version 6.04.universal1
 https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/install_dependencies.cnew
-9ad2083a0adac4c1556cbede2ff4f594daa80cc78a9ddc8e3ca96a903ee89dc1  install_dependencies.cnew
+50b7a8b8e4d1f8659fed1dbfdd55bfbb3e08daab479f9155b112219ef5572415  install_dependencies.cnew
 https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/install_dependencies.bnew
 8b91f1d6b859dbb0be7b265baffb632f97ba806cd2a36f90c9cd4ffcac97a6d3  install_dependencies.bnew
 https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/update_universalpackages_linuxmac.zip
