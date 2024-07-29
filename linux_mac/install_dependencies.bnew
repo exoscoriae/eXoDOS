@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-07-22
+# Revised: 2024-07-29
 
 #--------------------------------------------------------------------------------------
 clear
 
-setupversion="Version 6.04.universal1"
+setupversion="Version 6.03.universal1"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
