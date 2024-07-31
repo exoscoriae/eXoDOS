@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-07-29
+# Revised: 2024-07-31
 
 #--------------------------------------------------------------------------------------
 clear
@@ -17,9 +17,11 @@ scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
 
 if [[ "$OSTYPE" == "darwin"* ]]
 then
-    source "$scriptDir/$(basename -- "${BASH_SOURCE%.bsh}.command")"
+    source "$scriptDir/../../$(basename -- "${BASH_SOURCE%.bsh}.command")"
     exit 0
 fi
+
+cd ../..
 
 if [ ! -d Content ]
 then
@@ -493,7 +495,7 @@ function goupdate
             printf "\n\n"
             exit 1
         else
-            mv install_dependencies.bnew install_dependencies.bsh
+            mv install_dependencies.bnew eXo/util/install_dependencies.bsh
             if [ $? != 0 ]
             then
                 printf "\n\e[1;31;47mError replacing install_dependencies.bsh.\e[0m\n\n"

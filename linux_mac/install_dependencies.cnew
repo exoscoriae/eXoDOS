@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-07-29
+# Revised: 2024-07-31
 
 #--------------------------------------------------------------------------------------
 clear
@@ -19,74 +19,78 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
 then
     if [ `which konsole` ]
     then
-        konsole -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which gnome-terminal` ]
     then
-        gnome-terminal -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        gnome-terminal -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which xfce4-terminal` ]
     then
-        xfce4-terminal -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-    exit 0
+        xfce4-terminal -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
+    elif [ `which kgx` ]
+    then
+        kgx -e "/usr/bin/env bash \"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+        exit 0
     elif [ `which xterm` ]
     then
-        xterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-    exit 0
+        xterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
     elif [ `which uxterm` ]
     then
-        uxterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        uxterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which eterm` ]
     then
-        Eterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        Eterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which x-terminal-emulator` ]
     then
-        x-terminal-emulator -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        x-terminal-emulator -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which mate-terminal` ]
     then
-        eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\" $@\" "$@" &
+        eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\" $@\" "$@" &
         exit 0
     elif [ `which terminator` ]
     then
-        terminator -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        terminator -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which urxvt` ]
     then
-        urxvt -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        urxvt -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which rxvt` ]
     then
-        rxvt -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        rxvt -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which termit` ]
     then
-        termit -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-    exit 0
+        termit -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
     elif [ `which lxterm` ]
     then
-        lxterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        lxterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which terminology` ]
     then
-        terminology -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+        terminology -e "/usr/bin/env bash \"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
         exit 0
     elif [ `which tilix` ]
     then
-        tilix -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        tilix -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which kitty` ]
     then
-        kitty -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        kitty -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which aterm` ]
     then
-        aterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        aterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     else
-        exit ERRCODE "Weird system achievement unlocked: None of the 17 supported terminal emulators are installed."
+        exit ERRCODE "Weird system achievement unlocked: None of the 18 supported terminal emulators are installed."
     fi
 
     exit 0
@@ -397,7 +401,7 @@ function goupdate
             printf "\n\n"
             exit 1
         else
-            mv install_dependencies.bnew install_dependencies.bsh
+            mv install_dependencies.bnew eXo/util/install_dependencies.bsh
             if [ $? != 0 ]
             then
                 printf "\n\e[1;31;47mError replacing install_dependencies.bsh.\e[0m\n\n"
