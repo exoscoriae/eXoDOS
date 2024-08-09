@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Linux Dependency Setup For eXo Collections
-# Revised: 2024-07-31
+# Universal Dependency Setup For eXo Collections
+# Revised: 2024-08-09
 
 #--------------------------------------------------------------------------------------
 clear
@@ -17,7 +17,87 @@ scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]
 then
-    if [ `which konsole` ]
+    if [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "konsole" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "gnome-terminal-" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xfce4-terminal" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kgx" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xterm" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "Eterm" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "x-terminal-emul" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "mate-terminal" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminator" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "urxvt" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "rxvt" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "termit" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminology" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "tilix" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kitty" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "aterm" ]
+    then
+        cd eXo/util
+        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [ `which konsole` ]
     then
         konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
@@ -94,6 +174,9 @@ then
     fi
 
     exit 0
+elif [[ "$OSTYPE" != "darwin"* ]]
+then
+    exit ERRCODE "OS not supported"
 fi
 
 if [ ! -d Content ]
