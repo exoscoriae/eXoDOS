@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-07-31
+# Revised: 2024-08-13
 
 #--------------------------------------------------------------------------------------
 clear
@@ -130,6 +130,7 @@ function beginLinux
 
 function extractPackages
 {
+    echo "Extracting packages..."
     cd eXo
     unzip -o -q ./util/util\*_linux\*.zip EXT\*_linux\*.zip -d ./util
     [ $? != 0 ] && failedunzip
