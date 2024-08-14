@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2024-08-09
+# Revised: 2024-08-14
 
 #--------------------------------------------------------------------------------------
 clear
@@ -349,7 +349,7 @@ function beginMac
     
     clear
     printf "\nAll required dependencies are now satisfied.\n%s\e[1;33;40m%s\e[0m%s\n\n" \
-        "You may proceed with running " "Setup.sh" " to install the eXoDOS collection."
+        "You may proceed with running the appropriate " "Setup eXo<collection>.command" " file."
     read -s -n 1 -p "Press any key to exit..."
     printf "\n\n"
 }
@@ -375,7 +375,7 @@ function failedinstall
         "- A zip file is corrupted" \
         "- Your computer leading a rebellion against you"
     printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the readme:\n%s\e[1;33;40m%s\e[0m%s\n\n" \
-        "\"" "./eXoDOS Linux ReadMe.txt" "\""
+        "\"" "./eXo<collection> Linux ReadMe.txt" "\""
     read -s -n 1 -p "Press any key to abort."
     printf "\n\n"
     exit 1
