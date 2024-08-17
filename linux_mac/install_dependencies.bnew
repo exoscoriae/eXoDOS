@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-08-14
+# Revised: 2024-08-17
 
 #--------------------------------------------------------------------------------------
 clear
@@ -57,10 +57,11 @@ function beginLinux
     distrolike="$(cat /etc/os-release 2>/dev/null | grep '^ID_LIKE=' | sed -e 's/^ID_LIKE=//')"
     
     clear
-    printf "\n\e[1;31;40mWelcome to the eXo Dependency Installer.\e[0m\n\n%s\n%s\n%s\n\n" \
+    printf "\n\e[1;31;40mWelcome to the eXo Dependency Installer.\e[0m\n\n%s\n%s\n%s\n%s\n\n" \
         "This setup will install the software required by the collection." \
-        "If system packages are needed, sudo access will be required." \
-        "As such, you may be prompted for your password at various points."
+        "If system packages are needed, you may be asked for your password (for sudo)." \
+        "If your account lacks sudo access, this script cannot install system packages." \
+        "In such cases, you will need to install the missing system packages yourself."
     printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
         "[" "P" "]roceed with installation" "[" "D" "]ownload the latest setup" "[" "A" "]bort installation" 
     while true
@@ -78,13 +79,21 @@ function beginLinux
     done
     
     clear
-    
+    printf "Checking for missing system packages...\n"
     for check in curl ffmpeg flatpak fold perl python3 sed sha256sum tput unzip wget zip
     do
-        ! [ `which $check` ] && missingPackages=yes
+        if ! [ `which $check` ]
+        then
+            missingPackages=yes
+            printf "$check: \e[1;31;47mmissing\e[0m\n"
+        else
+            printf "$check: \e[1;37;46mpresent\e[0m\n"
+        fi
     done
     if [ $missingPackages == yes ]
     then
+        printf "\nNot all system dependencies installed."
+        read -s -n 1 -p "Press any key to proceed..."
         if [ "$distroid" == "arch" ]
         then
             goarch
@@ -116,6 +125,8 @@ function beginLinux
             setupother
         fi
     else
+        printf "\nAll system dependencies satisfied.\n"
+        read -s -n 1 -p "Press any key to proceed..."
         [ "$runupdate" == "yes" ] && goupdate
         extractPackages
         installflatpaks
@@ -587,42 +598,21 @@ function setupother
         goupdate
         exit 1
     fi
-    printf "\nYour distribution, $distroid, is not officially supported.\n%s\n\n%s\n%s\n\n%s\n%s\n\n" \
-        "As such, you may need to install some software manually." \
-        "If a problem is encountered, you may make a support request in our Discord." \
-        "If support is added, you will need to update this installer to access it." \
-        "This setup will now check for any packages that need to be installed." \
-        "After you have installed the required packages, rerun this setup."
-    read -s -n 1 -p "Press any key to continue..."
-    printf "\n\n"
     
-    missingDependencies=no
-    ! [ `which curl` ] && (missingDependencies=yes; printf "curl: \e[1;31;47mmissing\e[0m\n") || (printf "curl: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which ffmpeg` ] && (missingDependencies=yes; printf "ffmpeg: \e[1;31;47mmissing\e[0m\n") || (printf "ffmpeg: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which flatpak` ] && (missingDependencies=yes; printf "flatpak: \e[1;31;47mmissing\e[0m\n") || (printf "flatpak: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which fold` ] && (missingDependencies=yes; printf "fold: \e[1;31;47mmissing\e[0m\n") || (printf "fold: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which perl` ] && (missingDependencies=yes; printf "perl: \e[1;31;47mmissing\e[0m\n") || (printf "perl: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which python3` ] && (missingDependencies=yes; printf "python3: \e[1;31;47mmissing\e[0m\n") || (printf "python3: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which sed` ] && (missingDependencies=yes; printf "sed: \e[1;31;47mmissing\e[0m\n") || (printf "sed: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which sha256sum` ] && (missingDependencies=yes; printf "sha256sum: \e[1;31;47mmissing\e[0m\n") || (printf "sha256sum: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which tput` ] && (missingDependencies=yes; printf "tput: \e[1;31;47mmissing\e[0m\n") || (printf "tput: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which unzip` ] && (missingDependencies=yes; printf "unzip: \e[1;31;47mmissing\e[0m\n") || (printf "unzip: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which wget` ] && (missingDependencies=yes; printf "wget: \e[1;31;47mmissing\e[0m\n") || (printf "wget: \e[1;37;46mpresent\e[0m\n")
-    ! [ `which zip` ] && (missingDependencies=yes; printf "zip: \e[1;31;47mmissing\e[0m\n") || (printf "zip: \e[1;37;46mpresent\e[0m\n")
-    
-    if [ $missingDependencies == "no" ]
+    if [ $missingPackages == "no" ]
     then
         printf "\nSystem dependencies satisfied. Proceeding to install flatpaks.\n\n"
         extractPackages
         installflatpaks
     fi
     
-    if [ $missingDependencies == "yes" ]
+    if [ $missingPackages == "yes" ]
     then
-        printf "\n\e[1;31;47mNot all dependencies are satisfied.\e[0m\n\n%s\n\t%s\n\t%s\n\n" \
-            "If compiling, note that all executables must:" \
-            "- Be installed in a directory described by the \$PATH variable" \
-            "- Have the same filenames as described by this setup"
+        printf "\nYour distribution, $distroid, is not officially supported.\n%s\n\n%s\n%s\n\n%s\n\n" \
+            "As such, you will need to install the missing system dependencies manually." \
+            "If a problem is encountered, you may make a support request in our Discord." \
+            "If support is added, you will need to update this installer to access it." \
+            "After you have installed the required packages, rerun this setup."
         read -s -n 1 -p "Press any key to abort."
         printf "\n\n"
         exit 1
