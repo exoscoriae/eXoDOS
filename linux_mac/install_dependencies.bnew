@@ -79,7 +79,7 @@ function beginLinux
     done
     
     clear
-    printf "Checking for missing system packages...\n"
+    printf "Checking for missing system packages...\n\n"
     for check in curl ffmpeg flatpak fold perl python3 sed sha256sum tput unzip wget zip
     do
         if ! [ `which $check` ]
@@ -92,7 +92,7 @@ function beginLinux
     done
     if [ $missingPackages == yes ]
     then
-        printf "\nNot all system dependencies installed."
+        printf "\nNot all system dependencies installed.\n"
         read -s -n 1 -p "Press any key to proceed..."
         if [ "$distroid" == "arch" ]
         then
