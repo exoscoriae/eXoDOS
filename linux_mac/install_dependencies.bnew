@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-08-17
+# Revised: 2024-08-19
 
 #--------------------------------------------------------------------------------------
 clear
@@ -50,6 +50,7 @@ initialDir=$PWD
 function beginLinux
 {
     missingPackages=no
+    remove_exo=no
     runupdate=no
     distroeol=no
     distroid="$(cat /etc/os-release 2>/dev/null | grep '^ID=' | sed -e 's/^ID=//')"
@@ -62,14 +63,16 @@ function beginLinux
         "If system packages are needed, you may be asked for your password (for sudo)." \
         "If your account lacks sudo access, this script cannot install system packages." \
         "In such cases, you will need to install the missing system packages yourself."
-    printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
-        "[" "P" "]roceed with installation" "[" "D" "]ownload the latest setup" "[" "A" "]bort installation" 
+    printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
+        "[" "P" "]roceed with installation" "[" "D" "]ownload the latest setup" "[" "R" "]emove all installed eXo packages" "[" "A" "]bort installation" 
     while true
     do
-        read -p "(P/D/A)? " choice
+        read -p "(P/D/R/A)? " choice
         case $choice in
             [Pp]* ) break;;
             [Dd]* ) runupdate=yes
+                break;;
+            [Rr]* ) remove_exo=yes
                 break;;
             [Aa]* ) printf "\n"
                 exit 1
@@ -77,6 +80,49 @@ function beginLinux
             *   ) printf "Invalid input.\n";;
         esac
     done
+    
+    if [ "$remove_exo" == "yes" ]
+    then
+        clear
+        printf "This will uninstall all eXo flatpaks from your system.\n%s" \
+            "Are you sure you want to proceed? "
+        while true
+        do
+            read -p "(Y/N)? " choice
+            case $choice in
+                [Yy]* ) break;;
+                [Nn]* ) exit 0
+                    break;;
+                *   ) printf "Invalid input.\n";;
+            esac
+        done
+        if ! [ `which flatpak` ]
+        then
+            printf "\nflatpak is not present. There are no eXo packages to uninstall.\n\n"
+            read -s -n 1 -p "Press any key to abort."
+            exit 1
+        fi
+        if [ "$(flatpak list | grep com.retro_exo | wc -l)" -eq 0 ]
+        then
+            printf "\nThere are no eXo packages to uninstall.\n\n"
+            read -s -n 1 -p "Press any key to abort."
+            exit 1
+        fi
+        for package in `flatpak list | grep com.retro_exo | sed -e 's/^.*com.retro_exo/com.retro_exo/' | sed -e 's/[[:space:]].*//'`
+        do
+            flatpak remove -y "$package" 2>/dev/null
+            if [ $? != 0 ]
+            then
+                printf "\n\e[1;31;47mFailed to uninstall package.\e[0m\n\n"
+                read -s -n 1 -p "Press any key to abort."
+                printf "\n\n"
+                exit 1
+            fi
+        done
+        printf "\nAll eXo flatpaks have been successfully uninstalled.\n"
+        read -s -n 1 -p "Press any key to exit."
+        exit 0
+    fi
     
     clear
     printf "Checking for missing system packages...\n\n"
@@ -141,7 +187,7 @@ function beginLinux
 
 function extractPackages
 {
-    echo "Extracting packages..."
+    printf "\nExtracting packages...\n"
     cd eXo
     unzip -o -q ./util/util\*_linux\*.zip EXT\*_linux\*.zip -d ./util
     [ $? != 0 ] && failedunzip
@@ -583,16 +629,19 @@ function setupother
         if ! [ `which wget` ]
         then
             printf "\nWget is not present. Please install it before proceeding.\n\n"
+            read -s -n 1 -p "Press any key to abort."
             exit 1
         fi
         if ! [ `which sha256sum` ]
         then
             printf "\nCoreutils (sha256sum) is not present. Please install it before proceeding.\n\n"
+            read -s -n 1 -p "Press any key to abort."
             exit 1
         fi
         if ! [ `which unzip` ]
         then
             printf "\nUnzip is not present. Please install it before proceeding.\n\n"
+            read -s -n 1 -p "Press any key to abort."
             exit 1
         fi
         goupdate
