@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-08-19
+# Revised: 2024-08-21
 
 #--------------------------------------------------------------------------------------
 clear
@@ -601,6 +601,12 @@ function installflatpaks
 {
     flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     [ $? != 0 ] && failedinstall
+    flatpak install --user -y flathub org.freedesktop.Platform//23.08
+    [ $? != 0 ] && failedinstall
+    flatpak install --user -y flathub org.freedesktop.Platform.Compat.i386//23.08
+    [ $? != 0 ] && failedinstall
+    flatpak update --user -y
+    [ $? != 0 ] && failedinstall
     if [ `flatpak list 2>/dev/null | grep DOSBox | wc -l` -gt 0 ]
     then
         echo "Removing deprecated eXoDOS DOSBox flatpaks."
@@ -612,8 +618,6 @@ function installflatpaks
     echo "Installing retro_exo flatpaks..."
     for pkg in ./eXo/Flatpaks/*.flatpak
     do
-        flatpak update --user -y
-        [ $? != 0 ] && failedinstall
         flatpak info "`basename "${pkg%.*}"`" &>/dev/null && flatpak remove -y "`basename "${pkg%.*}"`"
         flatpak install --user --reinstall -y "$pkg"
         [ $? != 0 ] && failedinstall
