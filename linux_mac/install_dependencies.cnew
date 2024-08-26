@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2024-08-14
+# Revised: 2024-08-26
 
 #--------------------------------------------------------------------------------------
+if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
+then
+    LD_PRELOAD=""
+fi
 clear
 
-setupversion="Version 6.03.universal1"
+setupversion="Version 6.04.universal1"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
