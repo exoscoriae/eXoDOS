@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-08-28
+# Revised: 2024-09-11
 
 #--------------------------------------------------------------------------------------
 if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
@@ -605,9 +605,15 @@ function installflatpaks
 {
     flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     [ $? != 0 ] && failedinstall
+    flatpak install --user -y flathub org.freedesktop.Platform//24.08
+    [ $? != 0 ] && failedinstall
+    flatpak install --user -y flathub org.freedesktop.Platform.Compat.i386//24.08
+    [ $? != 0 ] && failedinstall
     flatpak install --user -y flathub org.freedesktop.Platform//23.08
     [ $? != 0 ] && failedinstall
     flatpak install --user -y flathub org.freedesktop.Platform.Compat.i386//23.08
+    [ $? != 0 ] && failedinstall
+    flatpak install --user -y flathub org.gnome.Platform//46
     [ $? != 0 ] && failedinstall
     flatpak install --user -y flathub org.kde.Platform//6.7
     [ $? != 0 ] && failedinstall
@@ -620,6 +626,7 @@ function installflatpaks
         [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-ECE-r4358"` ]] && flatpak remove -y com.dosbox.DOSBox-ECE-r4358 2>/dev/null
         [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-ECE-r4301"` ]] && flatpak remove -y com.dosbox.DOSBox-ECE-r4301 2>/dev/null
         [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-ECE"` ]] && flatpak remove -y com.dosbox.DOSBox-ECE 2>/dev/null
+        [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox"` ]] && flatpak remove -y com.dosbox.DOSBox 2>/dev/null
     fi
     echo "Installing retro_exo flatpaks..."
     for pkg in ./eXo/Flatpaks/*.flatpak
