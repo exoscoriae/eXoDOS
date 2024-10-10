@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-09-11
+# Revised: 2024-10-10
 
 #--------------------------------------------------------------------------------------
 if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
@@ -616,6 +616,8 @@ function installflatpaks
     flatpak install --user -y flathub org.gnome.Platform//46
     [ $? != 0 ] && failedinstall
     flatpak install --user -y flathub org.kde.Platform//6.7
+    [ $? != 0 ] && failedinstall
+    flatpak install --user -y flathub org.kde.Platform//5.15-23.08
     [ $? != 0 ] && failedinstall
     flatpak update --user -y
     [ $? != 0 ] && failedinstall
