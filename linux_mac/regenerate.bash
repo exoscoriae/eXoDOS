@@ -859,7 +859,6 @@ for file in ../Setup*.msh ../eXoMerge.msh
 do
     [ -e "$file" ] && sed -i -e 's/\.msh}\.bsh/.command}.bsh/' "$file"
     [ -e "$file" ] && sed -i -e 's/\.bsh}\.msh/.bsh}.command/' "${file%.msh}.bsh"
-    # shellcheck disable=SC2016
     [ -e "$file" ] && sed -i -e 's#^echo "\[Desktop Entry\]" > ~/Desktop/\(.*\).desktop#osascript <<EOF\
 tell application "Finder"\
    set myapp to POSIX file "${scriptDir}/exogui.app" as alias\
@@ -867,7 +866,6 @@ tell application "Finder"\
    set name of result to "\1.app"\
 end tell\
 EOF#' "$file"
-    # shellcheck disable=SC2016
     [ -e "$file" ] && sed -i -e '/source "\$scriptDir\/\$(basename -- "\${BASH_SOURCE%.command}.bsh")"/c\
 
     # FIXME: Determine where the "detect_terminal_emulator.bash" script will be placed\
