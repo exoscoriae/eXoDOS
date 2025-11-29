@@ -338,144 +338,41 @@ cd "$( dirname "$BASH_SOURCE")"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]
 then
-    if [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "konsole" ]
+    # FIXME: Determine where the "detect_terminal_emulator.bash" script will be placed
+    terminal_emulator_data_str=$("$PWD/detect_terminal_emulator.bash")
+    if [[ $? -eq 0 ]]
     then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "gnome-terminal-" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xfce4-terminal" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kgx" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xterm" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "Eterm" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "x-terminal-emul" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "mate-terminal" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminator" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "urxvt" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "rxvt" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "termit" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminology" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "tilix" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kitty" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "aterm" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `which konsole` ]
-    then
-        konsole -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which gnome-terminal` ]
-    then
-        gnome-terminal -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which xfce4-terminal` ]
-    then
-        xfce4-terminal -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which kgx` ]
-    then
-        kgx -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
-        exit 0
-    elif [ `which xterm` ]
-    then
-        xterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which uxterm` ]
-    then
-        uxterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which eterm` ]
-    then
-        Eterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which x-terminal-emulator` ]
-    then
-        x-terminal-emulator -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which mate-terminal` ]
-    then
-        eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\" $@\" "$@" &
-        exit 0
-    elif [ `which terminator` ]
-    then
-        terminator -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which urxvt` ]
-    then
-        urxvt -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which rxvt` ]
-    then
-        rxvt -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which termit` ]
-    then
-        termit -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which lxterm` ]
-    then
-        lxterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which terminology` ]
-    then
-        terminology -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
-        exit 0
-    elif [ `which tilix` ]
-    then
-        tilix -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which kitty` ]
-    then
-        kitty -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which aterm` ]
-    then
-        aterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
+        if [[ "$terminal_emulator_data_str" ]]
+        then
+            IFS=" " read -ra terminal_emulator_data <<< "$terminal_emulator_data_str"
+            binary_name=${terminal_emulator_data[0]}
+            binary_path=${terminal_emulator_data[1]}
+            parameters=${terminal_emulator_data[2]}
+            case "$binary_name" in
+                kgx)
+                    kgx -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+                    exit 0
+                    ;;
+                mate-terminal)
+                    eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\" $@\" "$@" &
+                    exit 0
+                    ;;
+                terminology) 
+                    terminology -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+                    exit 0
+                    ;;
+                *)
+                    $binary_path $parameters /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+                    exit 0
+                    ;;
+            esac
+        else
+            source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+            exit 0
+        fi
     else
-        exit ERRCODE "Weird system achievement unlocked: None of the 18 supported terminal emulators are installed."
+        echo "$terminal_emulator_info"
+        exit 1
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]
 then
@@ -962,6 +859,7 @@ for file in ../Setup*.msh ../eXoMerge.msh
 do
     [ -e "$file" ] && sed -i -e 's/\.msh}\.bsh/.command}.bsh/' "$file"
     [ -e "$file" ] && sed -i -e 's/\.bsh}\.msh/.bsh}.command/' "${file%.msh}.bsh"
+    # shellcheck disable=SC2016
     [ -e "$file" ] && sed -i -e 's#^echo "\[Desktop Entry\]" > ~/Desktop/\(.*\).desktop#osascript <<EOF\
 tell application "Finder"\
    set myapp to POSIX file "${scriptDir}/exogui.app" as alias\
@@ -969,161 +867,45 @@ tell application "Finder"\
    set name of result to "\1.app"\
 end tell\
 EOF#' "$file"
+    # shellcheck disable=SC2016
     [ -e "$file" ] && sed -i -e '/source "\$scriptDir\/\$(basename -- "\${BASH_SOURCE%.command}.bsh")"/c\
-    if [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "konsole" ]\
+
+    # FIXME: Determine where the "detect_terminal_emulator.bash" script will be placed\
+    terminal_emulator_data_str=$("$PWD/eXo/util/detect_terminal_emulator.bash")\
+    if [[ $? -eq 0 ]]\
     then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "gnome-terminal-" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xfce4-terminal" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kgx" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xterm" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "Eterm" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "x-terminal-emul" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "mate-terminal" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminator" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "urxvt" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "rxvt" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "termit" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminology" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "tilix" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kitty" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "aterm" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `which konsole` ]\
-    then\
-        konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which gnome-terminal` ]\
-    then\
-        gnome-terminal -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which xfce4-terminal` ]\
-    then\
-        xfce4-terminal -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which kgx` ]\
-    then\
-        kgx -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
-        exit 0\
-    elif [ `which xterm` ]\
-    then\
-        xterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which uxterm` ]\
-    then\
-        uxterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which eterm` ]\
-    then\
-        Eterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which x-terminal-emulator` ]\
-    then\
-        x-terminal-emulator -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which mate-terminal` ]\
-    then\
-        eval mate-terminal -e \\"/usr/bin/env bash \\\\\\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\\\\" $@\\" "$@" &\
-        exit 0\
-    elif [ `which terminator` ]\
-    then\
-        terminator -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which urxvt` ]\
-    then\
-        urxvt -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which rxvt` ]\
-    then\
-        rxvt -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which termit` ]\
-    then\
-        termit -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which lxterm` ]\
-    then\
-        lxterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which terminology` ]\
-    then\
-        terminology -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
-        exit 0\
-    elif [ `which tilix` ]\
-    then\
-        tilix -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which kitty` ]\
-    then\
-        kitty -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which aterm` ]\
-    then\
-        aterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
+        if [[ "$terminal_emulator_data_str" ]]\
+        then\
+            IFS=" " read -ra terminal_emulator_data <<< "$terminal_emulator_data_str"\
+            binary_name=${terminal_emulator_data[0]}\
+            binary_path=${terminal_emulator_data[1]}\
+            parameters=${terminal_emulator_data[2]}\
+            case "$binary_name" in\
+                kgx)\
+                    kgx -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
+                    exit 0\
+                    ;;\
+                mate-terminal)\
+                    eval mate-terminal -e \\"/usr/bin/env bash \\\\\\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\\\\" $@\\" "$@" &\
+                    exit 0\
+                    ;;\
+                terminology)\
+                    terminology -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
+                    exit 0\
+                    ;;\
+                *)\
+                    $binary_path $parameters /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
+                    exit 0\
+                    ;;\
+            esac\
+        else\
+            cd eXo/util\
+            source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+            exit 0\
+        fi\
     else\
-        exit ERRCODE "Weird system achievement unlocked: None of the 18 supported terminal emulators are installed."\
+        echo "$terminal_emulator_info"\
+        exit 1\
     fi\
 ' "$file"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"

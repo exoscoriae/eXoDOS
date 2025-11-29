@@ -20,6 +20,45 @@ scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
 [ $# -gt 3 ] && parameterfour="$4"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]
+    # FIXME: Determine where the "detect_terminal_emulator.bash" script will be placed
+    terminal_emulator_data_str=$("$PWD/eXo/util/detect_terminal_emulator.bash")
+    if [[ $? -eq 0 ]]
+    then
+        if [[ "$terminal_emulator_data_str" ]]
+        then
+            IFS=" " read -ra terminal_emulator_data <<< "$terminal_emulator_data_str"
+            binary_name=${terminal_emulator_data[0]}
+            binary_path=${terminal_emulator_data[1]}
+            parameters=${terminal_emulator_data[2]}
+            case "$binary_name" in
+                kgx)
+                    kgx -e "/usr/bin/env bash \"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+                    exit 0
+                    ;;
+                mate-terminal)
+                    eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\" $@\" "$@" &
+                    exit 0
+                    ;;
+                terminology) 
+                    terminology -e "/usr/bin/env bash \"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+                    exit 0
+                    ;;
+                *)
+                    $binary_path $parameters /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+                    exit 0
+                    ;;
+            esac
+        else
+            cd eXo/util
+            source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+            exit 0
+        fi
+    else
+        echo "$terminal_emulator_info"
+        exit 1
+    fi
+
+
 then
     if [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "konsole" ]
     then
