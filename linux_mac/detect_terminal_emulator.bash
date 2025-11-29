@@ -7,7 +7,8 @@ where:
 
 output:
     - exits with code 0 and no output if it's already running inside a terminal emulator
-    - exits with code other that 0 and outputs a path to the binary followed by parameters needed for a specific emulator
+    - exits with code 0 and outputs a path to the binary followed by parameters needed for a specific emulator
+    - exits with code other that 0 and an optional message if something went wrong
 "
 while getopts ':h' option; do
   case "$option" in
