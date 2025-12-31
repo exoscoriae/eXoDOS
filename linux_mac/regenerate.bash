@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2024-11-25
+# Revised: 2025-12-30
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -336,71 +336,19 @@ then
 fi
 cd "$( dirname "$BASH_SOURCE")"
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]
+if [[ "$OSTYPE" == "linux"* ]]
 then
-    if [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "konsole" ]
+    current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
+    case "$current_term" in
+        "cool-retro-term"|"konsole"|"gnome-terminal-"|"xfce4-terminal"|"ptyxis-agent"|"kgx"|"xterm"|"Eterm"|"x-terminal-emul"|"mate-terminal"|"terminator"|"urxvt"|"rxvt"|"termit"|"terminology"|"tilix"|"kitty"|"aterm"|"alacritty"|"qterminal"|"foot"|"mlterm"|"stterm")
+            source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+            exit 0
+            break;;
+    esac
+    unset current_term
+    if [ `which cool-retro-term` ]
     then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "gnome-terminal-" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xfce4-terminal" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kgx" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xterm" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "Eterm" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "x-terminal-emul" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "mate-terminal" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminator" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "urxvt" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "rxvt" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "termit" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminology" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "tilix" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kitty" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
-        exit 0
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "aterm" ]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        cool-retro-term -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which konsole` ]
     then
@@ -413,6 +361,10 @@ then
     elif [ `which xfce4-terminal` ]
     then
         xfce4-terminal -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
+    elif [ `which ptyxis` ]
+    then
+        ptyxis --new-window -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [ `which kgx` ]
     then
@@ -474,15 +426,41 @@ then
     then
         aterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
+    elif [ `which alacritty` ]
+    then
+        alacritty -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
+    elif [ `which qterminal` ]
+    then
+        qterminal -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
+        exit 0
+    elif [ `which foot` ]
+    then
+        foot -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
+    elif [ `which mlterm` ]
+    then
+        mlterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
+    elif [ `which stterm` ]
+    then
+        stterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
+    elif [[ "$-" == *i* ]]\
+    then\
+        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+        exit 0\
     else
-        exit ERRCODE "Weird system achievement unlocked: None of the 18 supported terminal emulators are installed."
+        logger -s "eXo: weird system achievement unlocked - None of the 25 supported terminal emulators are installed."
+        exit 1
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]
 then
     source "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")"
     exit 0
 else
-    exit ERRCODE "Unsupported OS"
+    logger -s "eXo: Unsupported OS"
+    exit 1
 fi
 EOF
     [ -e "$currentScript" ] && chmod +x "${currentScript%.bsh}.command" && chmod -x "$currentScript"
@@ -923,7 +901,7 @@ done
 echo "Converting macOS shell files..."
 for currentScript in eXoDREAMM/\!*/*/*.msh eXoDREAMM/\!*/*/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
-    [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux-gnu"/' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/BASH_SOURCE%\.bsh}\.msh/BASH_SOURCE%.msh}.PENDINGbs/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/\(Setup eXo.[^\.]*\)\.bsh/\1.command/Ig' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/\(Setup_.[^\.]*\)\.bsh/\1.command/Ig' "$currentScript"
@@ -970,85 +948,18 @@ tell application "Finder"\
 end tell\
 EOF#' "$file"
     [ -e "$file" ] && sed -i -e '/source "\$scriptDir\/\$(basename -- "\${BASH_SOURCE%.command}.bsh")"/c\
-    if [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "konsole" ]\
+    current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"\
+    case "$current_term" in\
+        "cool-retro-term"|"konsole"|"gnome-terminal-"|"xfce4-terminal"|"ptyxis-agent"|"kgx"|"xterm"|"Eterm"|"x-terminal-emul"|"mate-terminal"|"terminator"|"urxvt"|"rxvt"|"termit"|"terminology"|"tilix"|"kitty"|"aterm"|"alacritty"|"qterminal"|"foot"|"mlterm"|"stterm")\
+            cd eXo/util\
+            source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+            exit 0\
+            break;;\
+    esac\
+    unset current_term\
+    if [ `which cool-retro-term` ]\
     then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "gnome-terminal-" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xfce4-terminal" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kgx" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "xterm" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "Eterm" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "x-terminal-emul" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "mate-terminal" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminator" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "urxvt" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "rxvt" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "termit" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "terminology" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "tilix" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "kitty" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    elif [ `ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p` = "aterm" ]\
-    then\
-        cd eXo/util\
-        source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+        cool-retro-term -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
         exit 0\
     elif [ `which konsole` ]\
     then\
@@ -1061,6 +972,10 @@ EOF#' "$file"
     elif [ `which xfce4-terminal` ]\
     then\
         xfce4-terminal -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
+        exit 0\
+    elif [ `which ptyxis` ]\
+    then\
+        ptyxis --new-window -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
         exit 0\
     elif [ `which kgx` ]\
     then\
@@ -1122,8 +1037,33 @@ EOF#' "$file"
     then\
         aterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
         exit 0\
+    elif [ `which alacritty` ]\
+    then\
+        alacritty -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
+        exit 0\
+    elif [ `which qterminal` ]\
+    then\
+        qterminal -e "/usr/bin/env bash \"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &\
+        exit 0\
+    elif [ `which foot` ]\
+    then\
+        foot -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
+        exit 0\
+    elif [ `which mlterm` ]\
+    then\
+        mlterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
+        exit 0\
+    elif [ `which stterm` ]\
+    then\
+        stterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
+        exit 0\
+    elif [[ "$-" == *i* ]]\
+    then\
+        source "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+        exit 0\
     else\
-        exit ERRCODE "Weird system achievement unlocked: None of the 18 supported terminal emulators are installed."\
+        logger -s "eXo: weird system achievement unlocked - None of the 25 supported terminal emulators are installed."\
+        exit 1\
     fi\
 ' "$file"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"
