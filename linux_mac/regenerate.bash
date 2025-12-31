@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2025-12-30
+# Revised: 2025-12-31
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -446,10 +446,14 @@ then
     then
         stterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
-    elif [[ "$-" == *i* ]]\
-    then\
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
+    elif [[ "$-" == *i* ]]
+    then
+        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
+    elif [[ `flatpak list 2>/dev/null | grep "retro_exo\.konsole"` ]]
+    then
+        flatpak run com.retro_exo.konsole -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        exit 0
     else
         logger -s "eXo: weird system achievement unlocked - None of the 25 supported terminal emulators are installed."
         exit 1
@@ -1043,7 +1047,7 @@ EOF#' "$file"
         exit 0\
     elif [ `which qterminal` ]\
     then\
-        qterminal -e "/usr/bin/env bash \"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &\
+        qterminal -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
         exit 0\
     elif [ `which foot` ]\
     then\
@@ -1060,6 +1064,10 @@ EOF#' "$file"
     elif [[ "$-" == *i* ]]\
     then\
         source "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+        exit 0\
+    elif [[ `flatpak list 2>/dev/null | grep "retro_exo\\.konsole"` ]]\
+    then\
+        flatpak run com.retro_exo.konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
         exit 0\
     else\
         logger -s "eXo: weird system achievement unlocked - None of the 25 supported terminal emulators are installed."\
