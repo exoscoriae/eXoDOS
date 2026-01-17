@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2024-11-06
+# Revised: 2026-01-17
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -11,6 +11,7 @@ DELAYEDVARECHBEG - denotes the beginning of a delayed expansion variable used in
 DELAYEDVARECHEND - denotes the end of a delayed expansion variable used in an echo statement
 DETERMINEBYTESFREE - placeholder that is later substituted with Linux command to determine bytes free
 PENDINGAST - pending asterisk (*)
+PENDINGBACKTICK - pending `
 PENDINGBASENOEXT - pending current script basename without extension
 PENDINGCAT - pending cat to set variable
 PENDINGDLR - pending $ character
@@ -51,10 +52,10 @@ function convertScript
     sed -i -e '/\%\%[[:space:]\t]*$/!s/\(\%\%\)\([^[:space:]\%]\)/\%\L\2\E\%/g' "$currentScript"
     
     #rename parameter variables
-    sed -i -e 's/\%1/\%parameterone\%/g' "$currentScript"
-    sed -i -e 's/\%2/\%parametertwo\%/g' "$currentScript"
-    sed -i -e 's/\%3/\%parameterthree\%/g' "$currentScript"
-    sed -i -e 's/\%4/\%parameterfour\%/g' "$currentScript"
+    sed -i -e 's/\([\\= ]\)\%1/\1\%parameterone\%/g' "$currentScript"
+    sed -i -e 's/\([\\= ]\)\%2/\1\%parametertwo\%/g' "$currentScript"
+    sed -i -e 's/\([\\= ]\)\%3/\1\%parameterthree\%/g' "$currentScript"
+    sed -i -e 's/\([\\= ]\)\%4/\1\%parameterfour\%/g' "$currentScript"
     sed -i -e 's/\%~1/\%parameterone\%/g' "$currentScript"
     sed -i -e 's/\%~2/\%parametertwo\%/g' "$currentScript"
     sed -i -e 's/\%~3/\%parameterthree\%/g' "$currentScript"
@@ -207,6 +208,9 @@ EOF
     sed -i -e '/^if .* echo /Is/ echo / echo /Ig' "$currentScript"
     sed -i -e 's/^echo/echo/I' "$currentScript"
     sed -i -e '/^[[:space:]]\+echo/Is/^\([[:space:]]\+\)echo/\1echo/I' "$currentScript"
+    
+    #prepare echoed ` instances
+    sed -i -e '/echo /s/`/PENDINGBACKTICK/g' "$currentScript"
     
     #remove DelayedExpansion global variables
     sed -i -e '/setlocal .*DelayedExpansion/Id' "$currentScript"
@@ -399,6 +403,12 @@ EOF
     
     #prepare ^> instances for fix
     sed -i -e '/echo /s/\^>/RIGHTANGLEBRACKET/g' "$currentScript"
+    
+    #fix ^( instances
+    sed -i -e '/echo /s/\^(/(/g' "$currentScript"
+    
+    #fix ^) instances
+    sed -i -e '/echo /s/\^)/)/g' "$currentScript"
     
     #fix ^| instances
     sed -i -e '/echo /s/\^|/|/g' "$currentScript"
@@ -1233,7 +1243,14 @@ EOF
     sed -i -e "s/eXoLPPPM\.exe/eXoLPPPM_linux.py/Ig" "$currentScript"
     
     #change restore.exe to restore.py
-    sed -i -e "s|./exo/update/restore.exe|python3 ./eXo/Update/restore.py|" "$currentScript"
+    sed -i -e "s|./exo/Update/restore.exe|./eXo/Update/restore.py|Ig" "$currentScript"
+    sed -i -e "s|./exo/util/restore.exe|./eXo/util/restore.py|Ig" "$currentScript"
+    sed -i -e "s|^./exo/Update/restore.py|python3 ./eXo/Update/restore.py|I" "$currentScript"
+    sed -i -e "s|^./exo/util/restore.py|python3 ./eXo/util/restore.py|I" "$currentScript"
+    sed -i -e "s|source ./exo/Update/restore.py|python3 ./eXo/Update/restore.py|I" "$currentScript"
+    sed -i -e "s|source ./exo/util/restore.py|python3 ./eXo/util/restore.py|I" "$currentScript"
+    sed -i -e "/util\.zip/ s/restore\.exe/restore.py/Ig" "$currentScript"
+    sed -i -e "/restore\.py/ s/util\.zip/utilPENDINGAST.zip/" "$currentScript"
     
     #fix echo lines that already had quotes
     sed -i -e 's/echo "\\"\(.*\)\\""/echo "\1"/' "$currentScript"
@@ -3353,6 +3370,9 @@ function goto\
     #pull just the final matching line and strip out carriage returns for grep based variable assignments
     sed -i -e "s/\(=\`grep [^\`]*\)\`/\1 | tail -1 | tr -d \"\\\r\"\`/Ig" "$currentScript"
     
+    #prepare extra \ escapes for extended echos, excluding lines with eval
+    sed -i -e '/eval /b' -e '/echo / s/\\\\\([abcefnrtv0x]\)/\\\\\\\1/g' "$currentScript"
+    
     #escape $ characters from variables in eval execution lines
     sed -i -e '/eval.*\${[[:alnum:]_]\+}/I{
                    :a;
@@ -3419,7 +3439,14 @@ function goto\
                } }' "$currentScript"
     
     #add carriage returns to files modified by restore.py
+    sed -i -e "s|^\(python3 \./eXo/Update/restore\.py\)$|\1\nsed -i -e '/\\\r/\! s/$/\\\r/' \"\$PWD\"/Data/Platforms/MS-DOS.xml|" "$currentScript"
     sed -i -e "s|^\(python3 \./eXo/Update/restore\.py \)\(\".*\"\)|\1\2\nsed -i -e '/\\\r/\! s/$/\\\r/' \2/Data/Platforms/MS-DOS.xml|" "$currentScript"
+    sed -i -e "s|^\(python3 \./eXo/util/restore\.py\)$|\1\nsed -i -e '/\\\r/\! s/$/\\\r/' \"\$PWD\"/Data/Platforms/MS-DOS.xml|" "$currentScript"
+    sed -i -e "s|^\(python3 \./eXo/util/restore\.py \)\(\".*\"\)|\1\2\nsed -i -e '/\\\r/\! s/$/\\\r/' \2/Data/Platforms/MS-DOS.xml|" "$currentScript"
+    sed -i -e "s|\(\&\& python3 \./eXo/Update/restore\.py\)$|\1 \&\& sed -i -e '/\\\r/\! s/$/\\\r/' \"\$PWD\"/Data/Platforms/MS-DOS.xml|" "$currentScript"
+    sed -i -e "s|\(\&\& python3 \./eXo/Update/restore\.py \)\(\".*\"\)|\1\2 \&\& sed -i -e '/\\\r/\! s/$/\\\r/' \2/Data/Platforms/MS-DOS.xml|" "$currentScript"
+    sed -i -e "s|\(\&\& python3 \./eXo/util/restore\.py\)$|\1 \&\& sed -i -e '/\\\r/\! s/$/\\\r/' \"\$PWD\"/Data/Platforms/MS-DOS.xml|" "$currentScript"
+    sed -i -e "s|\(\&\& python3 \./eXo/util/restore\.py \)\(\".*\"\)|\1\2 \&\& sed -i -e '/\\\r/\! s/$/\\\r/' \2/Data/Platforms/MS-DOS.xml|" "$currentScript"
     
     #fix PENDINGAST
     sed -i -e "s/PENDINGAST/*/g" "$currentScript"
@@ -3428,6 +3455,21 @@ function goto\
     sed -i -e 's/^\([[:space:]]\+\)\(.*\) \&\& pendingL3then/\1\2\n\1then/' "$currentScript"
     sed -i -e "s/pendingL3I /if /" "$currentScript"
     sed -i -e "s/pendingL3FI/fi/" "$currentScript"
+    
+    #fix PENDINGBACKTICK
+    sed -i -e 's/PENDINGBACKTICK/\\`/g' "$currentScript"
+    
+    #add quotes to text format declarations
+    sed -i -e '/=\x1b/ {
+                   s/$/"/;
+                   s/=\x1b/="\x1b/;
+               }' "$currentScript"
+               
+    #fix escape characters for text formatting
+    sed -i -e 's/\x1b/\\e/g' "$currentScript"
+    
+    #make all echos extended
+    sed -i -e '/eval /b' -e 's/echo "/echo -e "/' "$currentScript"
     
     #add bash header line, goto function and alias
     sed -i -e '1i\

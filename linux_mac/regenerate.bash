@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2025-12-31
+# Revised: 2026-01-17
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -195,6 +195,7 @@ do
     [ -e "$file" ] && sed -i -e "s/videos\.zip/Videos.zip/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/launch\.bat/launch.bat/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/install\.bat/install.bat/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/choice\.exe/CHOICE.EXE/Ig" "$file"
     # For now, we are skipping any precision search string substitutions related to language packs
     # as language packs may follow different text file formatting conventions than the base pack or other language.
 #    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/multilanguage\.txt/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I" "$file"
