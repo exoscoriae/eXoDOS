@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-01-19
+# Revised: 2026-02-06
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3332,6 +3332,13 @@ function goto\
     sed -i -e 's/^\([[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
     sed -i -e 's/^\([[:space:]_]\+[[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
     sed -i -e 's/\( && [[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
+    sed -i -e '/=["]\?${/ {
+                   :a;
+                   s/\([[:alnum:]_]\+="[^"]*\)"\([[:space:]]\+[^"=&]\+=\)"\([^"]*\)"/\1\2\3"/;
+                   ta;
+                   s/\([[:alnum:]_]\+="[^"]*\)"\([[:space:]]\+-[^"=&]\+\)/\1\2"/;
+                   ta;
+               }' "$currentScript"
     
     #fix sequence loops
     sed -i -e 's|for /l \([[:alnum:]_]\+\) in \([[:digit:]]\+\),\([[:digit:]]\+\),\([^[:space:]]\+\)|for \1 in `seq \2 \3 \4`|I' "$currentScript"
@@ -3473,15 +3480,15 @@ function goto\
     
     #set variable value to define directory selection dialog commands (pscommand)
     sed -i -e '/"[[:alnum:]_]\+="(new-object -COM '\''Shell\.Application'\'')\^/I {
-                N
-                s/^\([[:blank:]]*\)"\([[:alnum:]_]\+\)="(new-object -COM '\''Shell\.Application'\'')\^\n[[:blank:]]*\.BrowseForFolder(0,'\''\(.*\)'\'',0,0)\.self\.path""/\1\L\2\E="flatpak run com.retro_exo.zenity --file-selection --directory --title=\\"\3\\""/I
-            }' "$currentScript"
+                   N
+                   s/^\([[:blank:]]*\)"\([[:alnum:]_]\+\)="(new-object -COM '\''Shell\.Application'\'')\^\n[[:blank:]]*\.BrowseForFolder(0,'\''\(.*\)'\'',0,0)\.self\.path""/\1\L\2\E="flatpak run com.retro_exo.zenity --file-selection --directory --title=\\"\3\\""/I
+               }' "$currentScript"
     
     #set variables called through converted PowerShell commands
     sed -i -e '/for \/f usebackq delims=.*powershell.*/ {
-                N;N;N;
-                s/^\([[:blank:]]*\)for \/f usebackq delims= \([[:alnum:]_]\+\) in `powershell \("${[[:alnum:]_]\+}"\)`\n[[:blank:]]*do\n[[:blank:]]*"\([[:alnum:]_]\+\)="${\2}""\n[[:blank:]]*done/\1unset \L\4\E\n\1while [ -z "${\L\4\E}" ]\n\1do\n\1    \L\4\E="$(eval \L\3\E)"\n\1done/
-}' "$currentScript"
+                   N;N;N;
+                   s/^\([[:blank:]]*\)for \/f usebackq delims= \([[:alnum:]_]\+\) in `powershell \("${[[:alnum:]_]\+}"\)`\n[[:blank:]]*do\n[[:blank:]]*"\([[:alnum:]_]\+\)="${\2}""\n[[:blank:]]*done/\1unset \L\4\E\n\1while [ -z "${\L\4\E}" ]\n\1do\n\1    \L\4\E="$(eval \L\3\E)"\n\1done/
+               }' "$currentScript"
     
     #add bash header line, goto function and alias
     sed -i -e '1i\
