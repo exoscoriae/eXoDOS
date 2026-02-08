@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-06
+# Revised: 2026-02-08
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -17,7 +17,9 @@ PENDINGCAT - pending cat to set variable
 PENDINGDLR - pending $ character
 pendingdq - pending double quote
 PENDINGEXECHECK - placeholder that is later substituted with Linux command to determine if process is running
+pendingIFS - placeholder for IFS
 PENDINGPCT - pending % character
+pendingSED - short term placeholder to handle sed commands that need to be broken up due to token limitation
 PENDINGTONULL - pending &>/dev/null
 PENDINGTLTRU - pending top level true condition
 PENDINGTLFAL - pending top level false condition
@@ -520,6 +522,37 @@ EOF
                    s/goto#/GOTO/g;
                    s/##/#/g;
                }' "$currentScript"
+    
+    #add spaces to &set instances and change & to &&
+    sed -i -e 's/\([^ ]\)&set/\1 \&\& set/Ig' "$currentScript"
+    
+    #convert 1-9 token assignments pulled from variables with : or ; delimiters
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6,7,8,9 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && \(set .[^=]*=%f% && set .[^=]*=%g% && set .[^=]*=%h% && set .[^=]*=%i%\)[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E pendingSED \9 <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|pendingSED set \(.[^=]*\)=%f% && set \(.[^=]*\)=%g% && set \(.[^=]*\)=%h% && set \(.[^=]*\)=%i%|\L\1 \2 \3 \4\E|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6,7,8 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && \(set .[^=]*=%f% && set .[^=]*=%g% && set .[^=]*=%h%\)[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E pendingSED \9 <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|pendingSED set \(.[^=]*\)=%f% && set \(.[^=]*\)=%g% && set \(.[^=]*\)=%h%|\L\1 \2 \3\E|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6,7 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && \(set .[^=]*=%f% && set .[^=]*=%g%\)[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E pendingSED \9 <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|pendingSED set \(.[^=]*\)=%f% && set \(.[^=]*\)=%g%|\L\1 \2\E|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && set \(.[^=]*\)=%f%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8 \9\E <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7\E <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6\E <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5\E <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%a%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4\E <<< PENDINGDLR{\L\3\E}|I" "$currentScript"
+    
+    #convert 1-9 token assignments pulled from files with : or ; delimiters
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6,7,8,9 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && \(set .[^=]*=%f% && set .[^=]*=%g% && set .[^=]*=%h% && set .[^=]*=%i%\)[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E pendingSED \9 < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|pendingSED set \(.[^=]*\)=%f% && set \(.[^=]*\)=%g% && set \(.[^=]*\)=%h% && set \(.[^=]*\)=%i%|\L\1 \2 \3 \4\E|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6,7,8 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && \(set .[^=]*=%f% && set .[^=]*=%g% && set .[^=]*=%h%\)[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E pendingSED \9 < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|pendingSED set \(.[^=]*\)=%f% && set \(.[^=]*\)=%g% && set \(.[^=]*\)=%h%|\L\1 \2 \3\E|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6,7 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && \(set .[^=]*=%f% && set .[^=]*=%g%\)[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E pendingSED \9 < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|pendingSED set \(.[^=]*\)=%f% && set \(.[^=]*\)=%g%|\L\1 \2\E|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5,6 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e% && set \(.[^=]*\)=%f%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8 \9\E < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4,5 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d% && set \(.[^=]*\)=%e%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7 \8\E < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3,4 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c% && set \(.[^=]*\)=%d%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6 \7\E < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2,3 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b% && set \(.[^=]*\)=%c%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5 \6\E < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1,2 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a% && set \(.[^=]*\)=%b%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4 \5\E < <(tr -d '\\\r' < \3)|I" "$currentScript"
+    sed -i -e "s|^for /f \"tokens=1 delims=\([:;]\)\" %\([[:alnum:]_]\+\)% in (\(.[^\"%\!]*\)) do set \(.[^=]*\)=%a%[[:space:]\t\r]*$|pendingIFS='\1' read -r \L\4\E < <(tr -d '\\\r' < \3)|I" "$currentScript"
     
     #make batch statements lowercase
     sed -i -e '/^[[:space:]]\+if/Is/^\([[:space:]]\+\)if/\1if/I' "$currentScript"
@@ -3329,8 +3362,8 @@ function goto\
                    ta;
                }' "$currentScript"
     sed -i -e 's/\( && [[:alnum:]_]\+\)=\([^"&]\+\) && /\1="\2" \&\& /' "$currentScript"
-    sed -i -e 's/^\([[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
-    sed -i -e 's/^\([[:space:]_]\+[[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
+    sed -i -e '/pendingIFS='"'"'/! s/^\([[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
+    sed -i -e '/pendingIFS='"'"'/! s/^\([[:space:]_]\+[[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
     sed -i -e 's/\( && [[:alnum:]_]\+\)=\([^"]\+ [^"]\+\)$/\1="\2"/' "$currentScript"
     sed -i -e '/=["]\?${/ {
                    :a;
@@ -3465,6 +3498,9 @@ function goto\
     
     #fix PENDINGBACKTICK
     sed -i -e 's/PENDINGBACKTICK/\\`/g' "$currentScript"
+    
+    #fix pendingIFS
+    sed -i -e 's/pendingIFS/IFS/g' "$currentScript"
     
     #add quotes to text format declarations
     sed -i -e '/=\x1b/ {
@@ -3783,6 +3819,11 @@ then\
     read -s -n 1 -p "Press any key to abort."\
     printf "\\n\\n"\
     exit 0\
+fi\
+if [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]\
+then\
+    flatpak list --app --columns=application | grep "^com.retro_exo." | xargs -I {} flatpak override --user --env=SDL_VIDEODRIVER=x11 {}\
+    flatpak list --app --columns=application | grep "^com.retro_exo." | xargs -I {} flatpak override --user --env=SDL_AUDIODRIVER=alsa {}\
 fi\
 ' "$currentScript"
     
