@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-08
+# Revised: 2026-02-09
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -229,7 +229,7 @@ EOF
     sed -i -e 's/for.*usebackq delims.*wmic logicaldisk where.*get FreeSpace.*set FreeSpace.*/freespace=DETERMINEBYTESFREE/' "$currentScript"
     
     #prepare DelayedExpansion references
-    sed -i -e 's/\!\([[:alnum:]_]\+\)\!/\DELAYEDVARBEG\1DELAYEDVAREND/g' "$currentScript"
+    sed -i -e 's/\!\([[:alnum:]_]\+\)\!/\DELAYEDVARBEG\L\1\EDELAYEDVAREND/g' "$currentScript"
 
     #remove trailing \ characters excluding echo and comment lines
     sed -i -e '/^if .* echo /Is|\( echo .*\)\\|\1####|Ig' "$currentScript"
@@ -2869,7 +2869,7 @@ TEMPDONECHOICE' "$currentScript"
     sed -i -e 's/\"\${\(.[^[:space:]\"~=]*\):~-\([[:digit:]]\+\)}\"/\$\{\1: -\2\}/g' "$currentScript"
     
     #finish fixing DelayedExpansion references
-    sed -i -e 's/DELAYEDVARBEG\([[:alnum:]_]\+\)DELAYEDVAREND/\$\{\1\}/Ig' "$currentScript"
+    sed -i -e 's/DELAYEDVARBEG\([[:alnum:]_]\+\)DELAYEDVAREND/\$\{\L\1\E\}/Ig' "$currentScript"
     sed -i -e 's/DELAYEDVARECHBEG//g' "$currentScript"
     sed -i -e 's/DELAYEDVARECHEND//g' "$currentScript"
     
