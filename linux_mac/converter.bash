@@ -3230,6 +3230,7 @@ EOF
     
     #fix variables named with other variables
     sed -i -e "/^[[:space:]]*[^[:space:]]*\$[^[:space:]]\+=/ s/^\([[:space:]]*\)/\1declare /" "$currentScript"
+    sed -i -e 's/&& \([^[:space:]]*\$[^[:space:]]\+=\)/\&\& declare \1/g' "$currentScript"
     
     #add cat command to set variables from files
     sed -i -e '/PENDINGCAT/ s/PENDINGCAT\(.*\)/"\$(cat \1 | head -n 1)"/' "$currentScript"
