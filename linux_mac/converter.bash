@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-09
+# Revised: 2026-02-10
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -811,6 +811,9 @@ EOF
                s/^if exist \([^ ]*\) rd \(.*\)/if exist \"\1\" rd \2/" \
         "$currentScript"
     sed -i -e "/^if exist \"/I! \
+               s/^if exist \([^ ]*\) cd \(.*\)/if exist \"\1\" cd \2/" \
+        "$currentScript"
+    sed -i -e "/^if exist \"/I! \
                s/^if exist \([^ ]*\) unzip \(.*\)/if exist \"\1\" unzip \2/" \
         "$currentScript"
     sed -i -e "/^if exist \"/I! \
@@ -818,6 +821,9 @@ EOF
         "$currentScript"
     sed -i -e "/^[[:space:]]\+if exist \"/I! \
                s/^\(^[[:space:]]\+\)if exist \([^ ]*\) rd \(.*\)/\1if exist \"\2\" rd \3/" \
+        "$currentScript"
+    sed -i -e "/^[[:space:]]\+if exist \"/I! \
+               s/^\(^[[:space:]]\+\)if exist \([^ ]*\) cd \(.*\)/\1if exist \"\2\" cd \3/" \
         "$currentScript"
     sed -i -e "/^[[:space:]]\+if exist \"/I! \
                s/^\(^[[:space:]]\+\)if exist \([^ ]*\) unzip \(.*\)/\1if exist \"\2\" unzip \3/" \
@@ -834,6 +840,9 @@ EOF
                s/^if not exist \([^ ]*\) rd \(.*\)/if not exist \"\1\" rd \2/" \
         "$currentScript"
     sed -i -e "/^if not exist \"/I! \
+               s/^if not exist \([^ ]*\) cd \(.*\)/if not exist \"\1\" cd \2/" \
+        "$currentScript"
+    sed -i -e "/^if not exist \"/I! \
                s/^if not exist \([^ ]*\) unzip \(.*\)/if not exist \"\1\" unzip \2/" \
         "$currentScript"
     sed -i -e "/^if not exist \"/I! \
@@ -841,6 +850,9 @@ EOF
         "$currentScript"
     sed -i -e "/^[[:space:]]\+if not exist \"/I! \
                s/^\(^[[:space:]]\+\)if not exist \([^ ]*\) rd \(.*\)/\1if not exist \"\2\" rd \3/" \
+        "$currentScript"
+    sed -i -e "/^[[:space:]]\+if not exist \"/I! \
+               s/^\(^[[:space:]]\+\)if not exist \([^ ]*\) cd \(.*\)/\1if not exist \"\2\" cd \3/" \
         "$currentScript"
     sed -i -e "/^[[:space:]]\+if not exist \"/I! \
                s/^\(^[[:space:]]\+\)if not exist \([^ ]*\) unzip \(.*\)/\1if not exist \"\2\" unzip \3/" \
@@ -3351,6 +3363,26 @@ function goto\
     #ensure remaining executable calls use wine
     sed -i -e 's/^\([^[:space:]\"~=]*\)\.exe/flatpak run com.retro_exo.wine \1.exe/I' "$currentScript"
     
+    #remove quotes from declarations that contain variables with spaces
+    sed -i -e '/^[[:space:]_]*[[:alnum:]_]\+=/{
+                   /sed \|printf \|\$(/b; /[&<>\'\''`|]/{
+                       h;
+                       s/[&<>\'\''`|].*//;
+                       /^[[:space:]_]*[[:alnum:]_]\+=.*[[:space:]]./{
+                           s/"//g;
+                           x;
+                           s/^[^&<>\'\''`|]*//;
+                           H;
+                           x;
+                           s/\n//;
+                       };
+                       /^[[:space:]_]*[[:alnum:]_]\+=.*[[:space:]]./!g;
+                   };
+                   /[&<>\'\''`|]/!{
+                       /^[[:space:]_]*[[:alnum:]_]\+=.*[[:space:]]/s/"//g;
+                   };
+               }' "$currentScript"
+    
     #Fix variables with spaces
     sed -i -e 's/^\([[:alnum:]_]\+\)=\([^"&]\+ [^"&]\+\) && /\1="\2" \&\& /' "$currentScript"
     sed -i -e 's/^\([[:space:]_]\+[[:alnum:]_]\+\)=\([^"&]\+ [^"&]\+\) && /\1="\2" \&\& /' "$currentScript"
@@ -3372,6 +3404,8 @@ function goto\
                    s/\([[:alnum:]_]\+="[^"]*\)"\([[:space:]]\+-[^"=&]\+\)/\1\2"/;
                    ta;
                }' "$currentScript"
+    sed -i -e 's/^\([[:alnum:]_]\+\)=\([^"&(`'"'"'\\]\+\)"/\1="\2/' "$currentScript"
+    sed -i -e 's/^\([[:space:]_]\+[[:alnum:]_]\+\)=\([^"&(`'"'"'\\]\+\)"/\1="\2/' "$currentScript"
     
     #fix sequence loops
     sed -i -e 's|for /l \([[:alnum:]_]\+\) in \([[:digit:]]\+\),\([[:digit:]]\+\),\([^[:space:]]\+\)|for \1 in `seq \2 \3 \4`|I' "$currentScript"
