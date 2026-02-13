@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-10
+# Revised: 2026-02-13
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -147,6 +147,14 @@ EOF
     sed -i -e 's|for /f "tokens=2 delims==" %\([[:alpha:]]\)% in (.wmic OS Get localdatetime /value.) do set "\([[:alnum:]_]\+\)=%\1%"|\2=pendingYYYYMMDD|I' "$currentScript"
     
     #fix findstr declarations
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"^\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"^\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"^\2\" \"\3\"\`|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"^\2\" \"\3\"\`|I" "$currentScript"
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -q \"\2\" \"\3\" \&\& \4=\5|I" "$currentScript"
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -iq \"\2\" \"\3\" \&\& \4=\5|I" "$currentScript"
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -q \"^\2\" \"\3\" \&\& \4=\5|I" "$currentScript"
@@ -464,7 +472,10 @@ EOF
                    s|\( echo .*\)/#|\1\\\\|Ig;
                    s|\( echo .*\)##|\1#|Ig;
                }' "$currentScript"
-               
+    
+    #take set out of echo commands with redirects
+    sed -i -e "/echo set .*>/I s/echo set /echo /I" "$currentScript"
+    
     #escape quotes on echoes without redirects
     sed -i -e "/^echo\|^[[:space:]]\+echo/I{ />/! s/\"/\\\\\"/g }" "$currentScript"
     sed -i -e "/^if .* echo \|^[[:space:]]\+if .* echo /I{ />/! s/\( echo .*\)\"/\1\\\\\"/g }" "$currentScript"
@@ -481,8 +492,8 @@ EOF
     sed -i -e "/^if .* echo \|^[[:space:]]\+if .* echo /Is/ echo / echo \"/" "$currentScript"
 
     #add a double quote to the end of echoes without redirects
-    sed -i -e "/^echo/I{ />/!s/[[:space:]\t\r]*$/\"/ }" "$currentScript"
-    sed -i -e "/^\(^[[:space:]]\+\)echo/I{ />/!s/[[:space:]\t\r]*$/\"/ }" "$currentScript"
+    sed -i -e "/^echo/I{ />\|echo \"set .*>/!s/[[:space:]\t\r]*$/\"/ }" "$currentScript"
+    sed -i -e "/^\(^[[:space:]]\+\)echo/I{ />\|echo \"set .*>/!s/[[:space:]\t\r]*$/\"/ }" "$currentScript"
     sed -i -e "/^if .* echo \|^[[:space:]]\+if .* echo /I{ />/!s/[[:space:]\t\r]*$/\"/ }" "$currentScript"
 
     #ensure echo redirects are preceded by spaces
@@ -3445,6 +3456,12 @@ function goto\
     #pull just the final matching line and strip out carriage returns for grep based variable assignments
     sed -i -e "s/\(=\`grep [^\`]*\)\`/\1 | tail -1 | tr -d \"\\\r\"\`/Ig" "$currentScript"
     
+    #fix greps for comment lines
+    sed -i -e "/grep.[-i ]*\"REM\" /I {
+                   s/\"REM\"/\"^# \"/;
+                   s/tr -d \"\\\r\"\`/tr -d \"\\\r\" | sed -e \"s\/#\/REM\/\"\`/I;
+                }" "$currentScript"
+    
     #prepare extra \ escapes for extended echos, excluding lines with eval
     sed -i -e '/eval /b' -e '/echo / s/\\\\\([abcefnrtv0x]\)/\\\\\\\1/g' "$currentScript"
     
@@ -3538,16 +3555,24 @@ function goto\
     sed -i -e 's/pendingIFS/IFS/g' "$currentScript"
     
     #add quotes to text format declarations
+    sed -i -e '/echo \".*=\x1b.* >/ {
+                   s/=\x1b/=pendingdq\x1b/;
+                   s/" >/mpendingdq" >/I;
+               }' "$currentScript"
     sed -i -e '/=\x1b/ {
                    s/$/"/;
                    s/=\x1b/="\x1b/;
                }' "$currentScript"
+    sed -i -e 's/pendingdq/\\\"/Ig' "$currentScript"
                
     #fix escape characters for text formatting
     sed -i -e 's/\x1b/\\e/g' "$currentScript"
     
-    #make all echos extended
-    sed -i -e '/eval /b' -e 's/echo "/echo -e "/' "$currentScript"
+    #ensure comment lines are written in bash format
+    sed -i -e 's/echo "rem /echo "# /' "$currentScript"
+    
+    #make all echos without redirects extended
+    sed -i -e '/eval \|=.* >/b' -e 's/echo "/echo -e "/' "$currentScript"
     
     #set variable value to define directory selection dialog commands (pscommand)
     sed -i -e '/"[[:alnum:]_]\+="(new-object -COM '\''Shell\.Application'\'')\^/I {
