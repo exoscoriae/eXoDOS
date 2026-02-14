@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-13
+# Revised: 2026-02-14
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -62,6 +62,10 @@ function convertScript
     sed -i -e 's/\%~2/\%parametertwo\%/g' "$currentScript"
     sed -i -e 's/\%~3/\%parameterthree\%/g' "$currentScript"
     sed -i -e 's/\%~4/\%parameterfour\%/g' "$currentScript"
+    sed -i -e 's/ \[\%1\] / [\%parameterone\%] /g' "$currentScript"
+    sed -i -e 's/ \[\%2\] / [\%parametertwo\%] /g' "$currentScript"
+    sed -i -e 's/ \[\%3\] / [\%parameterthree\%] /g' "$currentScript"
+    sed -i -e 's/ \[\%4\] / [\%parameterfour\%] /g' "$currentScript"
     
     #prepare variable for current script basename without extension
     sed -i -e 's/\%~n0/PENDINGBASENOEXT/g' "$currentScript"
@@ -885,6 +889,10 @@ EOF
     sed -i -e "/^[[:space:]]\+pendingL3I exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ -e \"\2\" ] \&\&\3/" \
         "$currentScript"
+    sed -i -e "s/ \"\[\(\%[[:alnum:]_]\+\%\)\]\" == \[\] / -z \"\1\" /" "$currentScript"
+    sed -i -e "s/ \"\[\(\%[[:alnum:]_]\+\%\)\]\" \!= \[\] / \! -z \"\1\" /" "$currentScript"
+    sed -i -e "s/ \"\[\([[:alnum:]_]\+\)\]\" == \[\] / -z \"\1\" /" "$currentScript"
+    sed -i -e "s/ \"\[\([[:alnum:]_]\+\)\]\" \!= \[\] / \! -z \"\1\" /" "$currentScript"
     
     #fix if not exist statements (structure)
     sed -i -e "/^if not exist \"/I \
@@ -2979,6 +2987,16 @@ TEMPDONECHOICE' "$currentScript"
                 }' "$currentScript"
     # Note: DAUM conversion disabled due to Linux bugs and lack of Direct3D support; Wine used instead
     # Note: alt launcher dosbox variable fix occurs later in this script
+    
+    #have OpenUHS run through flatpak
+    sed -i -e 's|^[\./]*OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^[\./]*OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
     
     #have foobar2000.exe run through Wine
     sed -i -e 's|^\([^[:space:]]\+foobar2000.exe \)|flatpak run com.retro_exo.wine \1|' "$currentScript"
