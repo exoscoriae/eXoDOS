@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-14
+# Revised: 2026-02-15
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -293,7 +293,11 @@ EOF
     
     #fix cp commands
     sed -i -e 's/^copy/cp/I' "$currentScript"
+    sed -i -e 's|^cp /Y |cp -f |I' "$currentScript"
     sed -i -e '/^[[:space:]]\+copy/Is/^\([[:space:]]\+\)copy/\1cp/I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)cp /Y |\1cp -f |I' "$currentScript"
+    sed -i -e 's|xcopy \(.*\) /Y[[:space:]\t\r]*$|cp -f \1|I' "$currentScript"
+    sed -i -e 's|xcopy /Y \(.*\)[[:space:]\t\r]*$|cp -f \1|I' "$currentScript"
     
     #fix quoted wildcard paths
     sed -i -e '/\*/ { /^cp /s/\"//g }' "$currentScript"
