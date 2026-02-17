@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-02-15
+# Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
+# Revised: 2026-02-16
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -283,6 +283,10 @@ EOF
     sed -i -e 's/^[[:space:]]\+rem/#/I' "$currentScript"
     sed -i -e 's/^::/#/' "$currentScript"
     sed -i -e 's/^[[:space:]]\+::/#/' "$currentScript"
+    
+    #remove call for exe files
+    sed -i -e 's/^call \(.*\.exe\)[[:space:]\t\r]*$/\1/I' "$currentScript"
+    sed -i -e 's/^\([[:space:]]\+\)call \(.*\.exe\)[[:space:]\t\r]*$/\1\2/I' "$currentScript"
     
     #fix goto references
     sed -i -e 's/^:\(.*\)/: \L\1\E/' "$currentScript"
