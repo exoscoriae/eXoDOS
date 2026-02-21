@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-02-16
+# Revised: 2026-02-20
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -2997,14 +2997,14 @@ TEMPDONECHOICE' "$currentScript"
     # Note: alt launcher dosbox variable fix occurs later in this script
     
     #have OpenUHS run through flatpak
-    sed -i -e 's|^[\./]*OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^[\./]*OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^\([[:space:]]\+\)[\./]*OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^\([[:space:]]\+\)[\./]*OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
-    sed -i -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.OpenUHS "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^[\./]*OpenUHS "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^[\./]*OpenUHS\.exe "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*OpenUHS "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*OpenUHS\.exe "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+    sed -i -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
     
     #have foobar2000.exe run through Wine
     sed -i -e 's|^\([^[:space:]]\+foobar2000.exe \)|flatpak run com.retro_exo.wine \1|' "$currentScript"
