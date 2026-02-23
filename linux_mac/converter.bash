@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-02-20
+# Revised: 2026-02-22
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1077,6 +1077,7 @@ EOF
     sed -i -e 's|^"dosbox/x/dosbox\.exe"|flatpak run com.retro_exo.dosbox-x-08220|I' "$currentScript"
     sed -i -e 's|^"[\./]*emulators/dosbox/x/dosbox\.exe"|flatpak run com.retro_exo.dosbox-x-08220|I' "$currentScript"
     sed -i -e 's|^"[\./]*emulators/dosbox/x2/dosbox\.exe"|flatpak run com.retro_exo.dosbox-x-20240701|I' "$currentScript"
+    sed -i -e 's|^"[\./]*emulators/dosbox/x98/dosbox-x\.exe"|flatpak run com.retro_exo.dosbox-x-20250201|I' "$currentScript"
     sed -i -e 's|^"[\./]*emulators/dosbox/staging0\.82\.0/dosbox\.exe"|flatpak run com.retro_exo.dosbox-staging-082-0|I' "$currentScript"
     sed -i -e 's|^"[\./]*emulators/dosbox/staging0\.81\.2/dosbox\.exe"|flatpak run com.retro_exo.dosbox-staging-081-2|I' "$currentScript"
     sed -i -e 's|^"[\./]*emulators/dosbox/staging0\.81\.1/dosbox\.exe"|flatpak run com.retro_exo.dosbox-staging-081-2|I' "$currentScript"
@@ -1090,6 +1091,7 @@ EOF
     sed -i -e 's|dosbox=[\./]*emulators/dosbox/ece4481/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*emulators/dosbox/x/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-08220"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*emulators/dosbox/x2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20240701"|I' "$currentScript"
+    sed -i -e 's|dosbox=[\./]*emulators/dosbox/x98/dosbox-x\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20250201"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*emulators/dosbox/staging0\.82\.0/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-082-0"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*emulators/dosbox/staging0\.81\.2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-081-2"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*emulators/dosbox/staging0\.81\.1/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-081-2"|I' "$currentScript"
@@ -1103,6 +1105,7 @@ EOF
     sed -i -e 's|dosbox=[\./]*dosbox/ece4481/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*dosbox/x/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-08220"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*dosbox/x2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20240701"|I' "$currentScript"
+    sed -i -e 's|dosbox=[\./]*dosbox/x98/dosbox-x\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20250201"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*dosbox/staging0\.82\.0/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-082-0"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*dosbox/staging0\.81\.2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-081-2"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*dosbox/staging0\.81\.1/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-081-2"|I' "$currentScript"
@@ -1116,6 +1119,7 @@ EOF
     sed -i -e 's|dosbox=[\./]*ece4481/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*x/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-08220"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*x2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20240701"|I' "$currentScript"
+    sed -i -e 's|dosbox=[\./]*x98/dosbox-x\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20250201"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*staging0\.82\.0/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-082-0"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*staging0\.81\.2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-081-2"|I' "$currentScript"
     sed -i -e 's|dosbox=[\./]*staging0\.81\.1/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-staging-081-2"|I' "$currentScript"
@@ -2985,6 +2989,7 @@ TEMPDONECHOICE' "$currentScript"
     sed -i -e "s|^dosbox=\"dosbox/x/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-08220\"|I" "$currentScript"
     sed -i -e "s|^dosbox=\"x/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-08220\"|I" "$currentScript"
     sed -i -e "s|^dosbox=\"x2/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-20240701\"|I" "$currentScript"
+    sed -i -e "s|^dosbox=\"x98/dosbox-x\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-20250201\"|I" "$currentScript"
     sed -i -e "s|^dosbox=\"staging0\.82\.0/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-staging-082-0\"|I" "$currentScript"
     sed -i -e "s|^dosbox=\"staging0\.81\.2/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-staging-081-2\"|I" "$currentScript"
     sed -i -e "s|^dosbox=\"staging0\.81\.1/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-staging-081-2\"|I" "$currentScript"

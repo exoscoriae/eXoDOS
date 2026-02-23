@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
+# Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
 # Revised: 2026-02-22
 #
 # This script was written and tested with the following:
@@ -20,6 +20,7 @@
 #  - DOSBox-X 0.82.20 SDL1 (Jul 31 2019)
 #  - DOSBox-X 20240701 (Jul 01 2024)
 #  - DOSBox-X 20241001 (Oct 02 2024)
+#  - DOSBox-X 20250201 (Feb 01 2025)
 #  - Falkon 25.12.2 (Feb 05 2026)
 #  - ffmpeg version 7.1.1-1ubuntu4.2
 #  - Flatpak 1.16.1
@@ -356,7 +357,7 @@ do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
-    #[ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-2025-02-01"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20250201"` ]] \&\& missingDependencies=yes^' "$currentScript"
     #Dependencies will need to be added here
 done
 
