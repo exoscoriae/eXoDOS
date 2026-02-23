@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x
-# Revised: 2026-01-17
+# Revised: 2026-02-22
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
+#  - Abiword 3.0.7 (Jul 30 2025)
 #  - aria2 version 1.37.0 (Nov 15 2023)
-#  - curl 7.81.0 (Release-Date: 2022-01-05)
-#  - dos2unix 7.4.2 (2020-10-12)
+#  - curl 8.14.1 (Release-Date: 2025-06-04)
+#  - dos2unix 7.5.2 (2024-01-22)
 #  - DOSBox version 0.74-3, copyright 2002-2019 DOSBox Team.
 #  - DOSBox ECE r4301 (Dec 11 2019)
 #  - DOSBox ECE r4358 (Sep 02 2020)
@@ -15,25 +16,41 @@
 #  - DOSBox GRIDC 4.3.1 (Mar 04 2019)
 #  - DOSBox Staging 0.81.2 (Jul 21 2024)
 #  - DOSBox Staging 0.82.0 (Oct 26 2024)
+#  - DOSBox Staging 0.82.2 (Jun 17 2025)
 #  - DOSBox-X 0.82.20 SDL1 (Jul 31 2019)
 #  - DOSBox-X 20240701 (Jul 01 2024)
 #  - DOSBox-X 20241001 (Oct 02 2024)
-#  - ffmpeg version 4.4.2-0ubuntu0.22.04.1
-#  - Flatpak 1.12.7
-#  - fold (GNU coreutils) 8.32
-#  - GNU bash, version 5.1.16(1)-release (x86_64-pc-linux-gnu)
-#  - GNU Wget 1.21.2
+#  - Falkon 25.12.2 (Feb 05 2026)
+#  - ffmpeg version 7.1.1-1ubuntu4.2
+#  - Flatpak 1.16.1
+#  - fold (uutils coreutils) 0.2.2
+#  - GNU bash, version 5.2.37(1)-release (x86_64-pc-linux-gnu)
+#  - GNU Wget 1.25.0
+#  - Gnumeric 1.12.60 (Feb 10 2026)
 #  - GZDoom 4.11.3 (Oct 26 2023)
-#  - ncurses 6.2.20200212
-#  - node v23.3.0 (npm v10.9.0)
-#  - perl 5, version 34, subversion 0 (v5.34.0)
-#  - Python 3.10.12
-#  - ScummVM 2.2.0 (Oct 30 2020 19:42:51)
-#  - ScummVM 2.3.0 Alpha git15811-gf97bfb7ce1 (Apr 28 2021)
+#  - Konsole 25.12.2 (Feb 05 2026)
+#  - MComix 3.1.1 (2025-09-06)
+#  - Mpv 0.41.0 (Dec 21 2025)
+#  - Okular 25.12.2 (Feb 01 2026)
+#  - OpenUHS 0.6.6 (Feb 18 2012)
+#  - ncurses 6.5.20250216
+#  - node v25.6.1 (npm v11.9.0)
+#  - perl 5, version 40, subversion 1 (v5.40.1)
+#  - Python 3.13.7 (Aug 14 2025)
+#  - ScummVM 2.2.0 (Oct 30 2020 19:42:51) ---------------------pending phase-out
+#  - ScummVM 2.3.0 Alpha git15811-gf97bfb7ce1 (Apr 28 2021) ---pending phase-out
 #  - ScummVM 2.8.0 (Dec 16 2023)
-#  - sed (GNU sed) 4.8
+#  - ScummVM 2.5.0 (Oct 01 2021)
+#  - ScummVM 2.9.0 (Dec 07 2024)
+#  - ScummVM 2026.1.0 (Jan 17 2026)
+#  - ScummVM 2.3.0 Alpha git18903-g313a824fb9 (Jun 15 2021)
+#  - ScummVM 2.8.0 Alpha git9335-g00e72a17004 (Nov 15 2023)
+#  - ScummVM 3.0.0 Alpha git20192-g3ca9da6a1c3 (Nov 04 2025)
+#  - sed (GNU sed) 4.9
 #  - UnZip 6.00 of 20 April 2009, by Debian. Original by Info-ZIP.
-#  - Wine 9.0 (Jan 16 2024)
+#  - VLC 3.0.23 (Dec 19 2025)
+#  - Wine 11.0 (Jan 13 2026)
+#  - Zenity 4.2.1 (Nov 07 2025)
 #
 # Purpose: The purpose of this script is to assist in the development of future
 #          Linux patches by automating the conversion of Windows batch files to
@@ -82,7 +99,7 @@
 #  to the frontend may also be necessary to add proper language pack support.
 
 #  macOS Note: At this time, only the eXoDREAMM backend has had full conversion
-#  to macOS. Further work is on hold until the frontend adds support for macOS.
+#  to macOS.
 
 clear
 echo "IMPORTANT THINGS TO NOTE BEFORE PROCEEDING:"
@@ -215,6 +232,10 @@ do
     #sed -i -e "s/util\.zip/util_linux.zip/Ig" "$file"
     #[ -e "$file" ] && sed -i -e '/DownloadFile/I s/\.exo/_linux.exo/Ig' "$file"
 done
+for file in util/9x*.bat
+do
+    [ -e "$file" ] && sed -i -e "s/install\.bat/Install.bat/Ig" "$file"
+done
 
 [ `ls -1 eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tandy\.SEL|TANDY.SEL|Ig" eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\mt32|ckrynn\\\MT32|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
@@ -317,12 +338,26 @@ do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-8-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    #add additional eXoScummVM flatpaks to dependency check
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-5-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-9-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2026-1-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-3-0-git18903-g313a824fb9"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-8-0-git9335-g00e72a17004"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-3-0-0-git20192-g3ca9da6a1c3"` ]] \&\& missingDependencies=yes^' "$currentScript"
 done
 for currentScript in */\!*/*/Magazines/*.bsh
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.wine"` ]] \&\& missingDependencies=yes^' "$currentScript"
+done
+for currentScript in eXoWin9x/\!*/*/*/*.bsh eXoWin9x/\!*/*/*/*/*.bsh util/*_drm.bsh ../Setup\ eXoWin9x.bsh
+do
+    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
+    #[ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-2025-02-01"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    #Dependencies will need to be added here
 done
 
 echo ""
@@ -865,13 +900,15 @@ echo 'flatpak run com.retro_exo.dosbox-staging-082-0' > util/alt_dosbox_linux.tx
 #skipping alt_dosbox_mac-x64.txt and dosbox_mac-m1.txt until requirements are determined
 
 cp util/scummvm.txt util/scummvm_linux.txt 2>/dev/null
-sed -i -e 's/:scummvm\.exe/:flatpak run com.retro_exo.scummvm-2-8-0/I' util/scummvm_linux.txt  2>/dev/null
-sed -i -e 's/:2\.5\\scummvm.exe/:flatpak run com.retro_exo.scummvm-2-5-0_PENDINGFLATPAK/I' util/scummvm_linux.txt  2>/dev/null
-sed -i -e 's/:2\.7\.1\\scummvm.exe/:flatpak run com.retro_exo.scummvm-2-7-1_PENDINGFLATPAK/I' util/scummvm_linux.txt  2>/dev/null
-sed -i -e 's/:svn2\.3_18903\\scummvm.exe/:flatpak run com.retro_exo.scummvm-2-3-0-git18903_PENDINGFLATPAK/I' util/scummvm_linux.txt  2>/dev/null
-sed -i -e 's/:svn2\.7_5300\\scummvm.exe/:flatpak run com.retro_exo.scummvm-2-7-0-git5300_PENDINGFLATPAK/I' util/scummvm_linux.txt  2>/dev/null
-sed -i -e 's/:svn2\.8_2998\\scummvm.exe/:flatpak run com.retro_exo.scummvm-2-8-0-git2998_PENDINGFLATPAK/I' util/scummvm_linux.txt  2>/dev/null
-sed -i -e 's/:svn2\.8_9335\\scummvm.exe/:flatpak run com.retro_exo.scummvm-2-8-0-git9335_PENDINGFLATPAK/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/[[:space:]\t\r]*$//' util/scummvm_linux.txt 2>/dev/null
+sed -i -e 's/;scummvm\.exe/;flatpak run com.retro_exo.scummvm-2-8-0/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;2\.5\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-5-0/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;2\.9\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-9-0/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;2026\.1\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2026-1-0/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;svn2\.3_18903\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;svn2\.8_9335\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;svn3\.0\.0git19492\\scummvm.exe/;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3/I' util/scummvm_linux.txt  2>/dev/null
+
 dos2unix util/scummvm_linux.txt  2>/dev/null
 #skipping scummvm_mac-x64.txt and scummvm_mac-m1.txt until requirements are determined
 
