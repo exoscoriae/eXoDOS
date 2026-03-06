@@ -188,6 +188,9 @@ fi
 #hideMessage setting for converter.bash warning
 export hideMessage='true'
 
+#ensure hidden files are processed
+shopt -s dotglob
+
 echo ""
 cd "$rootDir"
 cd eXo
@@ -1213,5 +1216,8 @@ echo "Correcting xml inconsistencies..."
 #    [ -e "$file" ] && sed -i -e "s|<ManualPath>Manuals\\\MS-DOS\\\Pro League Baseball (1992)\.pdf</ManualPath>|<ManualPath />|" "$file"
 #    [ -e "$file" ] && sed -i -e "s/\\\Waterloo (1989)\.txt/\\\Waterloo (1989).pdf/" "$file"
 #done
+
+#disable the dotglob option again
+shopt -u dotglob
 
 echo "Conversion complete."
