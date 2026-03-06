@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-02-22
+# Revised: 2026-03-06
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -25,6 +25,7 @@
 #  - ffmpeg version 7.1.1-1ubuntu4.2
 #  - Flatpak 1.16.1
 #  - fold (uutils coreutils) 0.2.2
+#  - getconf (Ubuntu GLIBC 2.42-0ubuntu3.1) 2.42
 #  - GNU bash, version 5.2.37(1)-release (x86_64-pc-linux-gnu)
 #  - GNU Wget 1.25.0
 #  - Gnumeric 1.12.60 (Feb 10 2026)
@@ -102,6 +103,30 @@
 #  macOS Note: At this time, only the eXoDREAMM backend has had full conversion
 #  to macOS.
 
+#function to spawn a new script conversion
+function spawnConversion
+{
+    #export path to bsh script pending conversion
+    export currentScript="$1"
+    
+    #load convertScript function into the environment
+    . util/converter.bash
+    
+    convertScript
+    sed -i -e '/^if \[ "\${BASH_VERSINFO:-0}" -lt 5 \]/i\
+if [[ "$OSTYPE" == "darwin"* ]]\
+then\
+    source "$scriptDir/$(basename -- "${BASH_SOURCE%.bsh}.msh")"\
+    exit 0\
+fi\
+' "$currentScript"
+    echo "$currentScript created."
+}
+export -f spawnConversion
+
+#determine available threads for parallel script conversion
+totalThreads=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+
 clear
 echo "IMPORTANT THINGS TO NOTE BEFORE PROCEEDING:"
 echo ""
@@ -161,10 +186,7 @@ then
 fi
 
 #hideMessage setting for converter.bash warning
-hideMessage='true'
-
-#load convertScript function into the environment
-. eXo/util/converter.bash
+export hideMessage='true'
 
 echo ""
 cd "$rootDir"
@@ -297,16 +319,8 @@ echo ""
 
 for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
-    [ -e "$currentScript" ] && convertScript
-    [ -e "$currentScript" ] && sed -i -e '/^if \[ "\${BASH_VERSINFO:-0}" -lt 5 \]/i\
-if [[ "$OSTYPE" == "darwin"* ]]\
-then\
-    source "$scriptDir/$(basename -- "${BASH_SOURCE%.bsh}.msh")"\
-    exit 0\
-fi\
-' "$currentScript"
-    [ -e "$currentScript" ] && echo "$currentScript created."
-done
+    [ -e "$currentScript" ] && printf "%s\0" "$currentScript"
+done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'spawnConversion "$@"' _
 
 echo ""
 echo "Removing unnecessary dependency checks."
