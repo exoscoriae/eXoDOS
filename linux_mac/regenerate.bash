@@ -375,6 +375,13 @@ do
     #Dependencies will need to be added here
 done
 
+echo "Removing unnecessary files..."
+[ -e Magazines/BBD/run.bsh ] && rm Magazines/BBD/run.bsh
+[ -e Magazines/BBD/BBDS2/Go.bsh ] && rm Magazines/BBD/BBDS2/Go.bsh
+[ `ls -1 Magazines/GameBytes/*.bsh 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/GameBytes/*.bsh
+[ `ls -1 Magazines/Interactive\ Entertainment\ CD/*.bsh 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/Interactive\ Entertainment\ CD/*.bsh
+[ -e util/openuhs/OpenUHS.bsh ] && rm util/openuhs/OpenUHS.bsh
+
 echo ""
 echo "Creating universal launch files."
 for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh
@@ -1206,19 +1213,5 @@ echo "Correcting xml inconsistencies..."
 #    [ -e "$file" ] && sed -i -e "s|<ManualPath>Manuals\\\MS-DOS\\\Pro League Baseball (1992)\.pdf</ManualPath>|<ManualPath />|" "$file"
 #    [ -e "$file" ] && sed -i -e "s/\\\Waterloo (1989)\.txt/\\\Waterloo (1989).pdf/" "$file"
 #done
-
-echo "Removing unnecessary files..."
-[ -e Magazines/BBD/run.bsh ] && rm Magazines/BBD/run.bsh
-[ -e Magazines/BBD/run.command ] && rm Magazines/BBD/run.command
-[ -e Magazines/BBD/run.msh ] && rm Magazines/BBD/run.msh
-[ -e Magazines/BBD/BBDS2/Go.bsh ] && rm Magazines/BBD/BBDS2/Go.bsh
-[ -e Magazines/BBD/BBDS2/Go.command ] && rm Magazines/BBD/BBDS2/Go.command
-[ -e Magazines/BBD/BBDS2/Go.msh ] && rm Magazines/BBD/BBDS2/Go.msh
-[ `ls -1 Magazines/GameBytes/*.bsh 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/GameBytes/*.bsh
-[ `ls -1 Magazines/GameBytes/*.command 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/GameBytes/*.command
-[ `ls -1 Magazines/GameBytes/*.msh 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/GameBytes/*.msh
-[ `ls -1 Magazines/Interactive\ Entertainment\ CD/*.bsh 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/Interactive\ Entertainment\ CD/*.bsh
-[ `ls -1 Magazines/Interactive\ Entertainment\ CD/*.command 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/Interactive\ Entertainment\ CD/*.command
-[ `ls -1 Magazines/Interactive\ Entertainment\ CD/*.msh 2>/dev/null | wc -w` -gt 0 ] && rm Magazines/Interactive\ Entertainment\ CD/*.msh
 
 echo "Conversion complete."
