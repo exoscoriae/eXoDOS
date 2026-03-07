@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-05
+# Revised: 2026-03-06
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3418,7 +3418,10 @@ function goto\
                    s/=\x1b/="\x1b/;
                }' \
            -e 's/pendingdq/\\\"/Ig' "$currentScript"
-               
+    
+    #fix ANSI declaration structures
+    sed -i -e 's/\([[:alnum:]_]\+\)="\(\x1b.[^] ]*\)"/\1=$'\''\2'\''/' "$currentScript"
+    
     #fix escape characters for text formatting
     sed -i -e 's/\x1b/\\e/g' "$currentScript"
     
@@ -3739,6 +3742,7 @@ then\
     flatpak list --app --columns=application | grep "^com.retro_exo." | xargs -I {} flatpak override --user --env=SDL_VIDEODRIVER=x11 {}\
     flatpak list --app --columns=application | grep "^com.retro_exo." | xargs -I {} flatpak override --user --env=SDL_AUDIODRIVER=alsa {}\
 fi\
+shopt -s dotglob\
 ' "$currentScript"
     
 }
