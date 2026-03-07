@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-06
+# Revised: 2026-03-07
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -48,13 +48,14 @@ function convertScript
 {    
     
     #change ..\.\ instances to ..\
-    sed -i -e 's/\.\.\\\.\\/..\\/g' \
-           -e '#######################' \
-           -e '#prepare loop variables' \
-           -e '/\%\%[[:space:]\t]*$/!s/\(\%\%\)\([^[:space:]\%]\)/\%\L\2\E\%/g' \
-           -e '#######################' \
-           -e '#rename parameter variables' \
-           -e 's/\([\\= ]\)\%1/\1\%parameterone\%/g' \
+    sed -i -e 's/\.\.\\\.\\/..\\/g' "$currentScript"
+    
+    #prepare loop variables
+    sed -i -e 's/%%\([~]\)/%\1%/g' \
+           -e 's/%%\([a-zA-Z]\)\([^a-zA-Z0-9_:]\|$\)/%\L\1\E%\2/g' "$currentScript"
+    
+    #rename parameter variables
+    sed -i -e 's/\([\\= ]\)\%1/\1\%parameterone\%/g' \
            -e 's/\([\\= ]\)\%2/\1\%parametertwo\%/g' \
            -e 's/\([\\= ]\)\%3/\1\%parameterthree\%/g' \
            -e 's/\([\\= ]\)\%4/\1\%parameterfour\%/g' \
@@ -65,10 +66,10 @@ function convertScript
            -e 's/ \[\%1\] / [\%parameterone\%] /g' \
            -e 's/ \[\%2\] / [\%parametertwo\%] /g' \
            -e 's/ \[\%3\] / [\%parameterthree\%] /g' \
-           -e 's/ \[\%4\] / [\%parameterfour\%] /g' \
-           -e '#######################' \
-           -e '#prepare variable for current script basename without extension' \
-           -e 's/\%~n0/PENDINGBASENOEXT/g' "$currentScript"
+           -e 's/ \[\%4\] / [\%parameterfour\%] /g' "$currentScript"
+    
+    #prepare variable for current script basename without extension
+    sed -i -e 's/\%~n0/PENDINGBASENOEXT/g' "$currentScript"
     
     #prepare true / false tests
     sed -i -e "/^[^[:space:]]\+/ s/ && ([[:space:]\t\r]*$/\nPENDINGTLTRU/" "$currentScript"
@@ -83,13 +84,13 @@ function convertScript
            -e "s/ >nul[[:space:]\t\r]*$/ PENDINGTONULL/I" \
            -e "/^> nul /I s/([[:space:]\t\r]*$//" \
            -e "s/^> nul \(.*\)/\1 PENDINGTONULL/I" \
-           -e "s/ > nul[[:space:]\t\r]*$/ PENDINGTONULL/I" \
-           -e '#######################' \
-           -e '#at this time, robocopy is only used for merging (subsequent delete line not implemented for now)' \
-           -e 's|robocopy \([^[:space:]]\+ [^[:space:]]\+ \)/MOVE.* PENDINGTONULL|copy \1PENDINGTONULL|I' \
-           -e '#######################' \
-           -e '#ensure if statements are lowercase' \
-           -e '/^[[:space:]]\+if/Is/^\([[:space:]]\+\)if/\1if/I' \
+           -e "s/ > nul[[:space:]\t\r]*$/ PENDINGTONULL/I" "$currentScript"
+           
+    #at this time, robocopy is only used for merging (subsequent delete line not implemented for now)
+    sed -i -e 's|robocopy \([^[:space:]]\+ [^[:space:]]\+ \)/MOVE.* PENDINGTONULL|copy \1PENDINGTONULL|I' "$currentScript"
+    
+    #ensure if statements are lowercase
+    sed -i -e '/^[[:space:]]\+if/Is/^\([[:space:]]\+\)if/\1if/I' \
            -e 's/^if/if/I' "$currentScript"
     
     #prepare triple-nested multi-line if
@@ -926,11 +927,13 @@ EOF
     #Make variable declarations lowercase and remove 'set '
     sed -i -e 's/\(^set \)\([^=]*\)\(=\)/\L\2\E\3/I' \
            -e 's/Updaterline/updaterline/Ig' "$currentScript"
-
+    
+    #prepare percentages in echos
+    sed -i -e '/echo / s/\( [[:alnum:]_]\+\)\%\%/\1PENDINGPCT/g' "$currentScript"
+    
     #Make all variable references lowercase in bash style
-    sed -i -e '/\%\%/!s/\%\([[:alnum:]_]\+\)\%\([[:alnum:]_]\+\)/$\{\L\1\E\}\2/g' \
-           -e '/\%\%/!s/\(\%\)\([^[:space:]\%]\+\)\(\%\)/$\{\L\2\E\}/g' \
-           -e '/\%\%/!s|/\${\(.\)}\"|/\$\{\L\1\E\}\"|' \
+    sed -i -e '/%%.*:%.*%=%%/! s/%\([^[:space:]%]\+\)%/${\L\1\E}/g' \
+           -e 's|/\${\(.\)}\"|/\$\{\L\1\E\}\"|' \
            -e 's/PENDINGDLR/$/g' \
            -e 's/PENDINGPCT/%/g' "$currentScript"
     
