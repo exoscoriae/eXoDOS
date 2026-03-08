@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-07
+# Revised: 2026-03-08
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -963,7 +963,9 @@ EOF
            -e 's|^"\./scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|I' \
            -e 's|^"\./emulators/scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|I' \
            -e "s|^\"[\./]*emulators/scmvm/\(\${svm}\"\)|\"\1|I" \
+           -e "s|^\"[\./]*emulators/scmvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\"\${svm}\"|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/\(\${svm}\"\)|\&\& \"\1|I" \
+           -e "s|\&\& \"[\./]*emulators/scvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\&\& \"\${svm}\"|I" \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-2-0|flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini|I' \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
     
@@ -3445,6 +3447,9 @@ function goto\
                    N;N;N;
                    s/^\([[:blank:]]*\)for \/f usebackq delims= \([[:alnum:]_]\+\) in `powershell \("${[[:alnum:]_]\+}"\)`\n[[:blank:]]*do\n[[:blank:]]*"\([[:alnum:]_]\+\)="${\2}""\n[[:blank:]]*done/\1unset \L\4\E\n\1while [ -z "${\L\4\E}" ]\n\1do\n\1    \L\4\E="$(eval \L\3\E)"\n\1done/
                }' "$currentScript"
+    
+    #set svmini path using scummvm.txt (flatpak launch command in scummvm_linux.txt does not contain path)
+    sed -i -e 's#svmini="/\${svm\:.*#svmini="$(grep "\^\${gamename}" ./util/scummvm.txt | tail -1 | tr -d '\''\\r'\'' | awk -F'\'';'\'' '\''{print "/" substr(\$3, 1, length(\$3)-11)}'\'' | sed -e '\''s|\\\\|/|'\'')"#' "$currentScript"
     
     #add bash header line, goto function and alias
     sed -i -e '1i\
