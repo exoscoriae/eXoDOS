@@ -3415,14 +3415,13 @@ function goto\
     
     #add quotes to text format declarations
     sed -i -e '/echo \".*=\x1b.* >/ {
-                   s/=\x1b/=pendingdq\x1b/;
-                   s/" >/mpendingdq" >/I;
+                   s/=\x1b/=$'\''\x1b/;
+                   s/" >/'\''" >/I;
                }' \
            -e '/=\x1b/ {
                    s/$/"/;
                    s/=\x1b/="\x1b/;
-               }' \
-           -e 's/pendingdq/\\\"/Ig' "$currentScript"
+               }' "$currentScript"
     
     #fix ANSI declaration structures
     sed -i -e 's/\([[:alnum:]_]\+\)="\(\x1b.[^] ]*\)"/\1=$'\''\2'\''/' "$currentScript"
