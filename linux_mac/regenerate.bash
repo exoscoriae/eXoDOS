@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-06
+# Revised: 2026-03-08
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -281,13 +281,53 @@ done
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.exe|TNMGS.EXE|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.no|TNMGS.NO|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/wastland/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|setup\.sel|setup.SEL|Ig" eXoDOS/\!dos/wastland/exception.bat 2>/dev/null
-
+[ `ls -1 eXoScummVM/\!ScummVM/Al\ Emmo\ And\ The\ Lost\ Dutchman\'s\ Mine\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Al\ Emmo\ And\ The\ Lost\ Dutchman\'s\ Mine\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Black\ Cauldron,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Black\ Cauldron,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Blackwell\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Blackwell\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Clandestiny\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Clandestiny\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/EcoQuest\ 2\ -\ Lost\ Secret\ of\ the\ Rainforest\ \(Floppy\ DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/EcoQuest\ 2\ -\ Lost\ Secret\ of\ the\ Rainforest\ \(Floppy\ DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Escape\ from\ Monkey\ Island\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Escape\ from\ Monkey\ Island\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Feeble\ Files,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Feeble\ Files,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Flight\ of\ the\ Amazon\ Queen\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Flight\ of\ the\ Amazon\ Queen\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Gold\ Rush\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Gold\ Rush\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Grim\ Fandango\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Grim\ Fandango\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Lost\ Crown,\ The\ -\ A\ Ghost-Hunting\ Adventure\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Lost\ Crown,\ The\ -\ A\ Ghost-Hunting\ Adventure\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Lost\ Eden\ \(CD\ DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Lost\ Eden\ \(CD\ DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Lost\ Files\ of\ Sherlock\ Holmes,\ The\ -\ The\ Case\ of\ the\ Rose\ Tattoo\ \(CD\ DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Lost\ Files\ of\ Sherlock\ Holmes,\ The\ -\ The\ Case\ of\ the\ Rose\ Tattoo\ \(CD\ DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Manhunter\ 1\ -\ New\ York\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Manhunter\ 1\ -\ New\ York\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Maniac\ Mansion\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Maniac\ Mansion\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Maniac\ Mansion\ Deluxe\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Maniac\ Mansion\ Deluxe\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Might\ and\ Magic\ -\ World\ of\ Xeen\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Might\ and\ Magic\ -\ World\ of\ Xeen\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Moonmist\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Moonmist\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Myst\ 3\ -\ Exile\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Myst\ 3\ -\ Exile\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Message\ in\ a\ Haunted\ Mansion\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Message\ in\ a\ Haunted\ Mansion\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Secret\ of\ the\ Scarlet\ Hand\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Secret\ of\ the\ Scarlet\ Hand\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Secrets\ Can\ Kill\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Secrets\ Can\ Kill\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Stay\ Tuned\ for\ Danger\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Stay\ Tuned\ for\ Danger\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ The\ Final\ Scene\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ The\ Final\ Scene\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Treasure\ in\ the\ Royal\ Tower\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Nancy\ Drew\ -\ Treasure\ in\ the\ Royal\ Tower\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Orion\ Burger\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Orion\ Burger\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Reah\ -\ Face\ the\ Unknown\ \(DVD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Reah\ -\ Face\ the\ Unknown\ \(DVD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Ringworld\ -\ Revenge\ of\ the\ Patriarch\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Ringworld\ -\ Revenge\ of\ the\ Patriarch\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Sanitarium\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Sanitarium\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Schizm\ -\ Mysterious\ Journey\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Schizm\ -\ Mysterious\ Journey\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Secret\ of\ Monkey\ Island,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Secret\ of\ Monkey\ Island,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Shadowgate\ \(Floppy\ Macintosh\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Shadowgate\ \(Floppy\ Macintosh\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Sorcerer\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Sorcerer\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Space\ Quest\ X\ -\ The\ Lost\ Chapter\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Space\ Quest\ X\ -\ The\ Lost\ Chapter\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Spellbreaker\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Spellbreaker\ \(DOS\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Syberia\ \(Macintosh\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Syberia\ \(Macintosh\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Syberia\ II\ \(Macintosh\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Syberia\ II\ \(Macintosh\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoScummVM/\!ScummVM/Tony\ Tough\ and\ the\ Night\ of\ the\ Roasted\ Moths\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Tony\ Tough\ and\ the\ Night\ of\ the\ Roasted\ Moths\ \(CD\ Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
 #[ `ls -1 Update/update.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^:mpskip/{n;n;n;s/)//}' Update/update.bat 2>/dev/null
 #[ `ls -1 Update/update.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^:mpskip/)\n:mpskip/' Update/update.bat 2>/dev/null
 
 echo "Fixing typos."
 [ `ls -1 ../eXoMerge.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/To few parameters/Too few parameters/Ig' ../eXoMerge.bat 2>/dev/null
 [ `ls -1 ../eXoMerge.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/To much parameters/Too many parameters/Ig' ../eXoMerge.bat 2>/dev/null
+
+echo "Fixing scummvm.txt reference errors."
+[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^11th Hour, The (Windows);/11th Hour, The (CD Windows);/' util/scummvm.txt 2>/dev/null
 
 echo "Creating game shell files."
 echo "Preparing files for conversion..."
@@ -733,6 +773,21 @@ do\
         *     ) printf "Invalid input.\n";;\
     esac\
 done#I' Update/update_xml.bsh 2>/dev/null
+
+[ `ls -1 util/install_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\[ -e \.\/eXoScummVM\/"\${gamename}"\.zip \]\|\[ ! -e \.\/eXoScummVM\/"\${gamename}"\.zip \]/i\
+if [ ! -e ./eXoScummVM/"${gamename}".zip ]\
+then\
+    fixZip=$(find ./eXoScummVM/ -maxdepth 1 -iname "${gamename}.zip" | head -n 1)\
+    [ -n "$fixZip" ] && gamename=$(basename "$fixZip" .zip)\
+    unset fixZip\
+fi' \
+       -e '/\[ -e \.\/Update\/\\!ScummVM\/"\${gamename}"\.zip \]\|\[ ! -e \.\/Update\/\\!ScummVM\/"\${gamename}"\.zip \]/i\
+if [ ! -e ./Update/\\!ScummVM/"${gamename}".zip ]\
+then\
+    fixZip=$(find ./Update/\\!ScummVM/ -maxdepth 1 -iname "${gamename}.zip" | head -n 1)\
+    [ -n "$fixZip" ] && gamename=$(basename "$fixZip" .zip)\
+    unset fixZip\
+fi' util/install_svm.bsh 2>/dev/null
 
 echo "Applying Linux-only game fixes."
 [ `ls -1 emulators/dosbox/options_linux.conf 2>/dev/null | wc -w` -gt 0 ] && grep -iq usescancodes emulators/dosbox/options_linux.conf 2>/dev/null || sed -i -e 's/\(\[sdl\]\)/\1\nusescancodes=false/' emulators/dosbox/options_linux.conf 2>/dev/null
