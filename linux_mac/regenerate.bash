@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-08
+# Revised: 2026-03-10
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -328,6 +328,7 @@ echo "Fixing typos."
 
 echo "Fixing scummvm.txt reference errors."
 [ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^11th Hour, The (Windows);/11th Hour, The (CD Windows);/' util/scummvm.txt 2>/dev/null
+[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^Escape from Hell (DOS);/Escape From Hell (DOS);/' util/scummvm.txt 2>/dev/null
 
 echo "Creating game shell files."
 echo "Preparing files for conversion..."
@@ -789,6 +790,29 @@ then\
     unset fixZip\
 fi' util/install_svm.bsh 2>/dev/null
 
+[ `ls -1 util/install_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\[ -e \.\/eXoScummVM\/"\${gamedir}"\/ \]\|\[ ! -e \.\/eXoScummVM\/"\${gamedir}"\/ \]\|rm -rf \.\/eXoScummVM\/"\${gamedir}"\//i\
+if [ ! -e ./eXoScummVM/"${gamedir}"/ ]\
+then\
+fixDir=$(find ./eXoScummVM/ -mindepth 1 -maxdepth 1 -type d -iname "${gamedir}" | head -n 1)\
+    [ -n "$fixDir" ] && mv "${fixDir}" eXoScummVM/"${gamedir}"\
+    unset fixDir\
+fi' util/install_svm.bsh 2>/dev/null
+
+[ `ls -1 util/launch_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\[ -e \.\/eXoScummVM\/"\${gamedir}"\/ \]\|\[ ! -e \.\/eXoScummVM\/"\${gamedir}"\/ \]/i\
+if [ ! -e ./eXoScummVM/"${gamedir}"/ ]\
+then\
+fixDir=$(find ./eXoScummVM/ -mindepth 1 -maxdepth 1 -type d -iname "${gamedir}" | head -n 1)\
+    [ -n "$fixDir" ] && mv "${fixDir}" eXoScummVM/"${gamedir}"\
+    unset fixDir\
+fi' util/launch_svm.bsh 2>/dev/null
+
+[ `ls -1 ../Setup\ eXoScummVM.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^:xml$/a\
+for file in Data/Platforms/ScummVM.xml Data/Platforms/ScummVM\\ SVN.xml xml/all/ScummVM.xml xml/all/ScummVM\\ SVN.xml xml/family/ScummVM.xml xml/family/ScummVM\\ SVN.xml\
+do\
+    [ -e "$file" ] && sed -i -e "s/\\\\\\Once Upon a Time - Baba Yaga (Multi-Platform)/\\\\\\Once Upon A Time - Baba Yaga (Multi-Platform)/g" "$file"\
+    [ -e "$file" ] && sed -i -e "s/\\\\\\TeTRIks (Windows)/\\\\\\TeTriks (Windows)/g" "$file"\
+done' ../Setup\ eXoScummVM.bsh
+
 echo "Applying Linux-only game fixes."
 [ `ls -1 emulators/dosbox/options_linux.conf 2>/dev/null | wc -w` -gt 0 ] && grep -iq usescancodes emulators/dosbox/options_linux.conf 2>/dev/null || sed -i -e 's/\(\[sdl\]\)/\1\nusescancodes=false/' emulators/dosbox/options_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/bisle2/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/bisle2/dosbox_linux.conf 2>/dev/null
@@ -1202,6 +1226,11 @@ done
 chmod +x ../*.command 2>/dev/null
 
 echo "Correcting xml inconsistencies..."
+for file in ../Data/Platforms/ScummVM.xml ../Data/Platforms/ScummVM\ SVN.xml ../xml/all/ScummVM.xml ../xml/all/ScummVM\ SVN.xml ../xml/family/ScummVM.xml ../xml/family/ScummVM\ SVN.xml
+do
+    [ -e "$file" ] && sed -i -e "s/\\\Once Upon a Time - Baba Yaga (Multi-Platform)/\\\Once Upon A Time - Baba Yaga (Multi-Platform)/g" "$file"
+    [ -e "$file" ] && sed -i -e "s/\\\TeTRIks (Windows)/\\\TeTriks (Windows)/g" "$file"
+done
 #for file in ../Data/Platforms/MS-DOS.xml ../xml/all/MS-DOS.xml ../xml/family/MS-DOS.xml
 #do
 #    [ -e "$file" ] && sed -i -e "s/\\\abanplac/\\\Abanplac/" "$file"
