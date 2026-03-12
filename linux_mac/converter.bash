@@ -273,6 +273,7 @@ EOF
     
     #fix file deletion commands
     sed -i -e 's|del /Q |del |I' \
+           -e 's/^del\./del ./I' \
            -e 's/^del/rm/I' \
            -e '/^[[:space:]]\+del/Is/^\([[:space:]]\+\)del/\1rm/I' \
            -e 's/ del / rm /I' \
