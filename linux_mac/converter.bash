@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-11
+# Revised: 2026-03-12
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3319,7 +3319,7 @@ function goto\
     
     #fix greps for comment lines
     sed -i -e "/grep.[-i ]*\"REM\" /I {
-                   s/\"REM\"/\"^# \"/;
+                   s/\"REM\"/\"^# \"/g;
                    s/tr -d \"\\\r\"\`/tr -d \"\\\r\" | sed -e \"s\/#\/REM\/\"\`/I;
                 }" "$currentScript"
     
