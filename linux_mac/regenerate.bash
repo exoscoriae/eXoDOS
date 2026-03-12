@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-11
+# Revised: 2026-03-12
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -750,7 +750,7 @@ done 2>/dev/null
 
 echo "Creating Linux ScummVM ini files."
 rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini 2>/dev/null
-for file in emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini
+for file in emulators/scmvm/scummvm.ini emulators/scmvm/*/scummvm.ini emulators/scummvm/scummvm.ini emulators/scummvm/*/scummvm.ini
 do
     [ -e "$file" ] && cp "$file" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "/savepath=/ s|\\\|/|Ig" "${file%.ini}_linux.ini"
