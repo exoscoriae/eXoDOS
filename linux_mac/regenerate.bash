@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-10
+# Revised: 2026-03-11
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -327,8 +327,8 @@ echo "Fixing typos."
 [ `ls -1 ../eXoMerge.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/To much parameters/Too many parameters/Ig' ../eXoMerge.bat 2>/dev/null
 
 echo "Fixing scummvm.txt reference errors."
-[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^11th Hour, The (Windows);/11th Hour, The (CD Windows);/' util/scummvm.txt 2>/dev/null
-[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^Escape from Hell (DOS);/Escape From Hell (DOS);/' util/scummvm.txt 2>/dev/null
+#each game must have matching entry for the game directory; subdirectories may have an entry but this is not required; defaults to game directory if subdirectory has no entry
+#[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^Escape from Hell (DOS);/Escape from Hell (DOS);/' util/scummvm.txt 2>/dev/null
 
 echo "Creating game shell files."
 echo "Preparing files for conversion..."
@@ -748,6 +748,15 @@ do
     [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.bak}_linux.bak"
 done 2>/dev/null
 
+echo "Creating Linux ScummVM ini files."
+rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini 2>/dev/null
+for file in emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini
+do
+    [ -e "$file" ] && cp "$file" "${file%.ini}_linux.ini"
+    [ -e "$file" ] && sed -i -e "/savepath=/ s|\\\|/|Ig" "${file%.ini}_linux.ini"
+    [ -e "$file" ] && sed -i -e "s|Emulators|emulators|Ig" "${file%.ini}_linux.ini"
+done 2>/dev/null
+
 echo "Applying Linux-only file-specific backend fixes."
 [ `ls -1 ../eXoMerge.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|d:\\\\|/home/user/|Ig' ../eXoMerge.bsh 2>/dev/null
 [ `ls -1 ../eXoMerge.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/Ctrl+Break/Ctrl+c/Ig' ../eXoMerge.bsh 2>/dev/null
@@ -793,7 +802,7 @@ fi' util/install_svm.bsh 2>/dev/null
 [ `ls -1 util/install_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\[ -e \.\/eXoScummVM\/"\${gamedir}"\/ \]\|\[ ! -e \.\/eXoScummVM\/"\${gamedir}"\/ \]\|rm -rf \.\/eXoScummVM\/"\${gamedir}"\//i\
 if [ ! -e ./eXoScummVM/"${gamedir}"/ ]\
 then\
-fixDir=$(find ./eXoScummVM/ -mindepth 1 -maxdepth 1 -type d -iname "${gamedir}" | head -n 1)\
+    fixDir=$(find ./eXoScummVM/ -mindepth 1 -maxdepth 1 -type d -iname "${gamedir}" | head -n 1)\
     [ -n "$fixDir" ] && mv "${fixDir}" eXoScummVM/"${gamedir}"\
     unset fixDir\
 fi' util/install_svm.bsh 2>/dev/null
@@ -801,12 +810,14 @@ fi' util/install_svm.bsh 2>/dev/null
 [ `ls -1 util/launch_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\[ -e \.\/eXoScummVM\/"\${gamedir}"\/ \]\|\[ ! -e \.\/eXoScummVM\/"\${gamedir}"\/ \]/i\
 if [ ! -e ./eXoScummVM/"${gamedir}"/ ]\
 then\
-fixDir=$(find ./eXoScummVM/ -mindepth 1 -maxdepth 1 -type d -iname "${gamedir}" | head -n 1)\
+    fixDir=$(find ./eXoScummVM/ -mindepth 1 -maxdepth 1 -type d -iname "${gamedir}" | head -n 1)\
     [ -n "$fixDir" ] && mv "${fixDir}" eXoScummVM/"${gamedir}"\
     unset fixDir\
 fi' util/launch_svm.bsh 2>/dev/null
 
-[ `ls -1 ../Setup\ eXoScummVM.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^:xml$/a\
+[ `ls -1 util/launch_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/svmindex=`grep \("^${gamename}"\)/svmindex=`grep -i \1/g' util/launch_svm.bsh 2>/dev/null
+
+[ `ls -1 ../Setup\ eXoScummVM.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^: xml$/a\
 for file in Data/Platforms/ScummVM.xml Data/Platforms/ScummVM\\ SVN.xml xml/all/ScummVM.xml xml/all/ScummVM\\ SVN.xml xml/family/ScummVM.xml xml/family/ScummVM\\ SVN.xml\
 do\
     [ -e "$file" ] && sed -i -e "s/\\\\\\Once Upon a Time - Baba Yaga (Multi-Platform)/\\\\\\Once Upon A Time - Baba Yaga (Multi-Platform)/g" "$file"\
@@ -864,7 +875,7 @@ echo "Applying Linux-only game fixes."
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1.CUE 2>/dev/null | wc -w` -gt 0 ] && cp Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1.CUE Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1_linux.CUE 2>/dev/null
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1_linux.CUE 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/pcgamer_1\.bin/pcgamer_1.BIN/" Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1_linux.CUE 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/^flatpak run com\.retro_exo\.wine .\/eXoDOS\/120Deg\/sciAudio\/sciAudio.exe/,/^kill .*/ c\
-flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm.ini -F -g3x --aspect-ratio -peXoDOS/120Deg sci-fanmade" eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null
+flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini -F -g3x --aspect-ratio -peXoDOS/120Deg sci-fanmade" eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/BRcdoom/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/BRcdoom/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/BRmatrix/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/BRmatrix/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/ckrynn/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/ckrynn/exception.bsh 2>/dev/null

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-08
+# Revised: 2026-03-11
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -152,14 +152,14 @@ EOF
     sed -i -e 's|for /f "tokens=2 delims==" %\([[:alpha:]]\)% in (.wmic OS Get localdatetime /value.) do set "\([[:alnum:]_]\+\)=%\1%"|\2=pendingYYYYMMDD|I' "$currentScript"
     
     #fix findstr declarations
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"^\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"^\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep \"^\2\" \"\3\"\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\4=\`grep -i \"^\2\" \"\3\"\`|I" \
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"\2\" \"\3\")\" \] \&\& \4=\`grep \"\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"\2\" \"\3\")\" \] \&\& \4=\`grep -i \"\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"^\2\" \"\3\")\" \] \&\& \4=\`grep \"^\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"^\2\" \"\3\")\" \] \&\& \4=\`grep -i \"^\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"\2\" \"\3\")\" \] \&\& \4=\`grep \"\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"\2\" \"\3\")\" \] \&\& \4=\`grep -i \"\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"^\2\" \"\3\")\" \] \&\& \4=\`grep \"^\2\" \"\3\"\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"^\2\" \"\3\")\" \] \&\& \4=\`grep -i \"^\2\" \"\3\"\`|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -q \"\2\" \"\3\" \&\& \4=\5|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -iq \"\2\" \"\3\" \&\& \4=\5|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -q \"^\2\" \"\3\" \&\& \4=\5|I" \
@@ -168,10 +168,10 @@ EOF
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -iq \"\2\" \"\3\" \&\& \4=\5|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -q \"^\2\" \"\3\" \&\& \4=\5|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do (set \(.[^=]*\)=\(.[^)]*\))[[:space:]\t\r]*$|grep -iq \"^\2\" \"\3\" \&\& \4=\5|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\4=\`grep \"\2\" \3\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\4=\`grep -i \"\2\" \3\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\4=\`grep \"^\2\" \3\`|I" \
-           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\4=\`grep -i \"^\2\" \3\`|I" "$currentScript"
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"\2\" \3)\" \] \&\& \4=\`grep \"\2\" \3\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"\2\" \3)\" \] \&\& \4=\`grep -i \"\2\" \3\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"^\2\" \3)\" \] \&\& \4=\`grep \"^\2\" \3\`|I" \
+           -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"^\2\" \3)\" \] \&\& \4=\`grep -i \"^\2\" \3\`|I" "$currentScript"
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -q \"\2\" \"\3\"\ndo|I" "$currentScript"
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -iq \"\2\" \"\3\"\ndo|I" "$currentScript"
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -q \"^\2\" \"\3\"\ndo|I" "$currentScript"
@@ -966,6 +966,7 @@ EOF
            -e "s|^\"[\./]*emulators/scmvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\"\${svm}\"|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/\(\${svm}\"\)|\&\& \"\1|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\&\& \"\${svm}\"|I" \
+           -e "s|scummvm\.ini|scummvm_linux.ini|" \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-2-0|flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini|I' \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
     
@@ -3448,7 +3449,7 @@ function goto\
                }' "$currentScript"
     
     #set svmini path using scummvm.txt (flatpak launch command in scummvm_linux.txt does not contain path)
-    sed -i -e 's#svmini="/\${svm\:.*#svmini="$(grep "\^\${gamename}" ./util/scummvm.txt | tail -1 | tr -d '\''\\r'\'' | awk -F'\'';'\'' '\''{print "/" substr(\$3, 1, length(\$3)-11)}'\'' | sed -e '\''s|\\\\|/|'\'')"#' "$currentScript"
+    sed -i -e 's#svmini="/\${svm\:.*#svmini="$(grep -i "\^\${gamename}" ./util/scummvm.txt | tail -1 | tr -d '\''\\r'\'' | awk -F'\'';'\'' '\''{print "/" substr(\$3, 1, length(\$3)-11)}'\'' | sed -e '\''s|\\\\|/|'\'')"#' "$currentScript"
     
     #add bash header line, goto function and alias
     sed -i -e '1i\
