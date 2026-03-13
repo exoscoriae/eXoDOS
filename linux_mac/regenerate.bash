@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-12
+# Revised: 2026-03-13
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -328,7 +328,7 @@ echo "Fixing typos."
 
 echo "Fixing scummvm.txt reference errors."
 #each game must have matching entry for the game directory; subdirectories may have an entry but this is not required; defaults to game directory if subdirectory has no entry
-#[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/^Escape from Hell (DOS);/Escape from Hell (DOS);/' util/scummvm.txt 2>/dev/null
+[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm.txt 2>/dev/null
 
 echo "Creating game shell files."
 echo "Preparing files for conversion..."
