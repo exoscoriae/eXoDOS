@@ -750,12 +750,29 @@ done 2>/dev/null
 
 echo "Creating Linux ScummVM ini files."
 rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini 2>/dev/null
-for file in emulators/scmvm/scummvm.ini emulators/scmvm/*/scummvm.ini emulators/scummvm/scummvm.ini emulators/scummvm/*/scummvm.ini
+rm -rf emulators/scmvm/scmvm_{sml,med,lrg}
+for file in emulators/scmvm/scmvm_{sml,med,lrg}.zip
+do
+    if [ -e "$file" ]
+    then
+        mkdir -p "${file%.zip}"
+        unzip -q "$file" -d "${file%.zip}"
+    fi
+done
+for file in emulators/scmvm/scummvm.ini emulators/scmvm/*/scummvm.ini emulators/scmvm/*/*/scummvm.ini emulators/scummvm/scummvm.ini emulators/scummvm/*/scummvm.ini
 do
     [ -e "$file" ] && cp "$file" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "/savepath=/ s|\\\|/|Ig" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "s|Emulators|emulators|Ig" "${file%.ini}_linux.ini"
 done 2>/dev/null
+for folder in emulators/scmvm/scmvm_{sml,med,lrg}
+do
+    if [ -d "$folder" ]
+    then
+        (cd "$folder" && rm -rf scummvm.ini */scummvm.ini && zip -rq "scmvm_linux_${folder: -3}" . && mv "scmvm_linux_${folder: -3}.zip" ../)
+        rm -rf "$folder"
+    fi
+done
 
 echo "Applying Linux-only file-specific backend fixes."
 [ `ls -1 ../eXoMerge.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|d:\\\\|/home/user/|Ig' ../eXoMerge.bsh 2>/dev/null

@@ -968,6 +968,9 @@ EOF
            -e "s|\&\& \"[\./]*emulators/scvm/\(\${svm}\"\)|\&\& \"\1|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\&\& \"\${svm}\"|I" \
            -e "s|scummvm\.ini|scummvm_linux.ini|" \
+           -e "s|scmvm_sml\.zip|scmvm_linux_sml.zip|" \
+           -e "s|scmvm_med\.zip|scmvm_linux_med.zip|" \
+           -e "s|scmvm_lrg\.zip|scmvm_linux_lrg.zip|" \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-2-0|flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini|I' \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
     
