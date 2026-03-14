@@ -759,7 +759,7 @@ do
 done 2>/dev/null
 
 echo "Creating Linux ScummVM ini files."
-rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini 2>/dev/null
+rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini util/scummvm_linux.ini 2>/dev/null
 rm -rf emulators/scmvm/scmvm_{sml,med,lrg}
 for file in emulators/scmvm/scmvm_{sml,med,lrg}.zip
 do
@@ -769,7 +769,7 @@ do
         unzip -q "$file" -d "${file%.zip}"
     fi
 done
-for file in emulators/scmvm/scummvm.ini emulators/scmvm/*/scummvm.ini emulators/scmvm/*/*/scummvm.ini emulators/scummvm/scummvm.ini emulators/scummvm/*/scummvm.ini
+for file in emulators/scmvm/scummvm.ini emulators/scmvm/*/scummvm.ini emulators/scmvm/*/*/scummvm.ini emulators/scummvm/scummvm.ini emulators/scummvm/*/scummvm.ini util/scummvm.ini
 do
     [ -e "$file" ] && cp "$file" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "/savepath=/ s|\\\|/|Ig" "${file%.ini}_linux.ini"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-12
+# Revised: 2026-03-14
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -967,7 +967,7 @@ EOF
            -e "s|^\"[\./]*emulators/scmvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\"\${svm}\"|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/\(\${svm}\"\)|\&\& \"\1|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\&\& \"\${svm}\"|I" \
-           -e "s|scummvm\.ini|scummvm_linux.ini|" \
+           -e "s|scummvm\.ini|scummvm_linux.ini|g" \
            -e "s|scmvm_sml\.zip|scmvm_linux_sml.zip|" \
            -e "s|scmvm_med\.zip|scmvm_linux_med.zip|" \
            -e "s|scmvm_lrg\.zip|scmvm_linux_lrg.zip|" \
