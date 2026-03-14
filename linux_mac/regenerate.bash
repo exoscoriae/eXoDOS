@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-13
+# Revised: 2026-03-14
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -562,8 +562,18 @@ then
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]
 then
-    source "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")"
-    exit 0
+    if [ -x "/Applications/cool-retro-term.app/Contents/MacOS/cool-retro-term" ]
+    then
+        /Applications/cool-retro-term.app/Contents/MacOS/cool-retro-term -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
+        exit 0
+    elif [[ "$-" == *i* ]]
+    then
+        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")"
+        exit 0
+    else
+        logger -s "eXo: cool-retro-term is not installed. Run the dependency installer."
+        exit 1
+    fi
 else
     logger -s "eXo: Unsupported OS"
     exit 1
@@ -764,6 +774,7 @@ do
     [ -e "$file" ] && cp "$file" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "/savepath=/ s|\\\|/|Ig" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "s|Emulators|emulators|Ig" "${file%.ini}_linux.ini"
+    [[ -e "$file" && "$file" != *"svn"* ]] && sed -i -e '/^\[scummvm\][[:space:]\t\r]*$/a enable_unsupported_game_warning=false' "${file%.ini}_linux.ini"
 done 2>/dev/null
 for folder in emulators/scmvm/scmvm_{sml,med,lrg}
 do
@@ -1042,7 +1053,15 @@ sed -i -e 's/;svn2\.8_9335\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-8-0
 sed -i -e 's/;svn3\.0\.0git19492\\scummvm.exe/;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3/I' util/scummvm_linux.txt  2>/dev/null
 
 dos2unix util/scummvm_linux.txt  2>/dev/null
-#skipping scummvm_mac-x64.txt and scummvm_mac-m1.txt until requirements are determined
+#skipping scummvm_mac-x64.txt because Intel Macs have not been manufactured since 2020
+cp util/scummvm_linux.txt util/scummvm_mac-m1.txt 2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|/Applications/ScummVM-2-8-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|/Applications/ScummVM-2-5-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|/Applications/ScummVM-2-9-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|/Applications/ScummVM-2026-1-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|/Applications/ScummVM-2-3-0-git18903-g313a824fb9.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|/Applications/ScummVM-2-8-0-git9335-g00e72a17004.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|/Applications/ScummVM-3-0-0-git20192-g3ca9da6a1c3.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
 
 #remove Linux conf files for games running DOSBox through Wine
 rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/CosmicSh/*_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/MikeGunn/*_linux.conf eXoDOS/\!dos/PackRega/*_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
@@ -1073,7 +1092,7 @@ do
 done
 
 echo "Converting macOS shell files..."
-for currentScript in eXoDREAMM/\!*/*/*.msh eXoDREAMM/\!*/*/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
+for currentScript in eXoDREAMM/\!*/*/*.msh eXoDREAMM/\!*/*/*/*.msh eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
     [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/BASH_SOURCE%\.bsh}\.msh/BASH_SOURCE%.msh}.PENDINGbs/' "$currentScript"
@@ -1083,6 +1102,7 @@ do
     [ -e "$currentScript" ] && sed -i -e 's/PENDINGbs/bsh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/I s/flatpak run com\.retro_exo\.wine //' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/^[^[:space:]]\+foobar2000.exe /I s|foobar2000\.exe|macOS/foobar2000.app/Contents/MacOS/foobar2000|' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.openuhs/I s/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /' "$currentScript"
     #Note: The foobar2000 app appears to be a dual-platform binary supporting both m1 and x86_64
     #      If there are other binary references that are not dual-platform, they should be split
     #      into macOS/m1/ and macOS/x64/ directories. This will require adding a line to convert
