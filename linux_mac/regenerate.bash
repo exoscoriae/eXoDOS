@@ -328,7 +328,6 @@ echo "Fixing typos."
 
 echo "Fixing scummvm.txt reference errors."
 #each game must have matching entry for the game directory; subdirectories may have an entry but this is not required; defaults to game directory if subdirectory has no entry
-[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm.txt 2>/dev/null
 
 echo "Creating game shell files."
 echo "Preparing files for conversion..."
@@ -1051,17 +1050,20 @@ sed -i -e 's/;2026\.1\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2026-1-
 sed -i -e 's/;svn2\.3_18903\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;svn2\.8_9335\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;svn3\.0\.0git19492\\scummvm.exe/;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3/I' util/scummvm_linux.txt  2>/dev/null
-
 dos2unix util/scummvm_linux.txt  2>/dev/null
+
+# Game specific fixes for scummvm_linux.txt
+[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm.txt 2>/dev/null
+
 #skipping scummvm_mac-x64.txt because Intel Macs have not been manufactured since 2020
 cp util/scummvm_linux.txt util/scummvm_mac-m1.txt 2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|/Applications/ScummVM-2-8-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|/Applications/ScummVM-2-5-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|/Applications/ScummVM-2-9-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|/Applications/ScummVM-2026-1-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|/Applications/ScummVM-2-3-0-git18903-g313a824fb9.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|/Applications/ScummVM-2-8-0-git9335-g00e72a17004.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|/Applications/ScummVM-3-0-0-git20192-g3ca9da6a1c3.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;/Applications/ScummVM-2-8-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;/Applications/ScummVM-2-5-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;/Applications/ScummVM-2-9-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;/Applications/ScummVM-2026-1-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;/Applications/ScummVM-2-3-0-git18903-g313a824fb9.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;/Applications/ScummVM-2-8-0-git9335-g00e72a17004.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;/Applications/ScummVM-3-0-0-git20192-g3ca9da6a1c3.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
 
 #remove Linux conf files for games running DOSBox through Wine
 rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/CosmicSh/*_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/MikeGunn/*_linux.conf eXoDOS/\!dos/PackRega/*_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
@@ -1086,13 +1088,13 @@ dos2unix util/dreamm_mac.txt  2>/dev/null
 
 echo "Preparing macOS shell files..."
 #skipping eXoDOS and eXoScummVM files for now. They will need some additional changes in the converting macOS shell files section.
-for file in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
+for file in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh eXoScummVM/\!*/*/*.bsh eXoScummVM/\!*/*/*/*.bsh Update/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$file" ] && cp "$file" "${file%.bsh}.msh"
 done
 
 echo "Converting macOS shell files..."
-for currentScript in eXoDREAMM/\!*/*/*.msh eXoDREAMM/\!*/*/*/*.msh eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
+for currentScript in eXoDREAMM/\!*/*/*.msh eXoDREAMM/\!*/*/*/*.msh eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh Update/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
     [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/BASH_SOURCE%\.bsh}\.msh/BASH_SOURCE%.msh}.PENDINGbs/' "$currentScript"
