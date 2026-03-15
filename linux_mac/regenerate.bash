@@ -1057,13 +1057,13 @@ dos2unix util/scummvm_linux.txt  2>/dev/null
 
 #skipping scummvm_mac-x64.txt because Intel Macs have not been manufactured since 2020
 cp util/scummvm_linux.txt util/scummvm_mac-m1.txt 2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;/Applications/ScummVM-2-8-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;/Applications/ScummVM-2-5-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;/Applications/ScummVM-2-9-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;/Applications/ScummVM-2026-1-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;/Applications/ScummVM-2-3-0-git18903-g313a824fb9.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;/Applications/ScummVM-2-8-0-git9335-g00e72a17004.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;/Applications/ScummVM-3-0-0-git20192-g3ca9da6a1c3.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;./dmg/ScummVM-2-8-0/ScummVM-2-8-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;./dmg/ScummVM-2-5-0/ScummVM-2-5-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;./dmg/ScummVM-2-9-0/ScummVM-2-9-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;./dmg/ScummVM-2026-1-0/ScummVM-2026-1-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;./dmg/ScummVM-2-3-0-git18903-g313a824fb9/ScummVM-2-3-0-git18903-g313a824fb9.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;./dmg/ScummVM-2-8-0-git9335-g00e72a17004/ScummVM-2-8-0-git9335-g00e72a17004.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;./dmg/ScummVM-3-0-0-git20192-g3ca9da6a1c3/ScummVM-3-0-0-git20192-g3ca9da6a1c3.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
 
 #remove Linux conf files for games running DOSBox through Wine
 rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/CosmicSh/*_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/MikeGunn/*_linux.conf eXoDOS/\!dos/PackRega/*_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
@@ -1104,11 +1104,13 @@ do
     [ -e "$currentScript" ] && sed -i -e 's/PENDINGbs/bsh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/I s/flatpak run com\.retro_exo\.wine //' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/^[^[:space:]]\+foobar2000.exe /I s|foobar2000\.exe|macOS/foobar2000.app/Contents/MacOS/foobar2000|' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.openuhs/I s/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /' "$currentScript"
     #Note: The foobar2000 app appears to be a dual-platform binary supporting both m1 and x86_64
     #      If there are other binary references that are not dual-platform, they should be split
     #      into macOS/m1/ and macOS/x64/ directories. This will require adding a line to convert
     #      the Linux reference to macOS/m1/ above this note.
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.openuhs/I s/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |Applications/VLC.app/Contents/MacOS/VLC |' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
