@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-14
+# Revised: 2026-03-22
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -441,126 +441,35 @@ if [[ "$OSTYPE" == "linux"* ]]
 then
     current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
     case "$current_term" in
-        "cool-retro-term"|"konsole"|"gnome-terminal-"|"xfce4-terminal"|"ptyxis-agent"|"kgx"|"xterm"|"Eterm"|"x-terminal-emul"|"mate-terminal"|"terminator"|"urxvt"|"rxvt"|"termit"|"terminology"|"tilix"|"kitty"|"aterm"|"alacritty"|"qterminal"|"foot"|"mlterm"|"stterm")
+        "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
             source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
             exit 0
             break;;
     esac
     unset current_term
-    if [ `which cool-retro-term` ]
+    if command -v cool-retro-term &> /dev/null
     then
         cool-retro-term -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
-    elif [ `which konsole` ]
+    elif command -v konsole &> /dev/null
     then
         konsole -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which gnome-terminal` ]
-    then
-        gnome-terminal -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which xfce4-terminal` ]
-    then
-        xfce4-terminal -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which ptyxis` ]
-    then
-        ptyxis --new-window -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which kgx` ]
-    then
-        kgx -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
-        exit 0
-    elif [ `which xterm` ]
-    then
-        xterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which uxterm` ]
-    then
-        uxterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which eterm` ]
-    then
-        Eterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which x-terminal-emulator` ]
-    then
-        x-terminal-emulator -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which mate-terminal` ]
-    then
-        eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\" $@\" "$@" &
-        exit 0
-    elif [ `which terminator` ]
-    then
-        terminator -x /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which urxvt` ]
-    then
-        urxvt -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which rxvt` ]
-    then
-        rxvt -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which termit` ]
-    then
-        termit -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which lxterm` ]
-    then
-        lxterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which terminology` ]
-    then
-        terminology -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
-        exit 0
-    elif [ `which tilix` ]
-    then
-        tilix -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which kitty` ]
-    then
-        kitty -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which aterm` ]
-    then
-        aterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which alacritty` ]
-    then
-        alacritty -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which qterminal` ]
-    then
-        qterminal -e "/usr/bin/env bash \"$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")\" $@" &
-        exit 0
-    elif [ `which foot` ]
-    then
-        foot -- /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which mlterm` ]
-    then
-        mlterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [ `which stterm` ]
-    then
-        stterm -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
-        exit 0
-    elif [[ "$-" == *i* ]]
-    then
-        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
         exit 0
     elif [[ `flatpak list 2>/dev/null | grep "retro_exo\.konsole"` ]]
     then
         flatpak run com.retro_exo.konsole -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
+    elif [[ "$-" == *i* ]]
+    then
+        source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
+        exit 0
     else
-        logger -s "eXo: weird system achievement unlocked - None of the 25 supported terminal emulators are installed."
+        logger -s "eXo: no supported terminal emulators are installed."
         exit 1
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]
 then
+    export PATH="/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openjdk/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
     if [ -x "/Applications/cool-retro-term.app/Contents/MacOS/cool-retro-term" ]
     then
         /Applications/cool-retro-term.app/Contents/MacOS/cool-retro-term -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
@@ -1114,10 +1023,10 @@ do
     [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/(find \|^find \|^[[:space:]]\+find \| && find/ s/find/gfind/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
+    #[ -e "$currentScript" ] && sed -i -e '/(find \|^find \|^[[:space:]]\+find \| && find/ s/find/gfind/' "$currentScript"
+    #[ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
+    #[ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
+    #[ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac-m1.txt/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac-m1.txt/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac-m1.txt/' "$currentScript"
@@ -1148,127 +1057,40 @@ EOF#' "$file"
     [ -e "$file" ] && sed -i -e '/source "\$scriptDir\/\$(basename -- "\${BASH_SOURCE%.command}.bsh")"/c\
     current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"\
     case "$current_term" in\
-        "cool-retro-term"|"konsole"|"gnome-terminal-"|"xfce4-terminal"|"ptyxis-agent"|"kgx"|"xterm"|"Eterm"|"x-terminal-emul"|"mate-terminal"|"terminator"|"urxvt"|"rxvt"|"termit"|"terminology"|"tilix"|"kitty"|"aterm"|"alacritty"|"qterminal"|"foot"|"mlterm"|"stterm")\
+        "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")\
             cd eXo/util\
             source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
             exit 0\
             break;;\
     esac\
     unset current_term\
-    if [ `which cool-retro-term` ]\
+    if command -v cool-retro-term &> /dev/null\
     then\
         cool-retro-term -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
         exit 0\
-    elif [ `which konsole` ]\
+    elif command -v konsole &> /dev/null\
     then\
         konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which gnome-terminal` ]\
-    then\
-        gnome-terminal -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which xfce4-terminal` ]\
-    then\
-        xfce4-terminal -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which ptyxis` ]\
-    then\
-        ptyxis --new-window -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which kgx` ]\
-    then\
-        kgx -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
-        exit 0\
-    elif [ `which xterm` ]\
-    then\
-        xterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which uxterm` ]\
-    then\
-        uxterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which eterm` ]\
-    then\
-        Eterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which x-terminal-emulator` ]\
-    then\
-        x-terminal-emulator -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which mate-terminal` ]\
-    then\
-        eval mate-terminal -e \\"/usr/bin/env bash \\\\\\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\\\\\" $@\\" "$@" &\
-        exit 0\
-    elif [ `which terminator` ]\
-    then\
-        terminator -x /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which urxvt` ]\
-    then\
-        urxvt -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which rxvt` ]\
-    then\
-        rxvt -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which termit` ]\
-    then\
-        termit -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which lxterm` ]\
-    then\
-        lxterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which terminology` ]\
-    then\
-        terminology -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
-        exit 0\
-    elif [ `which tilix` ]\
-    then\
-        tilix -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which kitty` ]\
-    then\
-        kitty -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which aterm` ]\
-    then\
-        aterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which alacritty` ]\
-    then\
-        alacritty -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which qterminal` ]\
-    then\
-        qterminal -e "/usr/bin/env bash \\"$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")\\" $@" &\
-        exit 0\
-    elif [ `which foot` ]\
-    then\
-        foot -- /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which mlterm` ]\
-    then\
-        mlterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [ `which stterm` ]\
-    then\
-        stterm -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [[ "$-" == *i* ]]\
-    then\
-        source "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
         exit 0\
     elif [[ `flatpak list 2>/dev/null | grep "retro_exo\\.konsole"` ]]\
     then\
         flatpak run com.retro_exo.konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
         exit 0\
+    elif [[ "$-" == *i* ]]\
+    then\
+        source "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
+        exit 0\
     else\
-        logger -s "eXo: weird system achievement unlocked - None of the 25 supported terminal emulators are installed."\
+        logger -s "eXo: no supported terminal emulators are installed."\
         exit 1\
     fi\
 ' "$file"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"
+    [ -e "$file" ] && sed -i -e '\|^#!/usr/bin/env bash|a \
+if [[ "$OSTYPE" == "darwin"* ]]\
+then\
+    export PATH="/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openjdk/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"\
+fi' "$file"
     [ -e "$file" ] && mv "$file" "${file%.msh}.command"
     [ -e "${file%.msh}.bsh" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "${file%.msh}.bsh"
     [ -e "${file%.msh}.bsh" ] && sed -i -e '/command/ s|\(source "$scriptDir/\)\($(basename\)|\1../../\2|' "${file%.msh}.bsh"
