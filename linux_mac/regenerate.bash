@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-22
+# Revised: 2026-04-07
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -469,10 +469,11 @@ then
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]
 then
-    export PATH="/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openjdk/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-    if [ -x "/Applications/cool-retro-term.app/Contents/MacOS/cool-retro-term" ]
+    source ~/Library/Application\ Support/exogui/path
+    hash -r
+    if command -v cool-retro-term &> /dev/null
     then
-        /Applications/cool-retro-term.app/Contents/MacOS/cool-retro-term -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
+        cool-retro-term --profile "IBM VGA 8x16" -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
         exit 0
     elif [[ "$-" == *i* ]]
     then
@@ -964,15 +965,14 @@ dos2unix util/scummvm_linux.txt  2>/dev/null
 # Game specific fixes for scummvm_linux.txt
 [ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm.txt 2>/dev/null
 
-#skipping scummvm_mac-x64.txt because Intel Macs have not been manufactured since 2020
-cp util/scummvm_linux.txt util/scummvm_mac-m1.txt 2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;./dmg/ScummVM-2-8-0/ScummVM-2-8-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;./dmg/ScummVM-2-5-0/ScummVM-2-5-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;./dmg/ScummVM-2-9-0/ScummVM-2-9-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;./dmg/ScummVM-2026-1-0/ScummVM-2026-1-0.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;./dmg/ScummVM-2-3-0-git18903-g313a824fb9/ScummVM-2-3-0-git18903-g313a824fb9.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;./dmg/ScummVM-2-8-0-git9335-g00e72a17004/ScummVM-2-8-0-git9335-g00e72a17004.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
-sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;./dmg/ScummVM-3-0-0-git20192-g3ca9da6a1c3/ScummVM-3-0-0-git20192-g3ca9da6a1c3.app/Contents/MacOS/scummvm|I' util/scummvm_mac-m1.txt  2>/dev/null
+cp util/scummvm_linux.txt util/scummvm_mac.txt 2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;scummvm-2-8-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;scummvm-2-5-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;scummvm-2-9-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;scummvm-2026-1-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;scummvm-2-3-0-git18903-g313a824fb9|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;scummvm-2-8-0-git9335-g00e72a17004|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;scummvm-3-0-0-git20192-g3ca9da6a1c3|I' util/scummvm_mac.txt  2>/dev/null
 
 #remove Linux conf files for games running DOSBox through Wine
 rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/CosmicSh/*_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/MikeGunn/*_linux.conf eXoDOS/\!dos/PackRega/*_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
@@ -1019,7 +1019,7 @@ do
     #      the Linux reference to macOS/m1/ above this note.
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.openuhs/I s/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |Applications/VLC.app/Contents/MacOS/VLC |' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
@@ -1032,15 +1032,15 @@ do
     [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac-m1.txt/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac-m1.txt/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac-m1.txt/' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/^depcheck=flatpak/,/^fi/c\
 missingDependencies=no\
-! [[ `which brew` ]] && missingDependencies=yes\
-! [[ `which aria2c` ]] && missingDependencies=yes\
-! [[ `spctl --status | grep disabled` ]] && missingDependencies=yes' "$currentScript"
+#! [[ `which brew` ]] && missingDependencies=yes\
+#! [[ `which aria2c` ]] && missingDependencies=yes\
+#! [[ `spctl --status | grep disabled` ]] && missingDependencies=yes' "$currentScript"
 done
 
 for file in ../Setup*.msh ../eXoMerge.msh
@@ -1089,7 +1089,8 @@ EOF#' "$file"
     [ -e "$file" ] && sed -i -e '\|^#!/usr/bin/env bash|a \
 if [[ "$OSTYPE" == "darwin"* ]]\
 then\
-    export PATH="/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openjdk/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"\
+    source ~/Library/Application\ Support/exogui/path\
+    hash -r\
 fi' "$file"
     [ -e "$file" ] && mv "$file" "${file%.msh}.command"
     [ -e "${file%.msh}.bsh" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "${file%.msh}.bsh"
