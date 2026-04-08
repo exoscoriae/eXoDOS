@@ -473,7 +473,7 @@ then
     hash -r
     if command -v cool-retro-term &> /dev/null
     then
-        cool-retro-term --profile "IBM VGA 8x16" -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
+        cool-retro-term --profile "IBM VGA 8x16" --scaling "80%" -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
         exit 0
     elif [[ "$-" == *i* ]]
     then
