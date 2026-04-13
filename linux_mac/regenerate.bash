@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-07
+# Revised: 2026-04-13
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -669,6 +669,7 @@ done 2>/dev/null
 
 echo "Creating Linux ScummVM ini files."
 rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini util/scummvm_linux.ini 2>/dev/null
+rm emulators/scmvm/scummvm_mac.ini emulators/scmvm/*/scummvm_mac.ini emulators/scummvm/scummvm_mac.ini emulators/scummvm/*/scummvm_mac.ini util/scummvm_mac.ini 2>/dev/null
 rm -rf emulators/scmvm/scmvm_{sml,med,lrg}
 for file in emulators/scmvm/scmvm_{sml,med,lrg}.zip
 do
@@ -684,12 +685,13 @@ do
     [ -e "$file" ] && sed -i -e "/savepath=/ s|\\\|/|Ig" "${file%.ini}_linux.ini"
     [ -e "$file" ] && sed -i -e "s|Emulators|emulators|Ig" "${file%.ini}_linux.ini"
     [[ -e "$file" && "$file" != *"svn"* ]] && sed -i -e '/^\[scummvm\][[:space:]\t\r]*$/a enable_unsupported_game_warning=false' "${file%.ini}_linux.ini"
+    [ -e "$file" ] && cp "${file%.ini}_linux.ini" "${file%.ini}_mac.ini"
 done 2>/dev/null
 for folder in emulators/scmvm/scmvm_{sml,med,lrg}
 do
     if [ -d "$folder" ]
     then
-        (cd "$folder" && rm -rf scummvm.ini */scummvm.ini && zip -rq "scmvm_linux_${folder: -3}" . && mv "scmvm_linux_${folder: -3}.zip" ../)
+        (cd "$folder" && rm -rf scummvm.ini */scummvm.ini && zip -rq "scmvm_linuxmac_${folder: -3}" . && mv "scmvm_linuxmac_${folder: -3}.zip" ../)
         rm -rf "$folder"
     fi
 done
@@ -1027,20 +1029,20 @@ do
     #[ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac-m1.txt/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac-m1.txt/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac-m1.txt/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac-m1.txt/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac-m1.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac-m1.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac-m1.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac-m1.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/^depcheck=flatpak/,/^fi/c\
 missingDependencies=no\
-#! [[ `which brew` ]] && missingDependencies=yes\
-#! [[ `which aria2c` ]] && missingDependencies=yes\
-#! [[ `spctl --status | grep disabled` ]] && missingDependencies=yes' "$currentScript"
+! [[ `which java` ]] && missingDependencies=yes\
+! [[ `which wget` ]] && missingDependencies=yes\
+! [[ `which zenity` ]] && missingDependencies=yes' "$currentScript"
 done
 
 for file in ../Setup*.msh ../eXoMerge.msh
@@ -1089,7 +1091,7 @@ EOF#' "$file"
     [ -e "$file" ] && sed -i -e '\|^#!/usr/bin/env bash|a \
 if [[ "$OSTYPE" == "darwin"* ]]\
 then\
-    source ~/Library/Application\ Support/exogui/path\
+    source ~/Library/Application\\ Support/exogui/path\
     hash -r\
 fi' "$file"
     [ -e "$file" ] && mv "$file" "${file%.msh}.command"

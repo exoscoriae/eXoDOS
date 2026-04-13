@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-03-22
+# Revised: 2026-04-08
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -968,9 +968,9 @@ EOF
            -e "s|\&\& \"[\./]*emulators/scvm/\(\${svm}\"\)|\&\& \"\1|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\&\& \"\${svm}\"|I" \
            -e "s|scummvm\.ini|scummvm_linux.ini|g" \
-           -e "s|scmvm_sml\.zip|scmvm_linux_sml.zip|" \
-           -e "s|scmvm_med\.zip|scmvm_linux_med.zip|" \
-           -e "s|scmvm_lrg\.zip|scmvm_linux_lrg.zip|" \
+           -e "s|scmvm_sml\.zip|scmvm_linuxmac_sml.zip|" \
+           -e "s|scmvm_med\.zip|scmvm_linuxmac_med.zip|" \
+           -e "s|scmvm_lrg\.zip|scmvm_linuxmac_lrg.zip|" \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-2-0|flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini|I' \
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
     
@@ -3714,23 +3714,6 @@ then\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-3-0-git15811-gf97bfb7ce1"` ]] && missingDependencies=yes\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.vlc"` ]] && missingDependencies=yes\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.wine"` ]] && missingDependencies=yes\
-elif [ $depcheck == "native" ]\
-then\
-    ! [[ `which dosbox-074r3-1` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-ece-r4358` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-gridc-4-3-1` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-staging-082-0` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
-    ! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
-    ! [[ `which gzdoom-4-11-3` ]] && missingDependencies=yes\
-    ! [[ `which scummvm-2-2-0` ]] && missingDependencies=yes\
-    ! [[ `which scummvm-2-3-0-git15811-gf97bfb7ce1` ]] && missingDependencies=yes\
-    ! [[ `which aria2c` ]] && missingDependencies=yes\
-    ! [[ `which vlc` ]] && missingDependencies=yes\
-    ! [[ `which wine` ]] && missingDependencies=yes\
 else\
     missingDependencies=yes\
 fi\
