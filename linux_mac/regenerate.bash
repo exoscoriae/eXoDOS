@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-13
+# Revised: 2026-04-17
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -21,6 +21,7 @@
 #  - DOSBox-X 20240701 (Jul 01 2024)
 #  - DOSBox-X 20241001 (Oct 02 2024)
 #  - DOSBox-X 20250201 (Feb 01 2025)
+#  - DOSBox-X 20250503 (May 03 2025)
 #  - Falkon 25.12.2 (Feb 05 2026)
 #  - ffmpeg version 7.1.1-1ubuntu4.2
 #  - Flatpak 1.16.1
@@ -427,7 +428,7 @@ echo "Removing unnecessary files..."
 
 echo ""
 echo "Creating universal launch files."
-for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh
+for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$currentScript" ] && cat << 'EOF' > "${currentScript%.bsh}.command"
 #!/usr/bin/env bash
@@ -908,8 +909,8 @@ echo "Fixing dosbox.txt typos."
 
 echo "Converting dosbox.txt."
 
-rm -f util/dosbox*_linux.txt 2>/dev/null
-rm util/demoscn_linux.txt 2>/dev/null
+rm -f util/dosbox*_linux.txt util/dosbox*_mac.txt 2>/dev/null
+rm util/demoscn_linux.txt util/demoscn_mac.txt 2>/dev/null
 for file in util/dosbox*.txt util/demoscn.txt
 do
     [ -e "$file" ] && cp "$file" "${file%.txt}_linux.txt"
@@ -929,6 +930,8 @@ do
     [ -e "$file" ] && sed -i -e 's/:staging0\.81\.0a\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-081-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:staging0\.81\.1\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-081-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:staging0\.82\.0\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-082-0/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:staging0\.82\.2\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-082-2/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:staging0\.83\.0\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-083-0/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:x\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-x-08220/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:x2\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-x-20240701/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:X_2024\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20241001/I' "$file" 2>/dev/null
@@ -948,10 +951,33 @@ done
 sed -i -e '/TNM 7 Second Edition/ s|flatpak run com\.retro_exo\.dosbox.*|flatpak run com.retro_exo.wine emulators/dosbox/DOSBox.exe|I' util/dosbox_linux.txt  2>/dev/null
 sed -i -e '/Battle Arena Toshinden / s/ece-r4301/ece-r4358/' util/dosbox_linux.txt  2>/dev/null
 sed -i -e '/Furcol / s/ece-r4301/ece-r4358/' util/dosbox_linux.txt  2>/dev/null
-#skipping dosbox_mac-x64.txt and dosbox_mac-m1.txt until requirements are determined
 
-echo 'flatpak run com.retro_exo.dosbox-staging-082-0' > util/alt_dosbox_linux.txt  2>/dev/null
-#skipping alt_dosbox_mac-x64.txt and dosbox_mac-m1.txt until requirements are determined
+for file in util/dosbox*_linux.txt util/demoscn_linux.txt
+do
+    [ -e "$file" ] && cp "$file" "${file%_linux.txt}_mac.txt"
+done
+
+for file in util/dosbox*_linux.txt util/demoscn_linux.txt
+do
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-074r3-1/:dosbox-074r3-3/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-ece-r4301/:dosbox-ece-r4301/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-ece-r4358/:dosbox-ece-r4358/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-ece-r4482/:dosbox-ece-r4482/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's|:flatpak run com.retro_exo.dosbox-gridc-4-3-1|:dosbox-gridc-4-3-1|I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-081-2/:dosbox-staging-081-2/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-082-0/:dosbox-staging-082-0/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-082-2/:dosbox-staging-082-2/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-083-0/:dosbox-staging-083-0/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-08220/:dosbox-x-08220/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20240701/:dosbox-x-20240701/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20241001/:dosbox-x-20241001/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20250201/:dosbox-x-20250201/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20250503/:dosbox-x-20250503/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's|:flatpak run com.retro_exo.wine |:wine |I' "$file" 2>/dev/null
+done
+
+echo 'flatpak run com.retro_exo.dosbox-staging-082-2' > util/alt_dosbox_linux.txt  2>/dev/null
+echo 'dosbox-staging-082-2' > util/alt_dosbox_mac.txt  2>/dev/null
 
 cp util/scummvm.txt util/scummvm_linux.txt 2>/dev/null
 sed -i -e 's/[[:space:]\t\r]*$//' util/scummvm_linux.txt 2>/dev/null
@@ -968,10 +994,12 @@ dos2unix util/scummvm_linux.txt  2>/dev/null
 [ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm.txt 2>/dev/null
 
 cp util/scummvm_linux.txt util/scummvm_mac.txt 2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-2-0|;scummvm-2-2-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;scummvm-2-8-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;scummvm-2-5-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;scummvm-2-9-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;scummvm-2026-1-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|;scummvm-2-3-0-git15811-gf97bfb7ce1|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;scummvm-2-3-0-git18903-g313a824fb9|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;scummvm-2-8-0-git9335-g00e72a17004|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;scummvm-3-0-0-git20192-g3ca9da6a1c3|I' util/scummvm_mac.txt  2>/dev/null
@@ -979,10 +1007,14 @@ sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;scu
 #remove Linux conf files for games running DOSBox through Wine
 rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/CosmicSh/*_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/MikeGunn/*_linux.conf eXoDOS/\!dos/PackRega/*_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
 
-#recopy Windows conf files to Linux naming convention for games running DOSBox through Wine
+#remove MacOS conf files for games running DOSBox through Wine
+rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/CosmicSh/*_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/desund/*_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/dune2/*_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/MikeGunn/*_mac.conf eXoDOS/\!dos/PackRega/*_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TermFS/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf eXoDOS/\!dos/WarCraft/*_mac.conf 2>/dev/null
+
+#recopy Windows conf files to Linux and macOS naming convention for games running DOSBox through Wine
 for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/CosmicSh/*.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/desund/*.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/dune2/*.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/MikeGunn/*.conf eXoDOS/\!dos/PackRega/*.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TermFS/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf eXoDOS/\!dos/WarCraft/*.conf
 do
     [ -e "$file" ] && cp "$file" "${file%.conf}_linux.conf"
+    [ -e "$file" ] && cp "$file" "${file%.conf}_mac.conf"
 done 2>/dev/null
 
 cp util/dreamm.txt util/dreamm_linux.txt  2>/dev/null
@@ -999,29 +1031,55 @@ dos2unix util/dreamm_mac.txt  2>/dev/null
 
 echo "Preparing macOS shell files..."
 #skipping eXoDOS and eXoScummVM files for now. They will need some additional changes in the converting macOS shell files section.
-for file in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh eXoScummVM/\!*/*/*.bsh eXoScummVM/\!*/*/*/*.bsh Update/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
+for file in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$file" ] && cp "$file" "${file%.bsh}.msh"
 done
 
 echo "Converting macOS shell files..."
-for currentScript in eXoDREAMM/\!*/*/*.msh eXoDREAMM/\!*/*/*/*.msh eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh Update/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
+for currentScript in eXo*/\!*/*/*.msh eXo*/\!*/*/*/*.msh eXo*/\!*/*/*/*/*.msh Magazines/*.msh Magazines/*/*.msh Magazines/*/*/*.msh Videos/*.msh Videos/*/*.msh Videos/*/*/*.msh Update/*.msh emulators/dosbox/*.msh emulators/dosbox/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
     [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/BASH_SOURCE%\.bsh}\.msh/BASH_SOURCE%.msh}.PENDINGbs/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/\(Setup eXo.[^\.]*\)\.bsh/\1.command/Ig' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/\(Setup_.[^\.]*\)\.bsh/\1.command/Ig' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/\(Setup eXo.[^\.]*\)\.bsh/\1.msh/Ig' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/\(Setup_.[^\.]*\)\.bsh/\1.msh/Ig' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/find .*\.msh/! s/\.bsh/.msh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/PENDINGbs/bsh/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/I s/flatpak run com\.retro_exo\.wine //' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/^[^[:space:]]\+foobar2000.exe /I s|foobar2000\.exe|macOS/foobar2000.app/Contents/MacOS/foobar2000|' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' "$currentScript"
     #Note: The foobar2000 app appears to be a dual-platform binary supporting both m1 and x86_64
     #      If there are other binary references that are not dual-platform, they should be split
     #      into macOS/m1/ and macOS/x64/ directories. This will require adding a line to convert
     #      the Linux reference to macOS/m1/ above this note.
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.openuhs/I s/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 ' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /I' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-074r3-1 /dosbox-074r3-3 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4301 /dosbox-ece-r4301 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4358 /dosbox-ece-r4358 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4482 /dosbox-ece-r4482 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.dosbox-gridc-4-3-1 |dosbox-gridc-4-3-1 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-081-2 /dosbox-staging-081-2 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-082-0 /dosbox-staging-082-0 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-082-2 /dosbox-staging-082-2 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-083-0 /dosbox-staging-083-0 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-08220 /dosbox-x-08220 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20240701 /dosbox-x-20240701 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20241001 /dosbox-x-20241001 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20250201 /dosbox-x-20250201 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20250503 /dosbox-x-20250503 /I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run --env=DOOMWADDIR=\./gzdoom com\.retro_exo\.gzdoom-4-11-3 |DOOMWADDIR=./gzdoom gzdoom-4-11-3 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /I' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-2-0 |scummvm-2-2-0 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0 |scummvm-2-8-0 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-5-0 |scummvm-2-5-0 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-9-0 |scummvm-2-9-0 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2026-1-0 |scummvm-2026-1-0 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git15811-gf97bfb7ce1 |scummvm-2-3-0-git15811-gf97bfb7ce1 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git18903-g313a824fb9 |scummvm-2-3-0-git18903-g313a824fb9 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0-git9335-g00e72a17004 |scummvm-2-8-0-git9335-g00e72a17004 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-3-0-0-git20192-g3ca9da6a1c3 |scummvm-3-0-0-git20192-g3ca9da6a1c3 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |I' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.wine/I s|flatpak run com\.retro_exo\.wine |wine |I' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.zenity/I s|flatpak run com\.retro_exo\.zenity |zenity |I' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
@@ -1029,11 +1087,11 @@ do
     #[ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac-m1.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac-m1.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac-m1.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac-m1.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
@@ -1047,56 +1105,18 @@ done
 
 for file in ../Setup*.msh ../eXoMerge.msh
 do
-    [ -e "$file" ] && sed -i -e 's/\.msh}\.bsh/.command}.bsh/' "$file"
-    [ -e "$file" ] && sed -i -e 's/\.bsh}\.msh/.bsh}.command/' "${file%.msh}.bsh"
-    [ -e "$file" ] && sed -i -e 's#^echo "\[Desktop Entry\]" > ~/Desktop/\(.*\).desktop#osascript <<EOF\
+    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/\(.*\)\.desktop#osascript <<EOF\
 tell application "Finder"\
-   set myapp to POSIX file "${scriptDir}/exogui.app" as alias\
-   make new alias to myapp at Desktop\
+   set myapp to POSIX file "${scriptDir%/eXo/util}/exogui.command" as alias\
+   make new alias to myapp at desktop\
    set name of result to "\1.app"\
 end tell\
 EOF#' "$file"
-    [ -e "$file" ] && sed -i -e '/source "\$scriptDir\/\$(basename -- "\${BASH_SOURCE%.command}.bsh")"/c\
-    current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"\
-    case "$current_term" in\
-        "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")\
-            cd eXo/util\
-            source "$scriptDir/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-            exit 0\
-            break;;\
-    esac\
-    unset current_term\
-    if command -v cool-retro-term &> /dev/null\
-    then\
-        cool-retro-term -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif command -v konsole &> /dev/null\
-    then\
-        konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [[ `flatpak list 2>/dev/null | grep "retro_exo\\.konsole"` ]]\
-    then\
-        flatpak run com.retro_exo.konsole -e /usr/bin/env bash "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &\
-        exit 0\
-    elif [[ "$-" == *i* ]]\
-    then\
-        source "$PWD/eXo/util/$(basename -- "${BASH_SOURCE%.command}.bsh")"\
-        exit 0\
-    else\
-        logger -s "eXo: no supported terminal emulators are installed."\
-        exit 1\
-    fi\
-' "$file"
+    [ -e "${file%.msh}.command" ] && sed -i '/cd "\$( dirname "\$BASH_SOURCE")"/a cd eXo/util || { logger -s "ERROR: Unable to change to eXo/util directory. Aborting."; exit 1; }' "${file%.msh}.command"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"
-    [ -e "$file" ] && sed -i -e '\|^#!/usr/bin/env bash|a \
-if [[ "$OSTYPE" == "darwin"* ]]\
-then\
-    source ~/Library/Application\\ Support/exogui/path\
-    hash -r\
-fi' "$file"
-    [ -e "$file" ] && mv "$file" "${file%.msh}.command"
+    [ -e "$file" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "$file"
     [ -e "${file%.msh}.bsh" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "${file%.msh}.bsh"
-    [ -e "${file%.msh}.bsh" ] && sed -i -e '/command/ s|\(source "$scriptDir/\)\($(basename\)|\1../../\2|' "${file%.msh}.bsh"
+    [ -e "$file" ] && mv "$file" ./util/
     [ -e "${file%.msh}.bsh" ] && mv "${file%.msh}.bsh" ./util/
 done
 
