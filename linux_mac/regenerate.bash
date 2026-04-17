@@ -957,7 +957,7 @@ do
     [ -e "$file" ] && cp "$file" "${file%_linux.txt}_mac.txt"
 done
 
-for file in util/dosbox*_linux.txt util/demoscn_linux.txt
+for file in util/dosbox*_mac.txt util/demoscn_mac.txt
 do
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-074r3-1/:dosbox-074r3-3/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-ece-r4301/:dosbox-ece-r4301/I' "$file" 2>/dev/null
