@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-17
+# Revised: 2026-04-18
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1046,10 +1046,6 @@ do
     [ -e "$currentScript" ] && sed -i -e '/find .*\.msh/! s/\.bsh/.msh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/PENDINGbs/bsh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' "$currentScript"
-    #Note: The foobar2000 app appears to be a dual-platform binary supporting both m1 and x86_64
-    #      If there are other binary references that are not dual-platform, they should be split
-    #      into macOS/m1/ and macOS/x64/ directories. This will require adding a line to convert
-    #      the Linux reference to macOS/m1/ above this note.
     [ -e "$currentScript" ] && sed -i -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 ' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /I' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-074r3-1 /dosbox-074r3-3 /I' "$currentScript" 2>/dev/null
@@ -1087,6 +1083,7 @@ do
     #[ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.conf/_mac.conf/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
@@ -1096,6 +1093,7 @@ do
     [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/Linux 64/MacOS/gI' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/^depcheck=flatpak/,/^fi/c\
 missingDependencies=no\
 ! [[ `which java` ]] && missingDependencies=yes\
@@ -1121,6 +1119,13 @@ EOF#' "$file"
 done
 
 chmod +x ../*.command 2>/dev/null
+
+echo "Creating MacOS DOSBox configuration files. This may take a few minutes."
+rm eXo*/\!*/*/*_mac.conf eXo*/\!*/*/*/*_mac.conf dosbox/*_mac.conf dosbox/*/*_mac.conf emulators/dosbox/*_mac.conf emulators/dosbox/*/*_mac.conf Magazines/*/*_mac.conf Magazines/*/*/*_mac.conf 2>/dev/null
+for file in eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf
+do
+    [ -e "$file" ] && cp "$file" "${file%_linux.conf}_mac.conf"
+done 2>/dev/null
 
 echo "Correcting xml inconsistencies..."
 for file in ../Data/Platforms/ScummVM.xml ../Data/Platforms/ScummVM\ SVN.xml ../xml/all/ScummVM.xml ../xml/all/ScummVM\ SVN.xml ../xml/family/ScummVM.xml ../xml/family/ScummVM\ SVN.xml
