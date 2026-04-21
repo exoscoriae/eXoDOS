@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-18
+# Revised: 2026-04-20
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -207,9 +207,14 @@ for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.ba
 do
     [ -e "$file" ] && sed -i -e "s/\.\\\download\\\/.\\\DOWNLOAD\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exodos\\\/eXoDOS\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exoappleiigs\\\eXoAppleIIGS\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exodemoscn\\\eXoDemoScn\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exodreamm\\\/eXoDREAMM\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exoif\\\/eXoIF\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exopcjr\\\/eXoPCjr\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exoscummvm\\\/eXoScummVM\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exowin3x\\\/eXoWin3x\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exowin9x\\\/eXoWin9x\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exo\\\/eXo\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e 's/^cd exo/cd eXo/I' "$file"
     [ -e "$file" ] && sed -i -e 's/^cd eXodos/cd eXoDOS/I' "$file"
@@ -264,24 +269,56 @@ do
     [ -e "$file" ] && sed -i -e "s/install\.bat/Install.bat/Ig" "$file"
 done
 
-[ `ls -1 eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tandy\.SEL|TANDY.SEL|Ig" eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\mt32|ckrynn\\\MT32|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\sb16|ckrynn\\\SB16|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/dom_door/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|chain\.txt|CHAIN.TXT|gI" eXoDOS/\!dos/dom_door/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/drkqueen/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|disk1|DISK1|gI" eXoDOS/\!dos/drkqueen/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/gfterri/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|gfupdate|GFUpdate|gI" eXoDOS/\!dos/gfterri/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/gftracy/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|gf\\gfupdate|GF\\GFUpdate|gI" eXoDOS/\!dos/gftracy/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/gnomer/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|taskill|taskkill|gI" eXoDOS/\!dos/gnomer/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/jrrtf1/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosbox_tandy|dosbox_Tandy|Ig" eXoDOS/\!dos/jrrtf1/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/Priv2SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|privateer2\.cfg|Privateer2.cfg|Ig" eXoDOS/\!dos/Priv2SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosbox\.rst|DOSBOX.RST|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|program|PROGRAM|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|temp|TEMP|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tnm7se|TNM7SE|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tnmgs|TNMGS|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.exe|TNMGS.EXE|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.no|TNMGS.NO|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/wastland/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|setup\.sel|setup.SEL|Ig" eXoDOS/\!dos/wastland/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tandy\.SEL|TANDY.SEL|Ig" eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\mt32|ckrynn\\\MT32|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\sb16|ckrynn\\\SB16|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/dom_door/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|chain\.txt|CHAIN.TXT|gI" eXoDOS/\!dos/dom_door/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/drkqueen/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|disk1|DISK1|gI" eXoDOS/\!dos/drkqueen/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/gfterri/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|gfupdate|GFUpdate|gI" eXoDOS/\!dos/gfterri/exception.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/gftracy/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|gf\\\gfupdate|GF\\\GFUpdate|gI" eXoDOS/\!dos/gftracy/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/gnomer/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|taskill|taskkill|gI" eXoDOS/\!dos/gnomer/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/jrrtf1/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosbox_tandy|dosbox_Tandy|Ig" eXoDOS/\!dos/jrrtf1/exception.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/KQ4/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosboxc|dosboxC|Ig" eXoDOS/\!dos/KQ4/exception.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/KQ4/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosboxh|dosboxH|Ig" eXoDOS/\!dos/KQ4/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/Priv2SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|privateer2\.cfg|Privateer2.cfg|Ig" eXoDOS/\!dos/Priv2SE/exception.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/QG1OLD/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosboxc|dosboxC|Ig" eXoDOS/\!dos/QG1OLD/exception.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/QG1OLD/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosboxh|dosboxH|Ig" eXoDOS/\!dos/QG1OLD/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|dosbox\.rst|DOSBOX.RST|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|program|PROGRAM|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|temp|TEMP|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tnm7se|TNM7SE|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tnmgs|TNMGS|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.exe|TNMGS.EXE|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.no|TNMGS.NO|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/wastland/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|setup\.sel|setup.SEL|Ig" eXoDOS/\!dos/wastland/exception.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/BURGER/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/BURGER/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/BlakCaul/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/BlakCaul/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/FantasyW/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/FantasyW/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/GoldRush/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/GoldRush/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/SyndWars/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SyndWars/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/TassTime/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/TassTime/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/bforce/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/bforce/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/demotomb/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/demotomb/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/ecoq2/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/ecoq2/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/fable/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fable/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/fallout1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fallout1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/fqueen/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fqueen/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/losteden/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/losteden/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/mansiond/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/mansiond/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/mi1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/mi1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/moonmist/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/moonmist/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/rw1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/rw1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/shcrt/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/shcrt/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/sorc/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/sorc/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/spelbrek/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/spelbrek/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/ultima71/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/ultima71/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/wastland/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/wastland/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoScummVM/\!ScummVM/Al\ Emmo\ And\ The\ Lost\ Dutchman\'s\ Mine\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Al\ Emmo\ And\ The\ Lost\ Dutchman\'s\ Mine\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoScummVM/\!ScummVM/Black\ Cauldron,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Black\ Cauldron,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoScummVM/\!ScummVM/Blackwell\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Blackwell\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
@@ -507,141 +544,145 @@ do
     [ -e "$file" ] && sed -i -e "s/PPMode/PPmode/I" "$file"
 done 2>/dev/null
 
-[ -e eXoDOS/\!dos/11thHour/dosbox.conf ] && sed -i -e "s/\\\eXoDOS\\\11thhour/\\\eXoDOS\\\11thHour/Ig" eXoDOS/\!dos/11thHour/dosbox.conf
-[ -e eXoDOS/\!dos/1942PAW/dosbox.conf ] && sed -i -e "s/1942PAW\\\CD\\\/1942PAW\\\cd\\\/" eXoDOS/\!dos/1942PAW/dosbox.conf
-[ -e eXoDOS/\!dos/442/dosbox.conf ] && sed -i -e "s/442\\\cd\\\/442\\\CD\\\/" eXoDOS/\!dos/442/dosbox.conf
-[ -e eXoDOS/\!dos/ACF95/dosbox.conf ] && sed -i -e "s/ACF95\\\cd\\\/ACF95\\\CD\\\/" eXoDOS/\!dos/ACF95/dosbox.conf
-[ -e eXoDOS/\!dos/Airstrik/dosbox.conf ] && sed -i -e "s/cd\\\ATF2\.iso/cd\\\ATF2.ISO/" eXoDOS/\!dos/Airstrik/dosbox.conf
-[ -e eXoDOS/\!dos/amaeden/dosbox.conf ] && sed -i -e "s/\\\cd\\\/\\\CD\\\/Ig" eXoDOS/\!dos/amaeden/dosbox.conf
-[ -e eXoDOS/\!dos/amaeden/dosbox.conf ] && sed -i -e "s/\\\floppy\\\d\([[:digit:]]\)\.ima/\\\floppy\\\d\1.IMA/Ig" eXoDOS/\!dos/amaeden/dosbox.conf
-[ -e eXoDOS/\!dos/amonra/dosbox.conf ] && sed -i -e "s/\\\amonra\\\cd\\\/\\\amonra\\\CD\\\/Ig" eXoDOS/\!dos/amonra/dosbox.conf
-[ -e eXoDOS/\!dos/amonra/dosbox.conf ] && sed -i -e "s/amonra\\\floppy\\\audio\.ima/amonra\\\floppy\\\Audio.ima/Ig" eXoDOS/\!dos/amonra/dosbox.conf
-[ -e eXoDOS/\!dos/Apodrasi/dosbox.conf ] && sed -i -e "s/Apodrasi\\\cd\\\/Apodrasi\\\CD\\\/" eXoDOS/\!dos/Apodrasi/dosbox.conf
-[ -e eXoDOS/\!dos/Astrorck/dosbox.conf ] && sed -i -e "s/Astrorck\\\CD\\\Astrorck\.cue/Astrorck\\\CD\\\Astrorck.CUE/" eXoDOS/\!dos/Astrorck/dosbox.conf
-[ -e eXoDOS/\!dos/AtW/dosbox.conf ] && sed -i -e "s/eXoDOS\\\ATW/eXoDOS\\\AtW/" eXoDOS/\!dos/AtW/dosbox.conf
-[ -e eXoDOS/\!dos/AtWXmas/dosbox.conf ] && sed -i -e "s/eXoDOS\\\ATWXmas/eXoDOS\\\AtWXmas/" eXoDOS/\!dos/AtWXmas/dosbox.conf
-[ -e eXoDOS/\!dos/BallHell/dosbox.conf ] && sed -i -e "s/BallHell\\\cd\\\/BallHell\\\CD\\\/" eXoDOS/\!dos/BallHell/dosbox.conf
-[ -e eXoDOS/\!dos/bangalor/dosbox.conf ] && sed -i -e "s/eXoDOS\\\Bangalor/eXoDOS\\\bangalor/" eXoDOS/\!dos/bangalor/dosbox.conf
-[ -e eXoDOS/\!dos/BatChop/dosbox.conf ] && sed -i -e "s/eXoDOS\\\BatCHop/eXoDOS\\\BatChop/" eXoDOS/\!dos/BatChop/dosbox.conf
-[ -e eXoDOS/\!dos/bchessCD/dosbox.conf ] && sed -i -e "s/eXoDOS\\\bchesscd/eXoDOS\\\bchessCD/" eXoDOS/\!dos/bchessCD/dosbox.conf
-[ -e eXoDOS/\!dos/beamish/dosbox.conf ] && sed -i -e "s/beamish\\\CD\\\/beamish\\\cd\\\/" eXoDOS/\!dos/beamish/dosbox.conf
-[ -e eXoDOS/\!dos/BrutalPa/dosbox.conf ] && sed -i -e "s/BrutalPa\\\cd\\\/BrutalPa\\\CD\\\/" eXoDOS/\!dos/BrutalPa/dosbox.conf
-[ -e eXoDOS/\!dos/castleb/dosbox.conf ] && sed -i -e "s/castleb\\\cd\\\/castleb\\\CD\\\/" eXoDOS/\!dos/castleb/dosbox.conf
-[ -e eXoDOS/\!dos/chewy/dosbox.conf ] && sed -i -e "s/chewy\\\cd\\\/chewy\\\CD\\\/" eXoDOS/\!dos/chewy/dosbox.conf
-[ -e eXoDOS/\!dos/colorama/dosbox.conf ] && sed -i -e "s/colorama\\\cd\\\/colorama\\\CD\\\/" eXoDOS/\!dos/colorama/dosbox.conf
-[ -e eXoDOS/\!dos/coversp/dosbox.conf ] && sed -i -e "s/coversp\\\cd\\\poker\.cue/coversp\\\CD\\\Poker.cue/" eXoDOS/\!dos/coversp/dosbox.conf
-[ -e eXoDOS/\!dos/Darkseed/dosbox.conf ] && sed -i -e "s/eXoDOS\\\darkseed/eXoDOS\\\Darkseed/" eXoDOS/\!dos/Darkseed/dosbox.conf
-[ -e eXoDOS/\!dos/defcrown/dosbox_tandy.conf ] && sed -i -e "s/DOTCEGA\.IMG/DOTCEGA.img/" eXoDOS/\!dos/defcrown/dosbox_tandy.conf
-[ -e eXoDOS/\!dos/DejaVu/dosbox.conf ] && sed -i -e "s/eXoDOS\\\dejavu/eXoDOS\\\DejaVu/" eXoDOS/\!dos/DejaVu/dosbox.conf
-[ -e eXoDOS/\!dos/dinoadv/dosbox.conf ] && sed -i -e "s/dinoadv\\\cd\\\/dinoadv\\\CD\\\/" eXoDOS/\!dos/dinoadv/dosbox.conf
-[ -e eXoDOS/\!dos/DinoAdvn/dosbox.conf ] && sed -i -e "s/DinoAdvn\\\cd\\\/DinoAdvn\\\CD\\\/" eXoDOS/\!dos/DinoAdvn/dosbox.conf
-[ -e eXoDOS/\!dos/drakkhen/dosbox.conf ] && sed -i -e "s/eXoDOS\\\DRAKKHEN/eXoDOS\\\drakkhen/" eXoDOS/\!dos/drakkhen/dosbox.conf
-[ -e eXoDOS/\!dos/Duke\!Z/dosbox.conf ] && sed -i -e "s/imgmount d  /imgmount d /" eXoDOS/\!dos/Duke\!Z/dosbox.conf
-[ -e eXoDOS/\!dos/Ebola/dosbox.conf ] && sed -i -e "s/Ebola\\\cd\\\/Ebola\\\CD\\\/" eXoDOS/\!dos/Ebola/dosbox.conf
-[ -e eXoDOS/\!dos/EnemFSp/dosbox.conf ] && sed -i -e "s/EnemFSp\\\cd\\\/EnemFSp\\\CD\\\/" eXoDOS/\!dos/EnemFSp/dosbox.conf
-[ -e eXoDOS/\!dos/Enrak/dosbox.conf ] && sed -i -e "s/eXoDOS\\\enrak/eXoDOS\\\Enrak/" eXoDOS/\!dos/Enrak/dosbox.conf
-[ -e eXoDOS/\!dos/erudit/dosbox.conf ] && sed -i -e "s/eXoDOS\\\Erudit/eXoDOS\\\erudit/" eXoDOS/\!dos/erudit/dosbox.conf
-[ -e eXoDOS/\!dos/EscSt7/dosbox.conf ] && sed -i -e "s/EscSt7\\\Floppy/EscSt7\\\floppy/" eXoDOS/\!dos/EscSt7/dosbox.conf
-[ -e eXoDOS/\!dos/fieldglo/dosbox.conf ] && sed -i -e "s/fieldglo\\\cd\\\/fieldglo\\\CD\\\/" eXoDOS/\!dos/fieldglo/dosbox.conf
-[ -e eXoDOS/\!dos/FightDSE/dosbox.conf ] && sed -i -e "s/cd\\\FDUEL\.cue/cd\\\FDUEL.CUE/" eXoDOS/\!dos/FightDSE/dosbox.conf
-[ -e eXoDOS/\!dos/FootM98/dosbox.conf ] && sed -i -e "s/CD\\\FM98\.cue/CD\\\FM98.CUE/" eXoDOS/\!dos/FootM98/dosbox.conf
-[ -e eXoDOS/\!dos/FunNGame/dosbox.conf ] && sed -i -e "s/FunNGame\\\cd\\\/FunNGame\\\CD\\\/" eXoDOS/\!dos/FunNGame/dosbox.conf
-[ -e eXoDOS/\!dos/GalPani/dosbox.conf ] && sed -i -e "s/GalPani\\\cd\\\/GalPani\\\CD\\\/" eXoDOS/\!dos/GalPani/dosbox.conf
-[ -e eXoDOS/\!dos/GalPani2/dosbox.conf ] && sed -i -e "s/GalPani2\\\cd\\\/GalPani2\\\CD\\\/" eXoDOS/\!dos/GalPani2/dosbox.conf
-[ -e eXoDOS/\!dos/gftracy/dosbox.conf ] && sed -i -e "s/gftracy\\\cd\\\/gftracy\\\CD\\\/" eXoDOS/\!dos/gftracy/dosbox.conf
-[ -e eXoDOS/\!dos/gk1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\GK1/eXoDOS\\\gk1/" eXoDOS/\!dos/gk1/dosbox.conf
-[ -e eXoDOS/\!dos/GK2/dosbox.conf ] && sed -i -e "s/GK2\\\cd\\\/GK2\\\CD\\\/g" eXoDOS/\!dos/GK2/dosbox.conf
-[ -e eXoDOS/\!dos/gob2/dosbox.conf ] && sed -i -e "s/gob2\\\floppy\\\1\.ima/gob2\\\floppy\\\1.IMA/" eXoDOS/\!dos/gob2/dosbox.conf
-[ -e eXoDOS/\!dos/gob2/dosbox.conf ] && sed -i -e "s/gob2\\\floppy\\\2\.ima/gob2\\\floppy\\\2.IMA/" eXoDOS/\!dos/gob2/dosbox.conf
-[ -e eXoDOS/\!dos/GuySpyan/dosbox.conf ] && sed -i -e "s/GuySpyan\\\cd\\\/GuySpyan\\\CD\\\/" eXoDOS/\!dos/GuySpyan/dosbox.conf
-[ -e eXoDOS/\!dos/HACK/dosbox.conf ] && sed -i -e "s/eXoDOS\\\hack/eXoDOS\\\HACK/" eXoDOS/\!dos/HACK/dosbox.conf
-[ -e eXoDOS/\!dos/HARVEST/dosbox.conf ] && sed -i -e "s/eXoDOS\\\harvest/eXoDOS\\\HARVEST/" eXoDOS/\!dos/HARVEST/dosbox.conf
-[ -e eXoDOS/\!dos/HARVEST/dosbox.conf ] && sed -i -e "s/\.iso/.ISO/g" eXoDOS/\!dos/HARVEST/dosbox.conf
-[ -e eXoDOS/\!dos/HaunCas/dosbox.conf ] && sed -i -e "s/HaunCas\\\cd\\\/HaunCas\\\CD\\\/" eXoDOS/\!dos/HaunCas/dosbox.conf
-[ -e eXoDOS/\!dos/HickTown/dosbox.conf ] && sed -i -e "s/eXoDOS\\\hicktown/eXoDOS\\\HickTown/" eXoDOS/\!dos/HickTown/dosbox.conf
-[ -e eXoDOS/\!dos/HugoMaze/dosbox.conf ] && sed -i -e "s/eXoDOS\\\hugomaze/eXoDOS\\\HugoMaze/" eXoDOS/\!dos/HugoMaze/dosbox.conf
-[ -e eXoDOS/\!dos/Iceman/dosbox.conf ] && sed -i -e "s/eXoDOS\\\iceman/eXoDOS\\\Iceman/" eXoDOS/\!dos/Iceman/dosbox.conf
-[ -e eXoDOS/\!dos/InExtrem/dosbox.conf ] && sed -i -e "s/InExtrem\\\floppy/InExtrem\\\Floppy/g" eXoDOS/\!dos/InExtrem/dosbox.conf
-[ -e eXoDOS/\!dos/KSoul/dosbox.conf ] && sed -i -e "s/eXoDOS\\\Ksoul/eXoDOS\\\KSoul/" eXoDOS/\!dos/KSoul/dosbox.conf
-[ -e eXoDOS/\!dos/lafferu/dosbox.conf ] && sed -i -e "s/eXoDOS\\\LafferU/eXoDOS\\\lafferu\\\CD\\\/" eXoDOS/\!dos/lafferu/dosbox.conf
-[ -e eXoDOS/\!dos/LSL7DOS/dosbox.conf ] && sed -i -e "s/eXoDOS\\\lsl7dos\\\cd\\\/eXoDOS\\\LSL7DOS\\\CD\\\/" eXoDOS/\!dos/LSL7DOS/dosbox.conf
-[ -e eXoDOS/\!dos/LSL7DOS/dosbox.conf ] && sed -i -e "s/eXoDOS\\\lsl7dos/eXoDOS\\\LSL7DOS/" eXoDOS/\!dos/LSL7DOS/dosbox.conf
-[ -e eXoDOS/\!dos/mastori2/dosbox.conf ] && sed -i -e "s/mps\\\orion2\\\/MPS\\\ORION2\\\/" eXoDOS/\!dos/mastori2/dosbox.conf
-[ -e eXoDOS/\!dos/MegaMa94/dosbox.conf ] && sed -i -e "s/MegaMa94\\\CD\\\/MegaMa94\\\cd\\\/" eXoDOS/\!dos/MegaMa94/dosbox.conf
-[ -e eXoDOS/\!dos/MegaMaze/dosbox.conf ] && sed -i -e "s/MegaMaze\\\cd\\\/MegaMaze\\\CD\\\/" eXoDOS/\!dos/MegaMaze/dosbox.conf
-[ -e eXoDOS/\!dos/Midway/dosbox.conf ] && sed -i -e "s/Midway\\\cd\\\/Midway\\\CD\\\/" eXoDOS/\!dos/Midway/dosbox.conf
-[ -e eXoDOS/\!dos/MiniPrin/dosbox.conf ] && sed -i -e "s/eXoDOS\\\miniprin/eXoDOS\\\MiniPrin/" eXoDOS/\!dos/MiniPrin/dosbox.conf
-[ -e eXoDOS/\!dos/MMansion/dosbox.conf ] && sed -i -e "s/eXoDOS\\\mmansion/eXoDOS\\\MMansion/" eXoDOS/\!dos/MMansion/dosbox.conf
-[ -e eXoDOS/\!dos/MonmallA/dosbox.conf ] && sed -i -e "s/MonmallA\\\CD\\\/MonmallA\\\cd\\\/" eXoDOS/\!dos/MonmallA/dosbox.conf
-[ -e eXoDOS/\!dos/MRPlus/dosbox.conf ] && sed -i -e "s/eXoDOS\\\MRPLus/eXoDOS\\\MRPlus/" eXoDOS/\!dos/MRPlus/dosbox.conf
-[ -e eXoDOS/\!dos/mutanoiW/dosbox.conf ] && sed -i -e "s/\\\floppy\\\disk0\([[:digit:]]\)\.ima/\\\floppy\\\DISK0\1.IMA/Ig" eXoDOS/\!dos/mutanoiW/dosbox.conf
-[ -e eXoDOS/\!dos/NewsRmPr/dosbox.conf ] && sed -i -e "s/\\\floppy\\\disk0\([[:digit:]]\)\.img/\\\floppy\\\Disk0\1.img/Ig" eXoDOS/\!dos/NewsRmPr/dosbox.conf
-[ -e eXoDOS/\!dos/OpJuBec/dosbox.conf ] && sed -i -e "s/OpJuBec\\\cd\\\/OpJuBec\\\CD\\\/" eXoDOS/\!dos/OpJuBec/dosbox.conf
-[ -e eXoDOS/\!dos/PBase/dosbox.conf ] && sed -i -e "s/PBase\\\cd\\\/PBase\\\CD\\\/" eXoDOS/\!dos/PBase/dosbox.conf
-[ -e eXoDOS/\!dos/PQ1_VGA/dosbox.conf ] && sed -i -e "s/eXoDOS\\\pq1_vga/eXoDOS\\\PQ1_VGA/" eXoDOS/\!dos/PQ1_VGA/dosbox.conf
-[ -e eXoDOS/\!dos/prnmania/dosbox.conf ] && sed -i -e "s/prnmania\\\cd\\\/prnmania\\\CD\\\/g" eXoDOS/\!dos/prnmania/dosbox.conf
-[ -e eXoDOS/\!dos/puttmoon/dosbox.conf ] && sed -i -e "s/puttmoon\\\cd\\\/puttmoon\\\CD\\\/g" eXoDOS/\!dos/puttmoon/dosbox.conf
-[ -e eXoDOS/\!dos/puttpara/dosbox.conf ] && sed -i -e "s/puttpara\\\cd\\\/puttpara\\\CD\\\/g" eXoDOS/\!dos/puttpara/dosbox.conf
-[ -e eXoDOS/\!dos/Quarant/dosbox.conf ] && sed -i -e "s/CD\\\Quarantine\.cue/CD\\\QUARANTINE.cue/" eXoDOS/\!dos/Quarant/dosbox.conf
-[ -e eXoDOS/\!dos/QuizKids/dosbox.conf ] && sed -i -e "s/QuizKids\\\floppy\\\QuizKids\.ima/QuizKids\\\floppy\\\QuizKids.IMA/" eXoDOS/\!dos/QuizKids/dosbox.conf
-[ -e eXoDOS/\!dos/RadixBey/dosbox.conf ] && sed -i -e "s/RadixBey\\\cd\\\/RadixBey\\\CD\\\/" eXoDOS/\!dos/RadixBey/dosbox.conf
-[ -e eXoDOS/\!dos/RaymanFr/dosbox.conf ] && sed -i -e "s/RaymanFr\\\cd\\\/RaymanFr\\\CD\\\/" eXoDOS/\!dos/RaymanFr/dosbox.conf
-[ -e eXoDOS/\!dos/ReadRab2/dosbox.conf ] && sed -i -e "s/ReadRab2\\\floppy\\\image\.ima/ReadRab2\\\floppy\\\image.IMA/" eXoDOS/\!dos/ReadRab2/dosbox.conf
-[ -e eXoDOS/\!dos/RECALL/dosbox.conf ] && sed -i -e "s/eXoDOS\\\recall/eXoDOS\\\RECALL/" eXoDOS/\!dos/RECALL/dosbox.conf
-[ -e eXoDOS/\!dos/RM_CP/dosbox.conf ] && sed -i -e "s/RM_CP\\\cd\\\/RM_CP\\\CD\\\/g" eXoDOS/\!dos/RM_CP/dosbox.conf
-[ -e eXoDOS/\!dos/RM_DW/dosbox.conf ] && sed -i -e "s/RM_DW\\\cd\\\/RM_DW\\\CD\\\/g" eXoDOS/\!dos/RM_DW/dosbox.conf
-[ -e eXoDOS/\!dos/RM_Entity/dosbox.conf ] && sed -i -e "s/RM_Entity\\\cd\\\/RM_Entity\\\CD\\\/g" eXoDOS/\!dos/RM_Entity/dosbox.conf
-[ -e eXoDOS/\!dos/RM_FT/dosbox.conf ] && sed -i -e "s/RM_FT\\\cd\\\FL2CD\.iso/RM_FT\\\CD\\\FL2CD.ISO/g" eXoDOS/\!dos/RM_FT/dosbox.conf
-[ -e eXoDOS/\!dos/RM_FT/dosbox.conf ] && sed -i -e "s/RM_FT\\\cd\\\FL3CD\.iso/RM_FT\\\CD\\\FL3CD.ISO/g" eXoDOS/\!dos/RM_FT/dosbox.conf
-[ -e eXoDOS/\!dos/RM_FT/dosbox.conf ] && sed -i -e "s/RM_FT\\\cd\\\Flash1\.iso/RM_FT\\\CD\\\FLASH1.ISO/g" eXoDOS/\!dos/RM_FT/dosbox.conf
-[ -e eXoDOS/\!dos/RM_LOTR/dosbox.conf ] && sed -i -e "s/RM_LOTR\\\cd\\\/RM_LOTR\\\CD\\\/g" eXoDOS/\!dos/RM_LOTR/dosbox.conf
-[ -e eXoDOS/\!dos/RM_TH/dosbox.conf ] && sed -i -e "s/RM_TH\\\cd\\\/RM_TH\\\CD\\\/g" eXoDOS/\!dos/RM_TH/dosbox.conf
-[ -e eXoDOS/\!dos/ROMANTIC/dosbox.conf ] && sed -i -e "s/ROMANTIC\\\CD\\\/ROMANTIC\\\cd\\\/" eXoDOS/\!dos/ROMANTIC/dosbox.conf
-[ -e eXoDOS/\!dos/rzork/dosbox.conf ] && sed -i -e "s/rzork\\\cd\\\/rzork\\\CD\\\/" eXoDOS/\!dos/rzork/dosbox.conf
-[ -e eXoDOS/\!dos/SGate/dosbox.conf ] && sed -i -e "s/eXoDOS\\\sgate/eXoDOS\\\SGate/" eXoDOS/\!dos/SGate/dosbox.conf
+#[ -e eXoDOS/\!dos/11thHour/dosbox.conf ] && sed -i -e "s/\\\eXoDOS\\\11thhour/\\\eXoDOS\\\11thHour/Ig" eXoDOS/\!dos/11thHour/dosbox.conf
+#[ -e eXoDOS/\!dos/1942PAW/dosbox.conf ] && sed -i -e "s/1942PAW\\\CD\\\/1942PAW\\\cd\\\/" eXoDOS/\!dos/1942PAW/dosbox.conf
+#[ -e eXoDOS/\!dos/442/dosbox.conf ] && sed -i -e "s/442\\\cd\\\/442\\\CD\\\/" eXoDOS/\!dos/442/dosbox.conf
+#[ -e eXoDOS/\!dos/ACF95/dosbox.conf ] && sed -i -e "s/ACF95\\\cd\\\/ACF95\\\CD\\\/" eXoDOS/\!dos/ACF95/dosbox.conf
+#[ -e eXoDOS/\!dos/Airstrik/dosbox.conf ] && sed -i -e "s/cd\\\ATF2\.iso/cd\\\ATF2.ISO/" eXoDOS/\!dos/Airstrik/dosbox.conf
+#[ -e eXoDOS/\!dos/amaeden/dosbox.conf ] && sed -i -e "s/\\\cd\\\/\\\CD\\\/Ig" eXoDOS/\!dos/amaeden/dosbox.conf
+#[ -e eXoDOS/\!dos/amaeden/dosbox.conf ] && sed -i -e "s/\\\floppy\\\d\([[:digit:]]\)\.ima/\\\floppy\\\d\1.IMA/Ig" eXoDOS/\!dos/amaeden/dosbox.conf
+#[ -e eXoDOS/\!dos/amonra/dosbox.conf ] && sed -i -e "s/\\\amonra\\\cd\\\/\\\amonra\\\CD\\\/Ig" eXoDOS/\!dos/amonra/dosbox.conf
+#[ -e eXoDOS/\!dos/amonra/dosbox.conf ] && sed -i -e "s/amonra\\\floppy\\\audio\.ima/amonra\\\floppy\\\Audio.ima/Ig" eXoDOS/\!dos/amonra/dosbox.conf
+#[ -e eXoDOS/\!dos/Apodrasi/dosbox.conf ] && sed -i -e "s/Apodrasi\\\cd\\\/Apodrasi\\\CD\\\/" eXoDOS/\!dos/Apodrasi/dosbox.conf
+#[ -e eXoDOS/\!dos/Astrorck/dosbox.conf ] && sed -i -e "s/Astrorck\\\CD\\\Astrorck\.cue/Astrorck\\\CD\\\Astrorck.CUE/" eXoDOS/\!dos/Astrorck/dosbox.conf
+#[ -e eXoDOS/\!dos/AtW/dosbox.conf ] && sed -i -e "s/eXoDOS\\\ATW/eXoDOS\\\AtW/" eXoDOS/\!dos/AtW/dosbox.conf
+#[ -e eXoDOS/\!dos/AtWXmas/dosbox.conf ] && sed -i -e "s/eXoDOS\\\ATWXmas/eXoDOS\\\AtWXmas/" eXoDOS/\!dos/AtWXmas/dosbox.conf
+#[ -e eXoDOS/\!dos/BallHell/dosbox.conf ] && sed -i -e "s/BallHell\\\cd\\\/BallHell\\\CD\\\/" eXoDOS/\!dos/BallHell/dosbox.conf
+#[ -e eXoDOS/\!dos/bangalor/dosbox.conf ] && sed -i -e "s/eXoDOS\\\Bangalor/eXoDOS\\\bangalor/" eXoDOS/\!dos/bangalor/dosbox.conf
+#[ -e eXoDOS/\!dos/BatChop/dosbox.conf ] && sed -i -e "s/eXoDOS\\\BatCHop/eXoDOS\\\BatChop/" eXoDOS/\!dos/BatChop/dosbox.conf
+#[ -e eXoDOS/\!dos/bchessCD/dosbox.conf ] && sed -i -e "s/eXoDOS\\\bchesscd/eXoDOS\\\bchessCD/" eXoDOS/\!dos/bchessCD/dosbox.conf
+#[ -e eXoDOS/\!dos/beamish/dosbox.conf ] && sed -i -e "s/beamish\\\CD\\\/beamish\\\cd\\\/" eXoDOS/\!dos/beamish/dosbox.conf
+#[ -e eXoDOS/\!dos/BrutalPa/dosbox.conf ] && sed -i -e "s/BrutalPa\\\cd\\\/BrutalPa\\\CD\\\/" eXoDOS/\!dos/BrutalPa/dosbox.conf
+#[ -e eXoDOS/\!dos/castleb/dosbox.conf ] && sed -i -e "s/castleb\\\cd\\\/castleb\\\CD\\\/" eXoDOS/\!dos/castleb/dosbox.conf
+#[ -e eXoDOS/\!dos/chewy/dosbox.conf ] && sed -i -e "s/chewy\\\cd\\\/chewy\\\CD\\\/" eXoDOS/\!dos/chewy/dosbox.conf
+#[ -e eXoDOS/\!dos/colorama/dosbox.conf ] && sed -i -e "s/colorama\\\cd\\\/colorama\\\CD\\\/" eXoDOS/\!dos/colorama/dosbox.conf
+#[ -e eXoDOS/\!dos/coversp/dosbox.conf ] && sed -i -e "s/coversp\\\cd\\\poker\.cue/coversp\\\CD\\\Poker.cue/" eXoDOS/\!dos/coversp/dosbox.conf
+#[ -e eXoDOS/\!dos/Darkseed/dosbox.conf ] && sed -i -e "s/eXoDOS\\\darkseed/eXoDOS\\\Darkseed/" eXoDOS/\!dos/Darkseed/dosbox.conf
+#[ -e eXoDOS/\!dos/defcrown/dosbox_tandy.conf ] && sed -i -e "s/DOTCEGA\.IMG/DOTCEGA.img/" eXoDOS/\!dos/defcrown/dosbox_tandy.conf
+#[ -e eXoDOS/\!dos/DejaVu/dosbox.conf ] && sed -i -e "s/eXoDOS\\\dejavu/eXoDOS\\\DejaVu/" eXoDOS/\!dos/DejaVu/dosbox.conf
+#[ -e eXoDOS/\!dos/dinoadv/dosbox.conf ] && sed -i -e "s/dinoadv\\\cd\\\/dinoadv\\\CD\\\/" eXoDOS/\!dos/dinoadv/dosbox.conf
+#[ -e eXoDOS/\!dos/DinoAdvn/dosbox.conf ] && sed -i -e "s/DinoAdvn\\\cd\\\/DinoAdvn\\\CD\\\/" eXoDOS/\!dos/DinoAdvn/dosbox.conf
+#[ -e eXoDOS/\!dos/drakkhen/dosbox.conf ] && sed -i -e "s/eXoDOS\\\DRAKKHEN/eXoDOS\\\drakkhen/" eXoDOS/\!dos/drakkhen/dosbox.conf
+#[ -e eXoDOS/\!dos/Duke\!Z/dosbox.conf ] && sed -i -e "s/imgmount d  /imgmount d /" eXoDOS/\!dos/Duke\!Z/dosbox.conf
+#[ -e eXoDOS/\!dos/Ebola/dosbox.conf ] && sed -i -e "s/Ebola\\\cd\\\/Ebola\\\CD\\\/" eXoDOS/\!dos/Ebola/dosbox.conf
+#[ -e eXoDOS/\!dos/EnemFSp/dosbox.conf ] && sed -i -e "s/EnemFSp\\\cd\\\/EnemFSp\\\CD\\\/" eXoDOS/\!dos/EnemFSp/dosbox.conf
+#[ -e eXoDOS/\!dos/Enrak/dosbox.conf ] && sed -i -e "s/eXoDOS\\\enrak/eXoDOS\\\Enrak/" eXoDOS/\!dos/Enrak/dosbox.conf
+#[ -e eXoDOS/\!dos/erudit/dosbox.conf ] && sed -i -e "s/eXoDOS\\\Erudit/eXoDOS\\\erudit/" eXoDOS/\!dos/erudit/dosbox.conf
+#[ -e eXoDOS/\!dos/EscSt7/dosbox.conf ] && sed -i -e "s/EscSt7\\\Floppy/EscSt7\\\floppy/" eXoDOS/\!dos/EscSt7/dosbox.conf
+#[ -e eXoDOS/\!dos/fieldglo/dosbox.conf ] && sed -i -e "s/fieldglo\\\cd\\\/fieldglo\\\CD\\\/" eXoDOS/\!dos/fieldglo/dosbox.conf
+#[ -e eXoDOS/\!dos/FightDSE/dosbox.conf ] && sed -i -e "s/cd\\\FDUEL\.cue/cd\\\FDUEL.CUE/" eXoDOS/\!dos/FightDSE/dosbox.conf
+#[ -e eXoDOS/\!dos/FootM98/dosbox.conf ] && sed -i -e "s/CD\\\FM98\.cue/CD\\\FM98.CUE/" eXoDOS/\!dos/FootM98/dosbox.conf
+#[ -e eXoDOS/\!dos/FunNGame/dosbox.conf ] && sed -i -e "s/FunNGame\\\cd\\\/FunNGame\\\CD\\\/" eXoDOS/\!dos/FunNGame/dosbox.conf
+#[ -e eXoDOS/\!dos/GalPani/dosbox.conf ] && sed -i -e "s/GalPani\\\cd\\\/GalPani\\\CD\\\/" eXoDOS/\!dos/GalPani/dosbox.conf
+#[ -e eXoDOS/\!dos/GalPani2/dosbox.conf ] && sed -i -e "s/GalPani2\\\cd\\\/GalPani2\\\CD\\\/" eXoDOS/\!dos/GalPani2/dosbox.conf
+#[ -e eXoDOS/\!dos/gftracy/dosbox.conf ] && sed -i -e "s/gftracy\\\cd\\\/gftracy\\\CD\\\/" eXoDOS/\!dos/gftracy/dosbox.conf
+#[ -e eXoDOS/\!dos/gk1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\GK1/eXoDOS\\\gk1/" eXoDOS/\!dos/gk1/dosbox.conf
+#[ -e eXoDOS/\!dos/GK2/dosbox.conf ] && sed -i -e "s/GK2\\\cd\\\/GK2\\\CD\\\/g" eXoDOS/\!dos/GK2/dosbox.conf
+#[ -e eXoDOS/\!dos/gob2/dosbox.conf ] && sed -i -e "s/gob2\\\floppy\\\1\.ima/gob2\\\floppy\\\1.IMA/" eXoDOS/\!dos/gob2/dosbox.conf
+#[ -e eXoDOS/\!dos/gob2/dosbox.conf ] && sed -i -e "s/gob2\\\floppy\\\2\.ima/gob2\\\floppy\\\2.IMA/" eXoDOS/\!dos/gob2/dosbox.conf
+[ -e eXoDOS/\!dos/GoldRush/dosbox.conf ] && sed -i -e "s/eXoDOS\\\goldrush/eXoDOS\\\GoldRush/" eXoDOS/\!dos/GoldRush/dosbox.conf
+#[ -e eXoDOS/\!dos/GuySpyan/dosbox.conf ] && sed -i -e "s/GuySpyan\\\cd\\\/GuySpyan\\\CD\\\/" eXoDOS/\!dos/GuySpyan/dosbox.conf
+#[ -e eXoDOS/\!dos/HACK/dosbox.conf ] && sed -i -e "s/eXoDOS\\\hack/eXoDOS\\\HACK/" eXoDOS/\!dos/HACK/dosbox.conf
+#[ -e eXoDOS/\!dos/HARVEST/dosbox.conf ] && sed -i -e "s/eXoDOS\\\harvest/eXoDOS\\\HARVEST/" eXoDOS/\!dos/HARVEST/dosbox.conf
+#[ -e eXoDOS/\!dos/HARVEST/dosbox.conf ] && sed -i -e "s/\.iso/.ISO/g" eXoDOS/\!dos/HARVEST/dosbox.conf
+#[ -e eXoDOS/\!dos/HaunCas/dosbox.conf ] && sed -i -e "s/HaunCas\\\cd\\\/HaunCas\\\CD\\\/" eXoDOS/\!dos/HaunCas/dosbox.conf
+#[ -e eXoDOS/\!dos/HickTown/dosbox.conf ] && sed -i -e "s/eXoDOS\\\hicktown/eXoDOS\\\HickTown/" eXoDOS/\!dos/HickTown/dosbox.conf
+#[ -e eXoDOS/\!dos/HugoMaze/dosbox.conf ] && sed -i -e "s/eXoDOS\\\hugomaze/eXoDOS\\\HugoMaze/" eXoDOS/\!dos/HugoMaze/dosbox.conf
+#[ -e eXoDOS/\!dos/Iceman/dosbox.conf ] && sed -i -e "s/eXoDOS\\\iceman/eXoDOS\\\Iceman/" eXoDOS/\!dos/Iceman/dosbox.conf
+#[ -e eXoDOS/\!dos/InExtrem/dosbox.conf ] && sed -i -e "s/InExtrem\\\floppy/InExtrem\\\Floppy/g" eXoDOS/\!dos/InExtrem/dosbox.conf
+[ -e eXoDOS/\!dos/KQ4/cga.conf ] && sed -i -e "s/eXoDOS\\\KQ4\\\agi/eXoDOS\\\KQ4\\\AGI/" eXoDOS/\!dos/KQ4/cga.conf
+#[ -e eXoDOS/\!dos/KSoul/dosbox.conf ] && sed -i -e "s/eXoDOS\\\Ksoul/eXoDOS\\\KSoul/" eXoDOS/\!dos/KSoul/dosbox.conf
+[ -e eXoDOS/\!dos/LSL1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\lsl1/eXoDOS\\\LSL1/" eXoDOS/\!dos/LSL1/dosbox.conf
+[ -e eXoDOS/\!dos/LSL3/dosboxC.conf ] && sed -i -e "s/eXoDOS\\\lsl3/eXoDOS\\\LSL3/" eXoDOS/\!dos/LSL3/dosboxC.conf
+[ -e eXoDOS/\!dos/LSL3/dosboxH.conf ] && sed -i -e "s/eXoDOS\\\lsl3/eXoDOS\\\LSL3/" eXoDOS/\!dos/LSL3/dosboxH.conf
+#[ -e eXoDOS/\!dos/LSL7DOS/dosbox.conf ] && sed -i -e "s/eXoDOS\\\lsl7dos\\\cd\\\/eXoDOS\\\LSL7DOS\\\CD\\\/" eXoDOS/\!dos/LSL7DOS/dosbox.conf
+#[ -e eXoDOS/\!dos/LSL7DOS/dosbox.conf ] && sed -i -e "s/eXoDOS\\\lsl7dos/eXoDOS\\\LSL7DOS/" eXoDOS/\!dos/LSL7DOS/dosbox.conf
+#[ -e eXoDOS/\!dos/mastori2/dosbox.conf ] && sed -i -e "s/mps\\\orion2\\\/MPS\\\ORION2\\\/" eXoDOS/\!dos/mastori2/dosbox.conf
+#[ -e eXoDOS/\!dos/MegaMa94/dosbox.conf ] && sed -i -e "s/MegaMa94\\\CD\\\/MegaMa94\\\cd\\\/" eXoDOS/\!dos/MegaMa94/dosbox.conf
+#[ -e eXoDOS/\!dos/MegaMaze/dosbox.conf ] && sed -i -e "s/MegaMaze\\\cd\\\/MegaMaze\\\CD\\\/" eXoDOS/\!dos/MegaMaze/dosbox.conf
+#[ -e eXoDOS/\!dos/Midway/dosbox.conf ] && sed -i -e "s/Midway\\\cd\\\/Midway\\\CD\\\/" eXoDOS/\!dos/Midway/dosbox.conf
+#[ -e eXoDOS/\!dos/MiniPrin/dosbox.conf ] && sed -i -e "s/eXoDOS\\\miniprin/eXoDOS\\\MiniPrin/" eXoDOS/\!dos/MiniPrin/dosbox.conf
+#[ -e eXoDOS/\!dos/MMansion/dosbox.conf ] && sed -i -e "s/eXoDOS\\\mmansion/eXoDOS\\\MMansion/" eXoDOS/\!dos/MMansion/dosbox.conf
+#[ -e eXoDOS/\!dos/MonmallA/dosbox.conf ] && sed -i -e "s/MonmallA\\\CD\\\/MonmallA\\\cd\\\/" eXoDOS/\!dos/MonmallA/dosbox.conf
+#[ -e eXoDOS/\!dos/MRPlus/dosbox.conf ] && sed -i -e "s/eXoDOS\\\MRPLus/eXoDOS\\\MRPlus/" eXoDOS/\!dos/MRPlus/dosbox.conf
+#[ -e eXoDOS/\!dos/mutanoiW/dosbox.conf ] && sed -i -e "s/\\\floppy\\\disk0\([[:digit:]]\)\.ima/\\\floppy\\\DISK0\1.IMA/Ig" eXoDOS/\!dos/mutanoiW/dosbox.conf
+#[ -e eXoDOS/\!dos/NewsRmPr/dosbox.conf ] && sed -i -e "s/\\\floppy\\\disk0\([[:digit:]]\)\.img/\\\floppy\\\Disk0\1.img/Ig" eXoDOS/\!dos/NewsRmPr/dosbox.conf
+#[ -e eXoDOS/\!dos/OpJuBec/dosbox.conf ] && sed -i -e "s/OpJuBec\\\cd\\\/OpJuBec\\\CD\\\/" eXoDOS/\!dos/OpJuBec/dosbox.conf
+#[ -e eXoDOS/\!dos/PBase/dosbox.conf ] && sed -i -e "s/PBase\\\cd\\\/PBase\\\CD\\\/" eXoDOS/\!dos/PBase/dosbox.conf
+#[ -e eXoDOS/\!dos/PQ1_VGA/dosbox.conf ] && sed -i -e "s/eXoDOS\\\pq1_vga/eXoDOS\\\PQ1_VGA/" eXoDOS/\!dos/PQ1_VGA/dosbox.conf
+#[ -e eXoDOS/\!dos/prnmania/dosbox.conf ] && sed -i -e "s/prnmania\\\cd\\\/prnmania\\\CD\\\/g" eXoDOS/\!dos/prnmania/dosbox.conf
+#[ -e eXoDOS/\!dos/puttmoon/dosbox.conf ] && sed -i -e "s/puttmoon\\\cd\\\/puttmoon\\\CD\\\/g" eXoDOS/\!dos/puttmoon/dosbox.conf
+#[ -e eXoDOS/\!dos/puttpara/dosbox.conf ] && sed -i -e "s/puttpara\\\cd\\\/puttpara\\\CD\\\/g" eXoDOS/\!dos/puttpara/dosbox.conf
+#[ -e eXoDOS/\!dos/Quarant/dosbox.conf ] && sed -i -e "s/CD\\\Quarantine\.cue/CD\\\QUARANTINE.cue/" eXoDOS/\!dos/Quarant/dosbox.conf
+#[ -e eXoDOS/\!dos/QuizKids/dosbox.conf ] && sed -i -e "s/QuizKids\\\floppy\\\QuizKids\.ima/QuizKids\\\floppy\\\QuizKids.IMA/" eXoDOS/\!dos/QuizKids/dosbox.conf
+#[ -e eXoDOS/\!dos/RadixBey/dosbox.conf ] && sed -i -e "s/RadixBey\\\cd\\\/RadixBey\\\CD\\\/" eXoDOS/\!dos/RadixBey/dosbox.conf
+#[ -e eXoDOS/\!dos/RaymanFr/dosbox.conf ] && sed -i -e "s/RaymanFr\\\cd\\\/RaymanFr\\\CD\\\/" eXoDOS/\!dos/RaymanFr/dosbox.conf
+#[ -e eXoDOS/\!dos/ReadRab2/dosbox.conf ] && sed -i -e "s/ReadRab2\\\floppy\\\image\.ima/ReadRab2\\\floppy\\\image.IMA/" eXoDOS/\!dos/ReadRab2/dosbox.conf
+#[ -e eXoDOS/\!dos/RECALL/dosbox.conf ] && sed -i -e "s/eXoDOS\\\recall/eXoDOS\\\RECALL/" eXoDOS/\!dos/RECALL/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_CP/dosbox.conf ] && sed -i -e "s/RM_CP\\\cd\\\/RM_CP\\\CD\\\/g" eXoDOS/\!dos/RM_CP/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_DW/dosbox.conf ] && sed -i -e "s/RM_DW\\\cd\\\/RM_DW\\\CD\\\/g" eXoDOS/\!dos/RM_DW/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_Entity/dosbox.conf ] && sed -i -e "s/RM_Entity\\\cd\\\/RM_Entity\\\CD\\\/g" eXoDOS/\!dos/RM_Entity/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_FT/dosbox.conf ] && sed -i -e "s/RM_FT\\\cd\\\FL2CD\.iso/RM_FT\\\CD\\\FL2CD.ISO/g" eXoDOS/\!dos/RM_FT/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_FT/dosbox.conf ] && sed -i -e "s/RM_FT\\\cd\\\FL3CD\.iso/RM_FT\\\CD\\\FL3CD.ISO/g" eXoDOS/\!dos/RM_FT/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_FT/dosbox.conf ] && sed -i -e "s/RM_FT\\\cd\\\Flash1\.iso/RM_FT\\\CD\\\FLASH1.ISO/g" eXoDOS/\!dos/RM_FT/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_LOTR/dosbox.conf ] && sed -i -e "s/RM_LOTR\\\cd\\\/RM_LOTR\\\CD\\\/g" eXoDOS/\!dos/RM_LOTR/dosbox.conf
+#[ -e eXoDOS/\!dos/RM_TH/dosbox.conf ] && sed -i -e "s/RM_TH\\\cd\\\/RM_TH\\\CD\\\/g" eXoDOS/\!dos/RM_TH/dosbox.conf
+#[ -e eXoDOS/\!dos/ROMANTIC/dosbox.conf ] && sed -i -e "s/ROMANTIC\\\CD\\\/ROMANTIC\\\cd\\\/" eXoDOS/\!dos/ROMANTIC/dosbox.conf
+#[ -e eXoDOS/\!dos/rzork/dosbox.conf ] && sed -i -e "s/rzork\\\cd\\\/rzork\\\CD\\\/" eXoDOS/\!dos/rzork/dosbox.conf
+#[ -e eXoDOS/\!dos/SGate/dosbox.conf ] && sed -i -e "s/eXoDOS\\\sgate/eXoDOS\\\SGate/" eXoDOS/\!dos/SGate/dosbox.conf
 #[ -e eXoDOS/\!dos/shadcast/dosbox.conf ] && sed -i -e 's/"  "/" "/' eXoDOS/\!dos/shadcast/dosbox.conf
 #[ -e eXoDOS/\!dos/shadcast/dosbox.conf ] && sed -i -e 's/"-t floppy/" -t floppy/' eXoDOS/\!dos/shadcast/dosbox.conf
-[ -e eXoDOS/\!dos/SilkDust/dosbox.conf ] && sed -i -e "s/eXoDOS\\\silkdust/eXoDOS\\\SilkDust/" eXoDOS/\!dos/SilkDust/dosbox.conf
-[ -e eXoDOS/\!dos/SSAPBAPF/dosbox.conf ] && sed -i -e "s/SSAPBAPF\\\cd\\\/SSAPBAPF\\\CD\\\/" eXoDOS/\!dos/SSAPBAPF/dosbox.conf
-[ -e eXoDOS/\!dos/Syndicat/dosbox.conf ] && sed -i -e "s/Syndicat\\\cd\\\/Syndicat\\\CD\\\/" eXoDOS/\!dos/Syndicat/dosbox.conf
-[ -e eXoDOS/\!dos/TaleMyst/dosbox.conf ] && sed -i -e "s/\\\floppy\\\SIDE\([[:digit:]]\)\.IMG/\\\floppy\\\Side\1.img/Ig" eXoDOS/\!dos/TaleMyst/dosbox.conf
-[ -e eXoDOS/\!dos/TankTheM/dosbox.conf ] && sed -i -e "s/TankTheM\\\cd\\\/TankTheM\\\CD\\\/" eXoDOS/\!dos/TankTheM/dosbox.conf
-[ -e eXoDOS/\!dos/TGameWnC/dosbox.conf ] && sed -i -e "s/TGameWnC\\\cd\\\/TGameWnC\\\CD\\\/" eXoDOS/\!dos/TGameWnC/dosbox.conf
-[ -e eXoDOS/\!dos/TheScott/dosbox.conf ] && sed -i -e "s/TheScott\\\cd\\\/TheScott\\\CD\\\/" eXoDOS/\!dos/TheScott/dosbox.conf
-[ -e eXoDOS/\!dos/TheSocc2/dosbox.conf ] && sed -i -e "s/eXoDOS\\\theSocc2/eXoDOS\\\TheSocc2/" eXoDOS/\!dos/TheSocc2/dosbox.conf
-[ -e eXoDOS/\!dos/ToonJam/dosbox.conf ] && sed -i -e "s/ToonJam\\\cd\\\/ToonJam\\\CD\\\/" eXoDOS/\!dos/ToonJam/dosbox.conf
-[ -e eXoDOS/\!dos/torin/dosbox.conf ] && sed -i -e "s/torin\\\cd\\\/torin\\\CD\\\/" eXoDOS/\!dos/torin/dosbox.conf
-[ -e eXoDOS/\!dos/TORNADO/dosbox.conf ] && sed -i -e "s/cd\\\TORNAD\.CUE/cd\\\TORNAD.cue/" eXoDOS/\!dos/TORNADO/dosbox.conf
-[ -e eXoDOS/\!dos/ToyotaCe/dosbox.conf ] && sed -i -e "s/ToyotaCe\\\CD\\\/ToyotaCe\\\cd\\\/" eXoDOS/\!dos/ToyotaCe/dosbox.conf
-[ -e eXoDOS/\!dos/TreaHunt/dosbox.conf ] && sed -i -e "s/TreaHunt\\\cd\\\/TreaHunt\\\CD\\\/g" eXoDOS/\!dos/TreaHunt/dosbox.conf
-[ -e eXoDOS/\!dos/TTC1DOS/dosbox.conf ] && sed -i -e "s/TTC1DOS\\\cd\\\/TTC1DOS\\\CD\\\/g" eXoDOS/\!dos/TTC1DOS/dosbox.conf
-[ -e eXoDOS/\!dos/Ultima1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\ultima1/eXoDOS\\\Ultima1/" eXoDOS/\!dos/Ultima1/dosbox.conf
-[ -e eXoDOS/\!dos/Ultima1/dosbox_cga.conf ] && sed -i -e "s/eXoDOS\\\ultima1/eXoDOS\\\Ultima1/" eXoDOS/\!dos/Ultima1/dosbox_cga.conf
-[ -e eXoDOS/\!dos/Uninvite/dosbox.conf ] && sed -i -e "s/eXoDOS\\\uninvite/eXoDOS\\\Uninvite/" eXoDOS/\!dos/Uninvite/dosbox.conf
-[ -e eXoDOS/\!dos/unlimadv/dosbox_mods.conf ] && sed -i -e "s/unlimadv\\\mods/unlimadv\\\MODS/g" eXoDOS/\!dos/unlimadv/dosbox_mods.conf
-[ -e eXoDOS/\!dos/unlimadv/dosbox_mods_GBC.conf ] && sed -i -e "s/unlimadv\\\mods/unlimadv\\\MODS/g" eXoDOS/\!dos/unlimadv/dosbox_mods_GBC.conf
-[ -e eXoDOS/\!dos/Vanguard/dosbox.conf ] && sed -i -e "s/Vanguard\\\cd\\\/Vanguard\\\CD\\\/g" eXoDOS/\!dos/Vanguard/dosbox.conf
-[ -e eXoDOS/\!dos/vidjam/dosbox.conf ] && sed -i -e "s/eXoDOS\\\VidJam/eXoDOS\\\vidjam/" eXoDOS/\!dos/vidjam/dosbox.conf
-[ -e eXoDOS/\!dos/VRChessP/dosbox.conf ] && sed -i -e "s/eXoDOS\\\VRCHessP/eXoDOS\\\VRChessP/" eXoDOS/\!dos/VRChessP/dosbox.conf
-[ -e eXoDOS/\!dos/VRChessP/dosbox.conf ] && sed -i -e "s/eXoDOS\\\VRChessP\\\cd\\\/eXoDOS\\\VRChessP\\\CD\\\/" eXoDOS/\!dos/VRChessP/dosbox.conf
-[ -e eXoDOS/\!dos/wastland/dosbox.conf ] && sed -i -e "s/exodos\\\wastland/eXoDOS\\\wastland/" eXoDOS/\!dos/wastland/dosbox.conf
-[ -e eXoDOS/\!dos/wquestv2/dosbox.conf ] && sed -i -e "s/eXoDOS\\\wQuestv2/eXoDOS\\\wquestv2/" eXoDOS/\!dos/wquestv2/dosbox.conf
-[ -e eXoDOS/\!dos/wucsd/dosbox.conf ] && sed -i -e "s/wucsd\\\cd\\\/wucsd\\\CD\\\/g" eXoDOS/\!dos/wucsd/dosbox.conf
-[ -e eXoDOS/\!dos/Zak/dosbox.conf ] && sed -i -e "s/eXoDOS\\\zak/eXoDOS\\\Zak/" eXoDOS/\!dos/Zak/dosbox.conf
-[ -e eXoDOS/\!dos/ZakEnh/dosbox.conf ] && sed -i -e "s/eXoDOS\\\zakenh/eXoDOS\\\ZakEnh/" eXoDOS/\!dos/ZakEnh/dosbox.conf
-[ -e eXoDOS/\!dos/Zool2/dosbox.conf ] && sed -i -e "s/Zool2\\\cd\\\/Zool2\\\CD\\\/" eXoDOS/\!dos/Zool2/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1995_03/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer\.iso/cd\\\pcgamer.ISO/" Magazines/PCGamerUS/PCGamer_1995_03/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1996_03/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer\.iso/cd\\\pcgamer.ISO/" Magazines/PCGamerUS/PCGamer_1996_03/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1997_10/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer\.cue/cd\\\PCGAMER.cue/" Magazines/PCGamerUS/PCGamer_1997_10/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer_1\.cue/cd\\\pcgamer_1.CUE/" Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer_2\.cue/cd\\\pcgamer_2.CUE/" Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_07/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_07/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf ] && sed -i -e "s/cd\\\PCGAMER\.iso/cd\\\pcgamer.iso/" Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_09/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_09/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_10/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_10/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_11/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf
-[ -e Magazines/PCGamerUS/PCGamer_1998_12/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_12/dosbox.conf
+#[ -e eXoDOS/\!dos/SilkDust/dosbox.conf ] && sed -i -e "s/eXoDOS\\\silkdust/eXoDOS\\\SilkDust/" eXoDOS/\!dos/SilkDust/dosbox.conf
+[ -e eXoDOS/\!dos/SQ1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\sq1/eXoDOS\\\SQ1/" eXoDOS/\!dos/SQ1/dosbox.conf
+#[ -e eXoDOS/\!dos/SSAPBAPF/dosbox.conf ] && sed -i -e "s/SSAPBAPF\\\cd\\\/SSAPBAPF\\\CD\\\/" eXoDOS/\!dos/SSAPBAPF/dosbox.conf
+#[ -e eXoDOS/\!dos/Syndicat/dosbox.conf ] && sed -i -e "s/Syndicat\\\cd\\\/Syndicat\\\CD\\\/" eXoDOS/\!dos/Syndicat/dosbox.conf
+#[ -e eXoDOS/\!dos/TankTheM/dosbox.conf ] && sed -i -e "s/TankTheM\\\cd\\\/TankTheM\\\CD\\\/" eXoDOS/\!dos/TankTheM/dosbox.conf
+#[ -e eXoDOS/\!dos/TGameWnC/dosbox.conf ] && sed -i -e "s/TGameWnC\\\cd\\\/TGameWnC\\\CD\\\/" eXoDOS/\!dos/TGameWnC/dosbox.conf
+#[ -e eXoDOS/\!dos/TheScott/dosbox.conf ] && sed -i -e "s/TheScott\\\cd\\\/TheScott\\\CD\\\/" eXoDOS/\!dos/TheScott/dosbox.conf
+#[ -e eXoDOS/\!dos/TheSocc2/dosbox.conf ] && sed -i -e "s/eXoDOS\\\theSocc2/eXoDOS\\\TheSocc2/" eXoDOS/\!dos/TheSocc2/dosbox.conf
+#[ -e eXoDOS/\!dos/ToonJam/dosbox.conf ] && sed -i -e "s/ToonJam\\\cd\\\/ToonJam\\\CD\\\/" eXoDOS/\!dos/ToonJam/dosbox.conf
+#[ -e eXoDOS/\!dos/torin/dosbox.conf ] && sed -i -e "s/torin\\\cd\\\/torin\\\CD\\\/" eXoDOS/\!dos/torin/dosbox.conf
+#[ -e eXoDOS/\!dos/TORNADO/dosbox.conf ] && sed -i -e "s/cd\\\TORNAD\.CUE/cd\\\TORNAD.cue/" eXoDOS/\!dos/TORNADO/dosbox.conf
+#[ -e eXoDOS/\!dos/ToyotaCe/dosbox.conf ] && sed -i -e "s/ToyotaCe\\\CD\\\/ToyotaCe\\\cd\\\/" eXoDOS/\!dos/ToyotaCe/dosbox.conf
+#[ -e eXoDOS/\!dos/TreaHunt/dosbox.conf ] && sed -i -e "s/TreaHunt\\\cd\\\/TreaHunt\\\CD\\\/g" eXoDOS/\!dos/TreaHunt/dosbox.conf
+#[ -e eXoDOS/\!dos/TTC1DOS/dosbox.conf ] && sed -i -e "s/TTC1DOS\\\cd\\\/TTC1DOS\\\CD\\\/g" eXoDOS/\!dos/TTC1DOS/dosbox.conf
+#[ -e eXoDOS/\!dos/Ultima1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\ultima1/eXoDOS\\\Ultima1/" eXoDOS/\!dos/Ultima1/dosbox.conf
+#[ -e eXoDOS/\!dos/Ultima1/dosbox_cga.conf ] && sed -i -e "s/eXoDOS\\\ultima1/eXoDOS\\\Ultima1/" eXoDOS/\!dos/Ultima1/dosbox_cga.conf
+#[ -e eXoDOS/\!dos/Uninvite/dosbox.conf ] && sed -i -e "s/eXoDOS\\\uninvite/eXoDOS\\\Uninvite/" eXoDOS/\!dos/Uninvite/dosbox.conf
+#[ -e eXoDOS/\!dos/unlimadv/dosbox_mods.conf ] && sed -i -e "s/unlimadv\\\mods/unlimadv\\\MODS/g" eXoDOS/\!dos/unlimadv/dosbox_mods.conf
+#[ -e eXoDOS/\!dos/unlimadv/dosbox_mods_GBC.conf ] && sed -i -e "s/unlimadv\\\mods/unlimadv\\\MODS/g" eXoDOS/\!dos/unlimadv/dosbox_mods_GBC.conf
+#[ -e eXoDOS/\!dos/Vanguard/dosbox.conf ] && sed -i -e "s/Vanguard\\\cd\\\/Vanguard\\\CD\\\/g" eXoDOS/\!dos/Vanguard/dosbox.conf
+#[ -e eXoDOS/\!dos/vidjam/dosbox.conf ] && sed -i -e "s/eXoDOS\\\VidJam/eXoDOS\\\vidjam/" eXoDOS/\!dos/vidjam/dosbox.conf
+#[ -e eXoDOS/\!dos/VRChessP/dosbox.conf ] && sed -i -e "s/eXoDOS\\\VRCHessP/eXoDOS\\\VRChessP/" eXoDOS/\!dos/VRChessP/dosbox.conf
+#[ -e eXoDOS/\!dos/VRChessP/dosbox.conf ] && sed -i -e "s/eXoDOS\\\VRChessP\\\cd\\\/eXoDOS\\\VRChessP\\\CD\\\/" eXoDOS/\!dos/VRChessP/dosbox.conf
+#[ -e eXoDOS/\!dos/wastland/dosbox.conf ] && sed -i -e "s/exodos\\\wastland/eXoDOS\\\wastland/" eXoDOS/\!dos/wastland/dosbox.conf
+#[ -e eXoDOS/\!dos/wquestv2/dosbox.conf ] && sed -i -e "s/eXoDOS\\\wQuestv2/eXoDOS\\\wquestv2/" eXoDOS/\!dos/wquestv2/dosbox.conf
+#[ -e eXoDOS/\!dos/wucsd/dosbox.conf ] && sed -i -e "s/wucsd\\\cd\\\/wucsd\\\CD\\\/g" eXoDOS/\!dos/wucsd/dosbox.conf
+#[ -e eXoDOS/\!dos/Zak/dosbox.conf ] && sed -i -e "s/eXoDOS\\\zak/eXoDOS\\\Zak/" eXoDOS/\!dos/Zak/dosbox.conf
+#[ -e eXoDOS/\!dos/ZakEnh/dosbox.conf ] && sed -i -e "s/eXoDOS\\\zakenh/eXoDOS\\\ZakEnh/" eXoDOS/\!dos/ZakEnh/dosbox.conf
+#[ -e eXoDOS/\!dos/Zool2/dosbox.conf ] && sed -i -e "s/Zool2\\\cd\\\/Zool2\\\CD\\\/" eXoDOS/\!dos/Zool2/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1995_03/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer\.iso/cd\\\pcgamer.ISO/" Magazines/PCGamerUS/PCGamer_1995_03/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1996_03/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer\.iso/cd\\\pcgamer.ISO/" Magazines/PCGamerUS/PCGamer_1996_03/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1997_10/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer\.cue/cd\\\PCGAMER.cue/" Magazines/PCGamerUS/PCGamer_1997_10/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer_1\.cue/cd\\\pcgamer_1.CUE/" Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf ] && sed -i -e "s/cd\\\pcgamer_2\.cue/cd\\\pcgamer_2.CUE/" Magazines/PCGamerUS/PCGamer_1997_12/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_07/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_07/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf ] && sed -i -e "s/cd\\\PCGAMER\.iso/cd\\\pcgamer.iso/" Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_09/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_09/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_10/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_10/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_11/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_08/dosbox.conf
+#[ -e Magazines/PCGamerUS/PCGamer_1998_12/dosbox.conf ] && sed -i -e "s/\\\c\.img/\\\c.IMG/" Magazines/PCGamerUS/PCGamer_1998_12/dosbox.conf
 
 echo "Creating Linux DOSBox configuration files. This may take a few minutes."
 rm eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf 2>/dev/null

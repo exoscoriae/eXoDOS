@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-08
+# Revised: 2026-04-20
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3296,8 +3296,8 @@ function goto\
     
     #fix recursive file loops (note this is not a flawless substitution, but one that works with the way eXo uses them)
     sed -i -e 's|for /r \([^[:space:]"]\+\) \([[:alpha:]]\) in \([^[:space:]"]\+\)|for \2 in $(find "\1" -type f -name "\3" -printf "%f\\n")|I' \
-           -e 's|\${\~}"n\([[:alpha:]]\)|\$\{\L\1\E}"|' \
-           -e 's|\${\~}n\([[:alpha:]]\)|\$\{\L\1\E}|' "$currentScript"
+           -e 's|\${\~}"n\([[:alpha:]]\)|\$\{\L\1\E%.*}"|' \
+           -e 's|\${\~}n\([[:alpha:]]\)|\$\{\L\1\E%.*}|' "$currentScript"
     
     #escape wildcards in unzip commands
     sed -i -e '/unzip -/ {
