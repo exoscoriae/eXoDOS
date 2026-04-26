@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-20
+# Revised: 2026-04-25
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -45,8 +45,13 @@ TEMPDONECHOICE - done statement at the end of a case statement
 '
 
 function convertScript
-{    
-    
+{
+    #replace beginning of line tabs with 2 spaces each
+    sed -i ':a; s/^\( *\)\t/\1  /; ta' "$currentScript"
+
+    #fix failback tests for stripped strings without match
+    sed -i -e 's/=="\[\*\\=]"/==[]/g' "$currentScript"
+
     #change ..\.\ instances to ..\
     sed -i -e 's/\.\.\\\.\\/..\\/g' "$currentScript"
     
@@ -92,8 +97,101 @@ function convertScript
     #ensure if statements are lowercase
     sed -i -e '/^[[:space:]]\+if/Is/^\([[:space:]]\+\)if/\1if/I' \
            -e 's/^if/if/I' "$currentScript"
-    
+
     #prepare triple-nested multi-line if
+    #attempt to correct triple-nested multi-line if spacing
+    perl -e 'my $f = $ARGV[0]; my @lines = <>;
+             for (my $i = 0; $i < @lines; $i++) {
+                 if ($lines[$i] =~ /^if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i] !~ /\b(?:for|do)\b|\)/i) {
+                     if ($i + 2 < @lines &&
+                         $lines[$i+1] =~ /^[ \t]*if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i+1] !~ /\b(?:for|do)\b|\)/i &&
+                         $lines[$i+2] =~ /^[ \t]*if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i+2] !~ /\b(?:for|do)\b|\)/i) {
+
+                         my $j = $i + 3;
+                         my $is_valid = 1;
+
+                         while ($j < @lines) {
+                             if ($lines[$j] =~ /\(/) { $is_valid = 0; last; }
+                             if ($lines[$j] =~ /\)/) {
+                                 if ($lines[$j] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/) {
+                                     if ($j + 2 < @lines &&
+                                         $lines[$j+1] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/ &&
+                                         $lines[$j+2] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/) {
+                                         last;
+                                     } else { $is_valid = 0; last; }
+                                 } else { $is_valid = 0; last; }
+                             }
+                             $j++;
+                         }
+
+                         if ($is_valid && $j < @lines) {
+                             $lines[$i]   =~ s/^[ \t]*//;
+                             $lines[$i+1] =~ s/^[ \t]*/  /;
+                             $lines[$i+2] =~ s/^[ \t]*/    /;
+                             for (my $k = $i + 3; $k < $j; $k++) { $lines[$k] =~ s/^[ \t]*/      /; }
+                             $lines[$j]   =~ s/^[ \t]*/    /;
+                             $lines[$j+1] =~ s/^[ \t]*/  /;
+                             $lines[$j+2] =~ s/^[ \t]*//;
+                             $i = $j + 2;
+                         }
+                     }
+                 }
+             }
+             open(my $fh, ">", $f) or die "Cannot open file: $!";
+             print $fh @lines;
+             close($fh);' "$currentScript"
+
+    #attempt to correct double-nested multi-line if spacing
+    perl -e 'my $f = $ARGV[0]; my @lines = <>;
+             for (my $i = 0; $i < @lines; $i++) {
+                 if ($lines[$i] =~ /^if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i] !~ /\b(?:for|do)\b|\)/i) {
+
+                     if ($i + 1 < @lines &&
+                         $lines[$i+1] =~ /^[ \t]*if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i+1] !~ /\b(?:for|do)\b|\)/i) {
+
+                         my $j = $i + 2;
+                         my $is_valid = 1;
+
+                         while ($j < @lines) {
+                             if ($lines[$j] =~ /\(/) { $is_valid = 0; last; }
+
+                             if ($lines[$j] =~ /\)/) {
+                                 if ($lines[$j] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/) {
+                                     if ($j + 1 < @lines &&
+                                         $lines[$j+1] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/) {
+                                         last;
+                                     } else { $is_valid = 0; last; }
+                                 } else { $is_valid = 0; last; }
+                             }
+                             $j++;
+                         }
+
+                         if ($is_valid && $j < @lines) {
+                             $lines[$i]   =~ s/^[ \t]*//;
+                             $lines[$i+1] =~ s/^[ \t]*/  /;
+                             for (my $k = $i + 2; $k < $j; $k++) { $lines[$k] =~ s/^[ \t]*/    /; }
+                             $lines[$j]   =~ s/^[ \t]*/  /;
+                             $lines[$j+1] =~ s/^[ \t]*//;
+                             $i = $j + 1;
+                         }
+                     }
+                 }
+             }
+             open(my $fh, ">", $f) or die "Cannot open file: $!";
+             print $fh @lines;
+             close($fh);' "$currentScript"
+
+    #triple-nested multi-line if preparation step that puts closing paretheses at the end of the last line of the innermost condition
+    perl -i -0777 -pe 's/
+                         ( (?:^[ \t]*if\b(?:(?!\bfor\b|\bdo\b|\)).)*\([ \t]*\r?\n){3} )
+                         ( [^\(\)]*? )
+                         ( \r?\n )
+                         ^[ \t]* \) [ \t]* \r?\n
+                         ^[ \t]* \) [ \t]* \r?\n
+                         ^[ \t]* \) [ \t]* (?:\r?\n|$)
+                       /$1$2)))$3/gmix' "$currentScript"
+
+    #add placeholding names to prepare for bash conversion
     while grep "[^(]*)))" "$currentScript"
     do
         ed "$currentScript" <<EOF &>/dev/null
@@ -106,10 +204,13 @@ EOF
     sed -i -e '/pendingL3I / s/([[:space:]\t\r]*$/pendingL3then/' "$currentScript"
     sed -i -e '/^         /s/pendingPrepL3FI[[:space:]\t]*$/\n      pendingL3FI\n   )\n)/' "$currentScript"
     sed -i -e '/^      /s/pendingPrepL3FI[[:space:]\t]*$/\n    pendingL3FI\n  )\n)/' "$currentScript"
-    
+
     #move nested double ending parenthesis to separate lines
     sed -i -e '/(/!{ /^      /s/))[[:space:]\t]*$/\n   )\n)/ }' "$currentScript"
     sed -i -e '/(/!{ /^    /s/))[[:space:]\t]*$/\n  )\n)/ }' "$currentScript"
+
+    #move isolated single parenthesis to separate line
+    sed -i -e 's/^\( *\)  \([^()]*[^[:space:]()][^()]*\))[[:space:]\t]*$/\1  \2\n\1)/' "$currentScript"
     
     #ensure if statements with multiple lines of execution commands do not have the first execution command on same line as the opening (
     sed -i -e '/)/! s/^\(if .*\)(\([[:alnum:]_].*\)/\1(\n    \2/I' "$currentScript"
@@ -125,11 +226,13 @@ EOF
     
     #fix prompts
     sed -i -e 's|set /p \([[:alnum:]_]\+\)=\(".*"\)[[:space:]\t\r]*$|read -p \2 \L\1\E|I' "$currentScript"
-    
+
     #fix null value checks
+    sed -i -e 's/if "\[\(.*\)\]"==\[\]/if "\1"==""/I' \
+           -e 's/pendingL3I "\[\(.*\)\]"==\[\]/pendingL3I "\1"==""/I' "$currentScript"
     sed -i -e 's/if \[\(.*\)\]==\[\]/if \1==""/I' \
            -e 's/pendingL3I \[\(.*\)\]==\[\]/pendingL3I \1==""/I' "$currentScript"
-    
+
     #convert ren commands to mv commands
     sed -i -e "/^ren\|^[[:space:]]\+ren/I s/ren \([^[:space:]\"]*\)\\\\\([^[:space:]\"]*\) \([^[:space:]\"]*\)/mv \1\\\\\2 \1\\\\\3/I" \
            -e "/^ren\|^[[:space:]]\+ren/I s/ren \"\([^\"]*\)\\\\\([^\"]*\)\" \"\([^\"]*\)\"/mv \"\1\\\\\2\" \"\1\\\\\3\"/I" "$currentScript"
@@ -3296,6 +3399,8 @@ function goto\
     
     #fix recursive file loops (note this is not a flawless substitution, but one that works with the way eXo uses them)
     sed -i -e 's|for /r \([^[:space:]"]\+\) \([[:alpha:]]\) in \([^[:space:]"]\+\)|for \2 in $(find "\1" -type f -name "\3" -printf "%f\\n")|I' \
+           -e 's|\${\~}"nx\([[:alpha:]]\)|\$\{\L\1\E}"|' \
+           -e 's|\${\~}nx\([[:alpha:]]\)|\$\{\L\1\E}|' \
            -e 's|\${\~}"n\([[:alpha:]]\)|\$\{\L\1\E%.*}"|' \
            -e 's|\${\~}n\([[:alpha:]]\)|\$\{\L\1\E%.*}|' "$currentScript"
     
@@ -3337,6 +3442,13 @@ function goto\
                    ta;
                }' \
            -e '/eval / s#PENDINGsub{\([[:alnum:]_]\+\)}#$(echo \"${\1}\" | sed -e "s/\\\\$/\\\\\\\\$/g")#g' "$currentScript"
+    
+    sed -i -e '/eval.*\${[[:alnum:]_]\+%\.\*}/I{
+                   :a;
+                   s|\(eval.*\)\${\([[:alnum:]_]\+%\.\*\)}\(.*\)|\1PENDINGsub{\2}\3|;
+                   ta;
+               }' \
+           -e '/eval / s#PENDINGsub{\([[:alnum:]_]\+%\.\*\)}#$(echo \"${\1}\" | sed -e "s/\\\\$/\\\\\\\\$/g")#g' "$currentScript"
     
     #fix space issue for unit in combinedsize declarations
     sed -i -e '/combinedsize=/ s/" "/ /' "$currentScript"
