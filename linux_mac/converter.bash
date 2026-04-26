@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-25
+# Revised: 2026-04-26
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -318,6 +318,10 @@ EOF
     
     #set dosbox bak files to Linux versions
     sed -i -e "/dosbox/I s/\.bak/_linux.bak/Ig" "$currentScript"
+    sed -i -e "/dosbox/I s/\.crt/_linux.crt/Ig" "$currentScript"
+    sed -i -e "/dosbox/I s/\.def/_linux.def/Ig" "$currentScript"
+    sed -i -e "/dosbox/I s/\.int/_linux.int/Ig" "$currentScript"
+    sed -i -e "/dosbox/I s/\.ret/_linux.ret/Ig" "$currentScript"
     
     #set zip files to Linux versions
     #sed -i -e "s/util\.zip/util_linux.zip/Ig" "$currentScript"

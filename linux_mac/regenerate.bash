@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-20
+# Revised: 2026-04-26
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -697,21 +697,31 @@ do
     [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.conf}_linux.conf"
 done 2>/dev/null
 
-rm dosbox/*_linux.bak dosbox/*/*_linux.bak emulators/dosbox/*_linux.bak emulators/dosbox/*/*_linux.bak 2>/dev/null
+rm dosbox/*_{linux,mac}.bak dosbox/*/*_{linux,mac}.bak emulators/dosbox/*_{linux,mac}.bak emulators/dosbox/*/*_{linux,mac}.bak 2>/dev/null
 for file in dosbox/*.bak dosbox/*/*.bak emulators/dosbox/*.bak emulators/dosbox/*/*.bak
 do
     [ -e "$file" ] && cp "$file" "${file%.bak}_linux.bak"
+    [ -e "$file" ] && dos2unix "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/mount/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/boot/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/soundfont/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/romdir/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/glshader/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.bak}_linux.bak"
+    [ -e "$file" ] "${file%.bak}_linux.bak" "${file%.bak}_mac.bak"
 done 2>/dev/null
 
+rm -f emulators/dosbox/alt_settings_linux.{crt,def,int,ret,txt} emulators/dosbox/alt_settings_mac.{crt,def,int,ret,txt} 2>/dev/null
+for ext in crt def int ret txt
+do
+    [ -e emulators/dosbox/alt_settings.$ext ] && cp "emulators/dosbox/alt_settings.$ext" "emulators/dosbox/alt_settings_linux.$ext" 2>/dev/null
+    [ -e emulators/dosbox/alt_settings_linux.$ext ] && dos2unix emulators/dosbox/alt_settings_linux.$ext 2>/dev/null
+    [ -e emulators/dosbox/alt_settings_linux.$ext ] && sed -i -e "/glshader/ s|\\\|/|Ig" emulators/dosbox/alt_settings_linux.$ext
+    cp emulators/dosbox/alt_settings_linux.$ext emulators/dosbox/alt_settings_mac.$ext
+done
+
 echo "Creating Linux ScummVM ini files."
-rm emulators/scmvm/scummvm_linux.ini emulators/scmvm/*/scummvm_linux.ini emulators/scummvm/scummvm_linux.ini emulators/scummvm/*/scummvm_linux.ini util/scummvm_linux.ini 2>/dev/null
-rm emulators/scmvm/scummvm_mac.ini emulators/scmvm/*/scummvm_mac.ini emulators/scummvm/scummvm_mac.ini emulators/scummvm/*/scummvm_mac.ini util/scummvm_mac.ini 2>/dev/null
+rm emulators/scmvm/scummvm_{linux,mac}.ini emulators/scmvm/*/scummvm_{linux,mac}.ini emulators/scummvm/scummvm_{linux,mac}.ini emulators/scummvm/*/scummvm_{linux,mac}.ini util/scummvm_{linux,mac}.ini 2>/dev/null
 rm -rf emulators/scmvm/scmvm_{sml,med,lrg}
 for file in emulators/scmvm/scmvm_{sml,med,lrg}.zip
 do
@@ -934,11 +944,9 @@ do
     [ -e "$file" ] && dos2unix "$file"
 done
 
-cp emulators/dosbox/alt_settings.txt emulators/dosbox/alt_settings_linux.txt 2>/dev/null
 cp util/alt_launch.txt util/alt_launch_linux.txt 2>/dev/null
 sed -i -e "s|\\\|/|Ig" util/alt_launch_linux.txt 2>/dev/null
 dos2unix util/alt_launch_linux.txt 2>/dev/null
-dos2unix emulators/dosbox/alt_settings_linux.txt 2>/dev/null
 #note - these files are also used by the macOS port
 
 echo "Fixing dosbox.txt typos."
