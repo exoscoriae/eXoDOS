@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-26
+# Revised: 2026-04-27
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -32,9 +32,14 @@ PENDINGL2IAD - pending level2 if after do (if statement declared as part of a fo
 PENDINGthen - then statement corresponding to level 2 multi-line if statments and multi-line if statements lacking inner loops
 PENDINGFI - fi statements (not including ones corresponding with PENDINGTLIBF or pendingL3FI)
 pendingPrepL3FI - ed replaced )))
+pendingPrepL4FI - ed replaced ))))
 pendingL3FI - fi statement
 pendingL3I - pending level 3 if
 pendingL3then - pending level 3 then for if
+pendingL3FI - fi statement
+pendingL4FI - fi statement
+pendingL4I - pending level 3 if
+pendingL4then - pending level 3 then for if
 PENDINGTLIBF - pending top level if before for (for when an if statement has a multi-line for loop as part of its declaration)
 PENDINGtBF - pending then before for (the then statement that corresponds to PENDINGTLIBF)
 PENDINGL2FAI - pending level 2 for after if (the for loop declared as part of an if statement)
@@ -97,6 +102,80 @@ function convertScript
     #ensure if statements are lowercase
     sed -i -e '/^[[:space:]]\+if/Is/^\([[:space:]]\+\)if/\1if/I' \
            -e 's/^if/if/I' "$currentScript"
+
+    #prepare quadruple-nested multi-line if
+    perl -0777 -pi -e 's/
+                         ^[ \t]*
+                         (?![^\r\n]*(?:\bfor\b|\bdo\b|\)))
+                         (if\b[^\r\n]*\()[ \t]*
+                         (\r?\n)
+
+                         ^[ \t]*
+                         (?![^\r\n]*(?:\bfor\b|\bdo\b|\)))
+                         (if\b[^\r\n]*\()[ \t]*\r?\n
+
+                         ^[ \t]*
+                         (?![^\r\n]*(?:\bfor\b|\bdo\b|\)))
+                         (if\b[^\r\n]*\()[ \t]*\r?\n
+
+                         ^[ \t]*
+                         (?![^\r\n]*(?:\bfor\b|\bdo\b|\)))
+                         (?![^\r\n]*\([^\r\n]*\()
+                         (if\b[^\r\n(]*\()[ \t]*
+
+                         (.*?[^ \t\r\n])[ \t]*
+                         \r?(?:\n|$)
+
+                       /$1$2  $3$2    $4$2      $5$2        $6$2/mgx' "$currentScript"
+
+    #quadruple-nested multi-line if preparation step that puts closing paretheses at the end of the last line of the innermost condition
+    perl -0777 -pi -e 's/^[ \t]*([^\r\n]*?)[ \t]*\r?\n[ \t]*\)\)\)\)[ \t]*(\r?\n|$)/        $1))))$2/mg' "$currentScript"
+
+    #attempt to correct quadruple-nested multi-line if spacing
+    perl -e 'my $f = $ARGV[0]; my @lines = <>;
+             for (my $i = 0; $i < @lines; $i++) {
+                 if ($lines[$i] =~ /^if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i] !~ /\b(?:for|do)\b|\)/i) {
+                     if ($i + 3 < @lines &&
+                         $lines[$i+1] =~ /^[ \t]*if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i+1] !~ /\b(?:for|do)\b|\)/i &&
+                         $lines[$i+2] =~ /^[ \t]*if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i+2] !~ /\b(?:for|do)\b|\)/i &&
+                         $lines[$i+3] =~ /^[ \t]*if\b.*?\([ \t]*(?:\r?\n)?$/i && $lines[$i+3] !~ /\b(?:for|do)\b|\)/i) {
+
+                         my $j = $i + 4;
+                         my $is_valid = 1;
+
+                         while ($j < @lines) {
+                             if ($lines[$j] =~ /\(/) { $is_valid = 0; last; }
+                             if ($lines[$j] =~ /\)/) {
+                                 if ($lines[$j] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/) {
+                                     if ($j + 3 < @lines &&
+                                         $lines[$j+1] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/ &&
+                                         $lines[$j+2] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/ &&
+                                         $lines[$j+3] =~ /^[ \t]*\)[ \t]*(?:\r?\n)?$/) {
+                                         last;
+                                     } else { $is_valid = 0; last; }
+                                 } else { $is_valid = 0; last; }
+                             }
+                             $j++;
+                         }
+
+                         if ($is_valid && $j < @lines) {
+                             $lines[$i]   =~ s/^[ \t]*//;
+                             $lines[$i+1] =~ s/^[ \t]*/  /;
+                             $lines[$i+2] =~ s/^[ \t]*/    /;
+                             $lines[$i+3] =~ s/^[ \t]*/      /;
+                             for (my $k = $i + 4; $k < $j; $k++) { $lines[$k] =~ s/^[ \t]*/        /; }
+                             $lines[$j]   =~ s/^[ \t]*/      /;
+                             $lines[$j+1] =~ s/^[ \t]*/    /;
+                             $lines[$j+2] =~ s/^[ \t]*/  /;
+                             $lines[$j+3] =~ s/^[ \t]*//;
+                             $i = $j + 3;
+                         }
+                     }
+                 }
+             }
+             open(my $fh, ">", $f) or die "Cannot open file: $!";
+             print $fh @lines;
+             close($fh);' "$currentScript"
 
     #prepare triple-nested multi-line if
     #attempt to correct triple-nested multi-line if spacing
@@ -181,6 +260,45 @@ function convertScript
              print $fh @lines;
              close($fh);' "$currentScript"
 
+    #prepare single-level multi-line if
+    perl -0777 -pi -e 's/^if\b([^\n\r()]*)\(([^\n\r()]*)\r?\n([^)]*)\)\r?$/
+                         my $pre  = $1;
+                         my $post = $2;
+                         my $mid  = $3;
+
+                         my $orig = $&;
+
+                         if ( $pre  =~ m{\b(?:for|do)\b} ||
+                              $post =~ m{\b(?:for|do)\b} ||
+                              $mid  =~ m{\b(?:if|for|do)\b} ||
+                              $mid  =~ m{\(} ) {
+                           $orig;
+                         } else {
+                           my $res = "if$pre(\n";
+                           $post =~ s{^[\s\xA0]+|[\s\xA0]+$}{}g;
+                           $res .= "  $post\n" if $post ne "";
+
+                           for my $line (split m{\r?\n}, $mid) {
+                             $line =~ s{^[\s\xA0]+|[\s\xA0]+$}{}g;
+                             $res .= "  $line\n" if $line ne "";
+                           }
+
+                           $res .= ")";
+                           $res;
+                         }
+                         /gmxe' "$currentScript"
+
+    #quadruple-nested multi-line if preparation step that puts closing paretheses at the end of the last line of the innermost condition
+    perl -i -0777 -pe 's/
+                         ( (?:^[ \t]*if\b(?:(?!\bfor\b|\bdo\b|\)).)*\([ \t]*\r?\n){4} )
+                         ( [^\(\)]*? )
+                         ( \r?\n )
+                         ^[ \t]* \) [ \t]* \r?\n
+                         ^[ \t]* \) [ \t]* \r?\n
+                         ^[ \t]* \) [ \t]* \r?\n
+                         ^[ \t]* \) [ \t]* (?:\r?\n|$)
+                       /$1$2))))$3/gmix' "$currentScript"
+
     #triple-nested multi-line if preparation step that puts closing paretheses at the end of the last line of the innermost condition
     perl -i -0777 -pe 's/
                          ( (?:^[ \t]*if\b(?:(?!\bfor\b|\bdo\b|\)).)*\([ \t]*\r?\n){3} )
@@ -192,6 +310,20 @@ function convertScript
                        /$1$2)))$3/gmix' "$currentScript"
 
     #add placeholding names to prepare for bash conversion
+
+    #quadruple-nested multi-line if placeholders
+    while grep "[^(]*))))" "$currentScript"
+    do
+        ed "$currentScript" <<EOF &>/dev/null
+\$
+?[^(]*))))[[:space:]\t]*\$? s/))))/pendingPrepL4FI/
+?[[:space:]]*if.*([[:space:]\t]*\$? s/if /pendingL4I /
+?[[:space:]]*if.*([[:space:]\t]*\$? s/if /pendingL3I /
+wq
+EOF
+    done
+
+    #triple nested multi-line if placeholders
     while grep "[^(]*)))" "$currentScript"
     do
         ed "$currentScript" <<EOF &>/dev/null
@@ -201,7 +333,11 @@ function convertScript
 wq
 EOF
     done
+
+    sed -i -e '/pendingL4I / s/([[:space:]\t\r]*$/pendingL4then/' "$currentScript"
     sed -i -e '/pendingL3I / s/([[:space:]\t\r]*$/pendingL3then/' "$currentScript"
+    sed -i -e '/^            /s/pendingPrepL4FI[[:space:]\t]*$/\n         pendingL4FI\n      pendingL3FI\n   )\n)/' "$currentScript"
+    sed -i -e '/^        /s/pendingPrepL4FI[[:space:]\t]*$/\n      pendingL4FI\n    pendingL3FI\n  )\n)/' "$currentScript"
     sed -i -e '/^         /s/pendingPrepL3FI[[:space:]\t]*$/\n      pendingL3FI\n   )\n)/' "$currentScript"
     sed -i -e '/^      /s/pendingPrepL3FI[[:space:]\t]*$/\n    pendingL3FI\n  )\n)/' "$currentScript"
 
@@ -211,7 +347,7 @@ EOF
 
     #move isolated single parenthesis to separate line
     sed -i -e 's/^\( *\)  \([^()]*[^[:space:]()][^()]*\))[[:space:]\t]*$/\1  \2\n\1)/' "$currentScript"
-    
+
     #ensure if statements with multiple lines of execution commands do not have the first execution command on same line as the opening (
     sed -i -e '/)/! s/^\(if .*\)(\([[:alnum:]_].*\)/\1(\n    \2/I' "$currentScript"
     
@@ -229,8 +365,10 @@ EOF
 
     #fix null value checks
     sed -i -e 's/if "\[\(.*\)\]"==\[\]/if "\1"==""/I' \
+           -e 's/pendingL4I "\[\(.*\)\]"==\[\]/pendingL4I "\1"==""/I' \
            -e 's/pendingL3I "\[\(.*\)\]"==\[\]/pendingL3I "\1"==""/I' "$currentScript"
     sed -i -e 's/if \[\(.*\)\]==\[\]/if \1==""/I' \
+           -e 's/pendingL4I \[\(.*\)\]==\[\]/pendingL4I \1==""/I' \
            -e 's/pendingL3I \[\(.*\)\]==\[\]/pendingL3I \1==""/I' "$currentScript"
 
     #convert ren commands to mv commands
@@ -692,31 +830,37 @@ EOF
            -e 's/^if exist/if exist/I' \
            -e 's/PENDINGL2IAD exist/PENDINGL2IAD exist/I' \
            -e 's/PENDINGTLIBF exist/PENDINGTLIBF exist/I' \
+           -e 's/pendingL4I exist/pendingL4I exist/I' \
            -e 's/pendingL3I exist/pendingL3I exist/I' \
            -e '/^[[:space:]]\+if not exist/Is/^\([[:space:]]\+\)if not exist/\1if not exist/I' \
            -e 's/^if not exist/if not exist/I' \
            -e 's/PENDINGL2IAD not exist/PENDINGL2IAD not exist/I' \
            -e 's/PENDINGTLIBF not exist/PENDINGTLIBF not exist/I' \
+           -e 's/pendingL4I not exist/pendingL4I not exist/I' \
            -e 's/pendingL3I not exist/pendingL3I not exist/I' \
            -e '/^[[:space:]]\+if not/Is/^\([[:space:]]\+\)if not/\1if not/I' \
            -e 's/^if not/if not/I' \
            -e 's/PENDINGL2IAD not/PENDINGL2IAD not/I' \
            -e 's/PENDINGTLIBF not/PENDINGTLIBF not/I' \
+           -e 's/pendingL4I not/pendingL4I not/I' \
            -e 's/pendingL3I not/pendingL3I not/I' \
            -e '/^[[:space:]]\+if not defined/Is/^\([[:space:]]\+\)if not defined/\1if not defined/I' \
            -e 's/^if not defined/if not defined/I' \
            -e 's/PENDINGL2IAD not defined/PENDINGL2IAD not defined/I' \
            -e 's/PENDINGTLIBF not defined/PENDINGTLIBF not defined/I' \
+           -e 's/pendingL4I not defined/pendingL4I not defined/I' \
            -e 's/pendingL3I not defined/pendingL3I not defined/I' \
            -e '/^[[:space:]]\+if defined/Is/^\([[:space:]]\+\)if defined/\1if defined/I' \
            -e 's/^if defined/if defined/I' \
            -e 's/PENDINGL2IAD defined/PENDINGL2IAD defined/I' \
            -e 's/PENDINGTLIBF defined/PENDINGTLIBF defined/I' \
+           -e 's/pendingL4I defined/pendingL4I defined/I' \
            -e 's/pendingL3I defined/pendingL3I defined/I' \
            -e '/^[[:space:]]\+if errorlevel/Is/^\([[:space:]]\+\)if errorlevel/\1if errorlevel/I' \
            -e 's/^if errorlevel/if errorlevel/I' \
            -e 's/PENDINGL2IAD errorlevel/PENDINGL2IAD errorlevel/I' \
            -e 's/PENDINGTLIBF errorlevel/PENDINGTLIBF errorlevel/I' \
+           -e 's/pendingL4I errorlevel/pendingL4I errorlevel/I' \
            -e 's/pendingL3I errorlevel/pendingL3I errorlevel/I' \
            -e '/^[[:space:]]\+set/Is/^\([[:space:]]\+\)set/\1set/I' \
            -e 's/^set/set/I' \
@@ -729,10 +873,12 @@ EOF
     sed -i -e 's/if errorlevel = /if errorlevel /' \
            -e 's/PENDINGL2IAD errorlevel = /PENDINGL2IAD errorlevel /' \
            -e 's/PENDINGTLIBF errorlevel = /PENDINGTLIBF errorlevel /' \
+           -e 's/pendingL4I errorlevel = /pendingL4I errorlevel /' \
            -e 's/pendingL3I errorlevel = /pendingL3I errorlevel /' \
            -e 's/if errorlevel=/if errorlevel /' \
            -e 's/PENDINGL2IAD errorlevel=/PENDINGL2IAD errorlevel /' \
            -e 's/PENDINGTLIBF errorlevel=/PENDINGTLIBF errorlevel /' \
+           -e 's/pendingL4I errorlevel=/pendingL4I errorlevel /' \
            -e 's/pendingL3I errorlevel=/pendingL3I errorlevel /' "$currentScript"
     
     #convert if errorlevel statements
@@ -740,6 +886,8 @@ EOF
                s/^if \(errorlevel \)\(.[^[:space:]]*\)\(.*\)/[ $\1== \'\2\' ] \&\&\3/" \
            -e "/^[[:space:]]\+if errorlevel/ \
                s/^\([[:space:]]\+\)if \(errorlevel\) \(.[^[:space:]]*\)\(.*\)/\1[ $\{\2\} == \'\3\' ] \&\&\4/" \
+           -e "/^[[:space:]]\+pendingL4I errorlevel/ \
+               s/^\([[:space:]]\+\)pendingL4I \(errorlevel\) \(.[^[:space:]]*\)\(.*\)/\1pendingL4I [ $\{\2\} == \'\3\' ] \&\&\4/" \
            -e "/^[[:space:]]\+pendingL3I errorlevel/ \
                s/^\([[:space:]]\+\)pendingL3I \(errorlevel\) \(.[^[:space:]]*\)\(.*\)/\1pendingL3I [ $\{\2\} == \'\3\' ] \&\&\4/" \
            -e "/^PENDINGL2IAD errorlevel/ \
@@ -786,39 +934,47 @@ EOF
            -e "s/^PENDINGL2IAD not defined \"%\(.[^[:space:]%\"]*\)\" /PENDINGL2IAD not defined \"$\{\1\}\" /" \
            -e "s/^PENDINGTLIBF not defined \"%\(.[^[:space:]%\"]*\)\" /PENDINGTLIBF not defined \"$\{\1\}\" /" \
            -e "s/^\(^[[:space:]]\+\)if not defined \"%\(.[^[:space:]%\"]*\)\" /\1if not defined \"$\{\2\}\" /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL4I not defined \"$\{\2\}\" /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL3I not defined \"$\{\2\}\" /" \
            -e "s/^if defined \"%\(.[^[:space:]%\"]*\)\" /if defined \"$\{\1\}\" /" \
            -e "s/^PENDINGL2IAD defined \"%\(.[^[:space:]%\"]*\)\" /PENDINGL2IAD defined \"$\{\1\}\" /" \
            -e "s/^PENDINGTLIBF defined \"%\(.[^[:space:]%\"]*\)\" /PENDINGTLIBF defined \"$\{\1\}\" /" \
            -e "s/^\(^[[:space:]]\+\)if defined \"%\(.[^[:space:]%\"]*\)\" /\1if defined \"$\{\1\}\" /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL4I defined \"$\{\1\}\" /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL3I defined \"$\{\1\}\" /" \
            -e "s/^if not defined %\(.[^[:space:]%\"]*\) /if not defined $\{\1\} /" \
            -e "s/^PENDINGL2IAD not defined %\(.[^[:space:]%\"]*\) /PENDINGL2IAD not defined $\{\1\} /" \
            -e "s/^PENDINGTLIBF not defined %\(.[^[:space:]%\"]*\) /PENDINGTLIBF not defined $\{\1\} /" \
            -e "s/^\(^[[:space:]]\+\)if not defined %\(.[^[:space:]%\"]*\) /\1if not defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined %\(.[^[:space:]%\"]*\) /\1pendingL4I not defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined %\(.[^[:space:]%\"]*\) /\1pendingL3I not defined $\{\2\} /" \
            -e "s/^if defined %\(.[^[:space:]%\"]*\) /if defined $\{\1\} /" \
            -e "s/^PENDINGL2IAD defined %\(.[^[:space:]%\"]*\) /PENDINGL2IAD defined $\{\1\} /" \
            -e "s/^PENDINGTLIBF defined %\(.[^[:space:]%\"]*\) /PENDINGTLIBF defined $\{\1\} /" \
            -e "s/^\(^[[:space:]]\+\)if defined %\(.[^[:space:]%\"]*\) /\1if defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined %\(.[^[:space:]%\"]*\) /\1pendingL4I defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined %\(.[^[:space:]%\"]*\) /\1pendingL3I defined $\{\2\} /" \
            -e "s/^if not defined \([[:alnum:]_]*\) /if not defined $\{\1\} /" \
            -e "s/^PENDINGL2IAD not defined \([[:alnum:]_]*\) /PENDINGL2IAD not defined $\{\1\} /" \
            -e "s/^PENDINGTLIBF not defined \([[:alnum:]_]*\) /PENDINGTLIBF not defined $\{\1\} /" \
            -e "s/^\(^[[:space:]]\+\)if not defined \([[:alnum:]_]*\) /\1if not defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined \([[:alnum:]_]*\) /\1pendingL4I not defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined \([[:alnum:]_]*\) /\1pendingL3I not defined $\{\2\} /" \
            -e "s/^if defined \([[:alnum:]_]*\) /if defined $\{\1\} /" \
            -e "s/^PENDINGL2IAD defined \([[:alnum:]_]*\) /PENDINGL2IAD defined $\{\1\} /" \
            -e "s/^PENDINGTLIBF defined \([[:alnum:]_]*\) /PENDINGTLIBF defined $\{\1\} /" \
            -e "s/^\(^[[:space:]]\+\)if defined \([[:alnum:]_]*\) /\1if defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined \([[:alnum:]_]*\) /\1pendingL4I defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined \([[:alnum:]_]*\) /\1pendingL3I defined $\{\2\} /" \
            -e "s/^if not defined \(.[^[:space:]]*\) \(.*\)/[ \1 = \"\" ] \&\& \2/" \
            -e "s/^\(^[[:space:]]\+\)if not defined \(.[^[:space:]]*\) \(.*\)/\1[ \2 = \"\" ] \&\& \3/" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 = \"\" ] \&\& \3/" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 = \"\" ] \&\& \3/" \
            -e "s/^if defined \(.[^[:space:]]*\) \(.*\)/[ \1 != \"\" ] \&\& \2/" \
            -e "s/^PENDINGL2IAD defined \(.[^[:space:]]*\) \(.*\)/PENDINGL2IAD 2RMV [ \1 != \"\" ] \&\& \2/" \
            -e "s/^PENDINGTLIBF defined \(.[^[:space:]]*\)/PENDINGTLIBF 2RMV [ \1 != \"\" ] \&\& PENDINGTRAILTLIBF/" \
            -e "s/^\(^[[:space:]]\+\)if defined \(.[^[:space:]]*\) \(.*\)/\1[ \2 != \"\" ] \&\& \3/" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 != \"\" ] \&\& \3/" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 != \"\" ] \&\& \3/" \
         "$currentScript"
     
@@ -907,6 +1063,8 @@ EOF
                s/^\(^[[:space:]]\+\)if exist \([^ ]*\) unzip \(.*\)/\1if exist \"\2\" unzip \3/" \
            -e "/^[[:space:]]\+if exist \"/I! \
                s/^\(^[[:space:]]\+\)if exist \([^\.]*\)\([^ ]*\)\(.*\)/\1if exist \"\2\3\"\4/" \
+           -e "/^[[:space:]]\+pendingL4I exist \"/I! \
+               s/^\(^[[:space:]]\+\)pendingL4I exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL4I exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+pendingL3I exist \"/I! \
                s/^\(^[[:space:]]\+\)pendingL3I exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL3I exist \"\2\3\"\4/" \
         "$currentScript"
@@ -928,6 +1086,8 @@ EOF
                s/^\(^[[:space:]]\+\)if not exist \([^ ]*\) unzip \(.*\)/\1if not exist \"\2\" unzip \3/" \
            -e "/^[[:space:]]\+if not exist \"/! \
                s/^\(^[[:space:]]\+\)if not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1if not exist \"\2\3\"\4/" \
+           -e "/^[[:space:]]\+pendingL4I not exist \"/! \
+               s/^\(^[[:space:]]\+\)pendingL4I not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL4I not exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+pendingL3I not exist \"/! \
                s/^\(^[[:space:]]\+\)pendingL3I not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL3I not exist \"\2\3\"\4/" \
         "$currentScript"
@@ -937,6 +1097,8 @@ EOF
                s/^if exist \"\([^\"]*\)\"\(.*\)/[ -e \"\1\" ] \&\&\2/" \
            -e "/^[[:space:]]\+if exist \"/I \
                s/^\(^[[:space:]]\+\)if exist \"\([^\"]*\)\"\(.*\)/\1[ -e \"\2\" ] \&\&\3/" \
+           -e "/^[[:space:]]\+pendingL4I exist \"/I \
+               s/^\(^[[:space:]]\+\)pendingL4I exist \"\([^\"]*\)\"\(.*\)/\1pendingL4I [ -e \"\2\" ] \&\&\3/" \
            -e "/^[[:space:]]\+pendingL3I exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ -e \"\2\" ] \&\&\3/" \
            -e "s/ \"\[\(\%[[:alnum:]_]\+\%\)\]\" == \[\] / -z \"\1\" /" \
@@ -949,12 +1111,14 @@ EOF
                s/^if not exist \"\([^\"]*\)\"\(.*\)/[ ! -e \"\1\" ] \&\&\2/" \
            -e "/^[[:space:]]\+if not exist \"/I \
                s/^\(^[[:space:]]\+\)if not exist \"\([^\"]*\)\"\(.*\)/\1[ ! -e \"\2\" ] \&\&\3/" \
+           -e "/^[[:space:]]\+pendingL4I not exist \"/I \
+               s/^\(^[[:space:]]\+\)pendingL4I not exist \"\([^\"]*\)\"\(.*\)/\1pendingL4I [ ! -e \"\2\" ] \&\&\3/" \
            -e "/^[[:space:]]\+pendingL3I not exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I not exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ ! -e \"\2\" ] \&\&\3/" \
         "$currentScript"
     
     #fix if exist/if not exist statements (escape ( characters)
-    sed -i -e "/^\[ -e \"\|^\[ ! -e \"\|^[[:space:]]\+\[ -e \"\|^[[:space:]]\+\[ ! -e \"\|^[[:space:]]\+pendingL3I \[ -e \"\|^[[:space:]]\+pendingL3I \[ ! -e \"/ {
+    sed -i -e "/^\[ -e \"\|^\[ ! -e \"\|^[[:space:]]\+\[ -e \"\|^[[:space:]]\+\[ ! -e \"\|^[[:space:]]\+pendingL4I \[ -e \"\|^[[:space:]]\+pendingL3I \[ -e \"\|^[[:space:]]\+pendingL4I \[ ! -e \"\|^[[:space:]]\+pendingL3I \[ ! -e \"/ {
                    s|\(echo \"\)\([^\"]*\)%|\1\2#####|g;
                    s|\(echo \"\)\([^\"]*\)(|\1\2=====|g;
                    s|%|%%|g;
@@ -969,7 +1133,7 @@ EOF
                }" "$currentScript"
     
     #fix if exist/if not exist statements (escape ) characters)
-    sed -i -e "/^\[ -e \"\|^\[ ! -e \"\|^[[:space:]]\+\[ -e \"\|^[[:space:]]\+\[ ! -e \"\|^[[:space:]]\+pendingL3I \[ -e \"\|^[[:space:]]\+pendingL3I \[ ! -e \"/ {
+    sed -i -e "/^\[ -e \"\|^\[ ! -e \"\|^[[:space:]]\+\[ -e \"\|^[[:space:]]\+\[ ! -e \"\|^[[:space:]]\+pendingL4I \[ -e \"\|^[[:space:]]\+pendingL3I \[ -e \"\|^[[:space:]]\+pendingL4I \[ ! -e \"\|^[[:space:]]\+pendingL3I \[ ! -e \"/ {
                    s|\(echo \"\)\([^\"]*\)%|\1\2#####|g;
                    s|\(echo \"\)\([^\"]*\))|\1\2=====|g;
                    s|%|%%|g;
@@ -984,7 +1148,7 @@ EOF
                }" "$currentScript"
     
     #fix if exist/if not exist statements (escape & characters)
-    sed -i -e "/^\[ -e \"\|^\[ ! -e \"\|^[[:space:]]\+\[ -e \"\|^[[:space:]]\+\[ ! -e \"\|^[[:space:]]\+pendingL3I \[ -e \"\|^[[:space:]]\+pendingL3I \[ ! -e \"/ {
+    sed -i -e "/^\[ -e \"\|^\[ ! -e \"\|^[[:space:]]\+\[ -e \"\|^[[:space:]]\+\[ ! -e \"\|^[[:space:]]\+pendingL4I \[ -e \"\|^[[:space:]]\+pendingL3I \[ -e \"\|^[[:space:]]\+pendingL4I \[ ! -e \"\|^[[:space:]]\+pendingL3I \[ ! -e \"/ {
                    s|\] \&\&|] ######|g;
                    s|\] ######\(.*\) \&\&|] ######\1 ######|g;
                    s|\&|\\\&|g;
@@ -998,21 +1162,27 @@ EOF
     #fix if numeric comparisons
     sed -i -e "s/^if \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/[ \1 -gt \2 ] \&\& \3/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/\1[ \2\ -gt \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2\ -gt \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2\ -gt \3 ] \&\& \4/I" \
            -e "s/^if \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/[ \1 -lt \2 ] \&\& \3/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/\1[ \2 -lt \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -lt \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -lt \3 ] \&\& \4/I" \
            -e "s/^if \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/[ \1 -eq \2 ] \&\& \3/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/\1[ \2 -eq \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -eq \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -eq \3 ] \&\& \4/I" \
            -e "s/^if \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/[ \1 -ne \2 ] \&\& \3/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/\1[ \2 -ne \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -ne \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -ne \3 ] \&\& \4/I" \
            -e "s/^if \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/[ \1 -le \2 ] \&\& \3/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/\1[ \2 -le \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -le \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -le \3 ] \&\& \4/I" \
            -e "s/^if \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/[ \1 -ge \2 ] \&\& \3/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/\1[ \2 -ge \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -ge \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -ge \3 ] \&\& \4/I" \
         "$currentScript"
     
@@ -2570,6 +2740,8 @@ TEMPDONECHOICE' "$currentScript"
                s/^\(^[[:space:]]\+\)if exist \([^ ]*\) unzip \(.*\)/\1if exist \"\2\" unzip \3/" \
            -e "/^[[:space:]]\+if exist \"/I! \
                s/^\(^[[:space:]]\+\)if exist \([^\.]*\)\([^ ]*\)\(.*\)/\1if exist \"\2\3\"\4/" \
+           -e "/^[[:space:]]\+pendingL4I exist \"/I! \
+               s/^\(^[[:space:]]\+\)pendingL4I exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL4I exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+pendingL3I exist \"/I! \
                s/^\(^[[:space:]]\+\)pendingL3I exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL3I exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+if not exist \"/I! \
@@ -2578,6 +2750,8 @@ TEMPDONECHOICE' "$currentScript"
                s/^\(^[[:space:]]\+\)if not exist \([^ ]*\) unzip \(.*\)/\1if not exist \"\2\" unzip \3/" \
            -e "/^[[:space:]]\+if not exist \"/! \
                s/^\(^[[:space:]]\+\)if not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1if not exist \"\2\3\"\4/" \
+           -e "/^[[:space:]]\+pendingL4I not exist \"/! \
+               s/^\(^[[:space:]]\+\)pendingL4I not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL4I not exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+pendingL3I not exist \"/! \
                s/^\(^[[:space:]]\+\)pendingL3I not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL3I not exist \"\2\3\"\4/" \
         "$currentScript"
@@ -2585,71 +2759,99 @@ TEMPDONECHOICE' "$currentScript"
     #fix nested if exist / if not exist statements (structure)
     sed -i -e "/^[[:space:]]\+if exist \"/I \
                s/^\(^[[:space:]]\+\)if exist \"\([^\"]*\)\"\(.*\)/\1[ -e \2 ] \&\&\3/" \
+           -e "/^[[:space:]]\+pendingL4I exist \"/I \
+               s/^\(^[[:space:]]\+\)pendingL4I exist \"\([^\"]*\)\"\(.*\)/\1pendingL4I [ -e \2 ] \&\&\3/" \
            -e "/^[[:space:]]\+pendingL3I exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ -e \2 ] \&\&\3/" \
            -e "/^[[:space:]]\+if not exist \"/I \
                s/^\(^[[:space:]]\+\)if not exist \"\([^\"]*\)\"\(.*\)/\1[ ! -e \2 ] \&\&\3/" \
+           -e "/^[[:space:]]\+pendingL4I not exist \"/I \
+               s/^\(^[[:space:]]\+\)pendingL4I not exist \"\([^\"]*\)\"\(.*\)/\1pendingL4I [ ! -e \2 ] \&\&\3/" \
            -e "/^[[:space:]]\+pendingL3I not exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I not exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ ! -e \2 ] \&\&\3/" \
         "$currentScript"
 
     #fix nested if numeric comparisons
     sed -i -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/\1[ \2 -gt \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -gt \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -gt \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/\1[ \2 -lt \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -lt \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) lss \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -lt \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/\1[ \2 -eq \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -eq \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) equ \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -eq \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/\1[ \2 -ne \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -ne \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) neq \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -ne \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/\1[ \2 -le \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -le \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) leq \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -le \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/\1[ \2 -ge \3 ] \&\& \4/I" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 -ge \3 ] \&\& \4/I" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]]*\) geq \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 -ge \3 ] \&\& \4/I" \
         "$currentScript"
         
     #convert nested if errorlevel statements
     sed -i -e "/^[[:space:]]\+if errorlevel/ \
                s/^\([[:space:]]\+\)if \(errorlevel \)\(.[^[:space:]]*\)\(.*\)/\1[ $\2== \'\3\' ] \&\&\4/" \
+           -e "/^[[:space:]]\+pendingL4I errorlevel/ \
+               s/^\([[:space:]]\+\)pendingL4I \(errorlevel \)\(.[^[:space:]]*\)\(.*\)/\1pendingL4I [ $\2== \'\3\' ] \&\&\4/" \
            -e "/^[[:space:]]\+pendingL3I errorlevel/ \
                s/^\([[:space:]]\+\)pendingL3I \(errorlevel \)\(.[^[:space:]]*\)\(.*\)/\1pendingL3I [ $\2== \'\3\' ] \&\&\4/" \
         "$currentScript"
     
     #convert nested if variable comparison statements
     sed -i -e "s/^\([[:space:]]\+\)if not \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/\1[ \2 != \"\3\" ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I not \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/\1pendingL4I [ \2 != \"\3\" ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I not \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/\1pendingL3I [ \2 != \"\3\" ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if not \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/\1[ \2 != \"\" ] \&\& \3/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I not \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/\1pendingL4I [ \2 != \"\" ] \&\& \3/" \
            -e "s/^\([[:space:]]\+\)pendingL3I not \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/\1pendingL3I [ \2 != \"\" ] \&\& \3/" \
            -e "s/^\([[:space:]]\+\)if not \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/\1[ \2 != \3 ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I not \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 != \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I not \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 != \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if not \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/\1[ \2 != \3 ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I not \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 != \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I not \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 != \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if not \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/\1[ \2 != \3 ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I not \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 != \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I not \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 != \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/\1[ \2 == \"\3\" ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/\1pendingL4I [ \2 == \"\3\" ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/\1pendingL3I [ \2 == \"\3\" ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/\1[ \2 == \"\" ] \&\& \3/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/\1pendingL4I [ \2 == \"\" ] \&\& \3/" \
            -e "s/^\([[:space:]]\+\)pendingL3I \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/\1pendingL3I [ \2 == \"\" ] \&\& \3/" \
            -e "s/^\([[:space:]]\+\)if \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/\1[ \2 == \3 ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 == \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 == \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/\1[ \2 == \3 ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 == \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 == \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)if \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/\1[ \2 == \3 ] \&\& \4/" \
+           -e "s/^\([[:space:]]\+\)pendingL4I \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 == \3 ] \&\& \4/" \
            -e "s/^\([[:space:]]\+\)pendingL3I \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 == \3 ] \&\& \4/" \
         "$currentScript"
     
     #convert nested if varible existence checks
     sed -i -e "s/^\(^[[:space:]]\+\)if not defined \"%\(.[^[:space:]%\"]*\)\" /\1if not defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL4I not defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL3I not defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)if defined \"%\(.[^[:space:]%\"]*\)\" /\1if defined $\{\1\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL4I defined $\{\1\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined \"%\(.[^[:space:]%\"]*\)\" /\1pendingL3I defined $\{\1\} /" \
            -e "s/^\(^[[:space:]]\+\)if not defined %\(.[^[:space:]%\"]*\) /\1if not defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined %\(.[^[:space:]%\"]*\) /\1pendingL4I not defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined %\(.[^[:space:]%\"]*\) /\1pendingL3I not defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)if defined %\(.[^[:space:]%\"]*\) /\1if defined $\{\2\} /" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined %\(.[^[:space:]%\"]*\) /\1pendingL4I defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined %\(.[^[:space:]%\"]*\) /\1pendingL3I defined $\{\2\} /" \
            -e "s/^\(^[[:space:]]\+\)if not defined \(.[^[:space:]]*\) \(.*\)/\1[ \2 = \"\" ] \&\& \3/" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I not defined \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 = \"\" ] \&\& \3/" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I not defined \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 = \"\" ] \&\& \3/" \
            -e "s/^\(^[[:space:]]\+\)if defined \(.[^[:space:]]*\) \(.*\)/\1[ \2 != \"\" ] \&\& \3/" \
+           -e "s/^\(^[[:space:]]\+\)pendingL4I defined \(.[^[:space:]]*\) \(.*\)/\1pendingL4I [ \2 != \"\" ] \&\& \3/" \
            -e "s/^\(^[[:space:]]\+\)pendingL3I defined \(.[^[:space:]]*\) \(.*\)/\1pendingL3I [ \2 != \"\" ] \&\& \3/" \
         "$currentScript"
     
@@ -2711,6 +2913,8 @@ TEMPDONECHOICE' "$currentScript"
                s/^\(^[[:space:]]\+\)if exist \([^ ]*\) unzip \(.*\)/\1if exist \"\2\" unzip \3/" \
            -e "/^[[:space:]]\+if exist \"/I! \
                s/^\(^[[:space:]]\+\)if exist \([^\.]*\)\([^ ]*\)\(.*\)/\1if exist \"\2\3\"\4/" \
+           -e "/^[[:space:]]\+pendingL4I exist \"/I! \
+               s/^\(^[[:space:]]\+\)pendingL4I exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL4I exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+pendingL3I exist \"/I! \
                s/^\(^[[:space:]]\+\)pendingL3I exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL3I exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+if not exist \"/I! \
@@ -2719,6 +2923,8 @@ TEMPDONECHOICE' "$currentScript"
                s/^\(^[[:space:]]\+\)if not exist \([^ ]*\) unzip \(.*\)/\1if not exist \"\2\" unzip \3/" \
            -e "/^[[:space:]]\+if not exist \"/! \
                s/^\(^[[:space:]]\+\)if not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1if not exist \"\2\3\"\4/" \
+           -e "/^[[:space:]]\+pendingL4I not exist \"/! \
+               s/^\(^[[:space:]]\+\)pendingL4I not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL4I not exist \"\2\3\"\4/" \
            -e "/^[[:space:]]\+pendingL3I not exist \"/! \
                s/^\(^[[:space:]]\+\)pendingL3I not exist \([^\.]*\)\([^ ]*\)\(.*\)/\1pendingL3I not exist \"\2\3\"\4/" \
         "$currentScript"
@@ -2726,10 +2932,14 @@ TEMPDONECHOICE' "$currentScript"
     #fix unhandled if exist / if not exist statements (structure)
     sed -i -e "/^[[:space:]]\+if exist \"/I \
                s/^\(^[[:space:]]\+\)if exist \"\([^\"]*\)\"\(.*\)/\1[ -e \2 ] \&\&\3/" \
+           -e "/^[[:space:]]\+pendingL4I exist \"/I \
+               s/^\(^[[:space:]]\+\)pendingL4I exist \"\([^\"]*\)\"\(.*\)/\1pendingL4I [ -e \2 ] \&\&\3/" \
            -e "/^[[:space:]]\+pendingL3I exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ -e \2 ] \&\&\3/" \
            -e "/^[[:space:]]\+if not exist \"/I \
                s/^\(^[[:space:]]\+\)if not exist \"\([^\"]*\)\"\(.*\)/\1[ ! -e \2 ] \&\&\3/" \
+           -e "/^[[:space:]]\+pendingL4I not exist \"/I \
+               s/^\(^[[:space:]]\+\)pendingL4I not exist \"\([^\"]*\)\"\(.*\)/\1pendingL4I [ ! -e \2 ] \&\&\3/" \
            -e "/^[[:space:]]\+pendingL3I not exist \"/I \
                s/^\(^[[:space:]]\+\)pendingL3I not exist \"\([^\"]*\)\"\(.*\)/\1pendingL3I [ ! -e \2 ] \&\&\3/" \
         "$currentScript"
@@ -3523,6 +3733,11 @@ function goto\
     #fix PENDINGAST
     sed -i -e "s/PENDINGAST/*/g" "$currentScript"
     
+    #fix pendingL4I
+    sed -i -e 's/^\([[:space:]]\+\)\(.*\) \&\& pendingL4then/\1\2\n\1then/' "$currentScript"
+    sed -i -e "s/pendingL4I /if /" \
+           -e "s/pendingL4FI/fi/" "$currentScript"
+
     #fix pendingL3I
     sed -i -e 's/^\([[:space:]]\+\)\(.*\) \&\& pendingL3then/\1\2\n\1then/' "$currentScript"
     sed -i -e "s/pendingL3I /if /" \
