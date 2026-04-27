@@ -11,6 +11,7 @@ DELAYEDVARECHBEG - denotes the beginning of a delayed expansion variable used in
 DELAYEDVARECHEND - denotes the end of a delayed expansion variable used in an echo statement
 DETERMINEBYTESFREE - placeholder that is later substituted with Linux command to determine bytes free
 PENDINGAST - pending asterisk (*)
+PENDINGBACKSLASH - pending \
 PENDINGBACKTICK - pending `
 PENDINGBASENOEXT - pending current script basename without extension
 PENDINGCAT - pending cat to set variable
@@ -380,6 +381,9 @@ EOF
     
     #prepare shader type declarations
     sed -i -e "s|^for /f \"tokens=1 delims=\\\\\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%\1%|\L\3\E=PENDINGDLR{\L\2\EPENDINGPCTPENDINGPCT/*}|I"  "$currentScript"
+
+    #convert declarations from last line of txt file
+    sed -i -e 's#^for /F "delims=" %\([[:alnum:]_]\+\)% in (\([^"%()]\+\.txt\)) do set \([[:alnum:]_]\+\)=%\1%#\L\3\E=PENDINGDLR(tail -1 \2 | tr -d '\''PENDINGBACKSLASHr'\'')#I' "$currentScript"
     
     #change LaunchBox.exe check variable and references to exogui
     sed -i -e 's/^SET EXE=LaunchBox\.exe/set exe=exogui/I' \
@@ -700,7 +704,7 @@ EOF
     sed -i -e '/^echo\|^#\|^[[:space:]]\+echo/I!s|/q /s||Ig' "$currentScript"
 
     #change unzip.exe to unzip
-    sed -i -e '/^echo\|^cp \|^#\| erase \|^[[:space:]]\+echo\|^[[:space:]]\+cp /I!s|unzip\.exe |unzip |Ig' "$currentScript"
+    sed -i -e '/^echo\|^cp \|^#\| erase \|exist .*unzip\.exe echo \|exist .*unzip\.exe set \|^[[:space:]]\+echo\|^[[:space:]]\+cp /I!s|unzip\.exe |unzip |Ig' "$currentScript"
 
     #change ./eXo/util/unzip to unzip
     sed -i -e '/^echo\|^#\|^[[:space:]]\+echo/I!s|[\./]*eXo/util/unzip |unzip |Ig' "$currentScript"
@@ -3399,18 +3403,15 @@ EOF
     
     #fix trailing backslashes at the end of echoes
     sed -i -e 's|\(echo.*\)\\\\"$|\1/"|' "$currentScript"
-    
+
     #fix ! for conditional echos
     sed -i -e "/&& \+echo.*\!/ {
-                   s/#/##/g;
-                   s/\!/\\\!#/g;
                    :a;
-                   s/\(&& \)\(echo.*>.*\)\\\!#\(.*\)/\1\2\\\!\3/;
+                   s/\(&& \+echo[^>]*\)\!/\1\n/;
                    ta;
-                   s/\\\!#/\"'\!'\"/g;
-                   s/##/#/g;
+                   s/\n/\"'\!'\"/g;
                }" "$currentScript"
-    
+
     #fix bash calls that lack extensions
     sed -i -e '/\.bsh\|\.bat/!s/^\(source \)\(".*\)"$/\1\2.bsh"/' \
            -e '/\.bsh\|\.bat/!s/^\(source \)\([^"]*\)$/\1\2.bsh/' \
@@ -3743,6 +3744,9 @@ function goto\
     sed -i -e "s/pendingL3I /if /" \
            -e "s/pendingL3FI/fi/" "$currentScript"
     
+    #fix PENDINGBACKSLASH
+    sed -i -e 's/PENDINGBACKSLASH/\\/g' "$currentScript"
+
     #fix PENDINGBACKTICK
     sed -i -e 's/PENDINGBACKTICK/\\`/g' "$currentScript"
     
@@ -3786,6 +3790,10 @@ function goto\
     #set svmini path using scummvm.txt (flatpak launch command in scummvm_linux.txt does not contain path)
     sed -i -e 's#svmini="/\${svm\:.*#svmini="$(grep -i "\^\${gamename}" ./util/scummvm.txt | tail -1 | tr -d '\''\\r'\'' | awk -F'\'';'\'' '\''{print "/" substr(\$3, 1, length(\$3)-11)}'\'' | sed -e '\''s|\\\\|/|'\'')"#' "$currentScript"
     
+    #convert certutil commands
+    sed -i -e "s#certutil -hashfile \(.*\) SHA256 | findstr /v \"hash\" *> *\(.*\)#sha256sum \1 | awk '{print \$1}' > \2#g" \
+           -e 's#sha256sum "\\\!#sha256sum \\\!"#g' "$currentScript"
+
     #add bash header line, goto function and alias
     sed -i -e '1i\
 #!/usr/bin/env bash\
