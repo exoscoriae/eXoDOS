@@ -61,6 +61,9 @@ function convertScript
     #change ..\.\ instances to ..\
     sed -i -e 's/\.\.\\\.\\/..\\/g' "$currentScript"
     
+    #fix unset commands
+    sed -i -e "s/set \"\([[:alnum:]_]\+\)=\"[[:space:]\t]*$/unset \L\1\E/I" "$currentScript"
+
     #prepare loop variables
     sed -i -e 's/%%\([~]\)/%\1%/g' \
            -e 's/%%\([a-zA-Z]\)\([^a-zA-Z0-9_:]\|$\)/%\L\1\E%\2/g' "$currentScript"
@@ -384,7 +387,10 @@ EOF
 
     #convert declarations from last line of txt file
     sed -i -e 's#^for /F "delims=" %\([[:alnum:]_]\+\)% in (\([^"%()]\+\.txt\)) do set \([[:alnum:]_]\+\)=%\1%#\L\3\E=PENDINGDLR(tail -1 \2 | tr -d '\''PENDINGBACKSLASHr'\'')#I' "$currentScript"
-    
+
+    #convert declarations from specified line of txt file (incremented to 1 line past skip)
+    sed -i -e 's#^for /F "skip=\([[:digit:]]\+\) delims=" %\([[:alnum:]_]\+\)% in ('\''type "\([^"%()]\+\.txt\)"'\'') do set "\([[:alnum:]_]\+\)=%\2%" & goto #echo "\L\4\E=PENDINGDLR(sed -n '\''$((\1 + 1))p'\'' \\\"$(printf '\''%s'\'' "\3" | tr '\''\\\\'\'' '\''/'\'')\\\" | tr -d '\''PENDINGBACKSLASHr'\'') \& goto "#Ie' "$currentScript"
+
     #change LaunchBox.exe check variable and references to exogui
     sed -i -e 's/^SET EXE=LaunchBox\.exe/set exe=exogui/I' \
            -e 's/LaunchBox must be closed/exogui must be closed/I' \
