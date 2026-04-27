@@ -733,10 +733,10 @@ EOF
     
     #take set out of echo commands with redirects
     sed -i -e "/echo set .*>/I s/echo set /echo /I" "$currentScript"
-    
+
     #escape quotes on echoes without redirects
     sed -i -e "/^echo\|^[[:space:]]\+echo/I{ />/! s/\"/\\\\\"/g }" "$currentScript"
-    sed -i -e "/^if .* echo \|^[[:space:]]\+if .* echo /I{ />/! s/\( echo .*\)\"/\1\\\\\"/g }" "$currentScript"
+    sed -i -e "/^if .* echo \|^[[:space:]]\+if .* echo /I{ />/!{ s/\( echo \)/\1\n/I; h; s/.*\n//; s/\"/\\\\\"/g; x; s/\n.*/\n/; G; s/\n//g; } }" "$currentScript"
     
     #escape quotes on echos with redirects
     sed -i -e "/^echo\|^[[:space:]]\+echo/I { :a s/\(echo .*[^\\]\)\"\(.* > \)/\1\\\\\"\2/Ig; ta; }" \
