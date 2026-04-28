@@ -18,6 +18,7 @@ PENDINGCAT - pending cat to set variable
 PENDINGDLR - pending $ character
 pendingdq - pending double quote
 PENDINGEXECHECK - placeholder that is later substituted with Linux command to determine if process is running
+PENDINGextip - placeholder to set extip
 pendingIFS - placeholder for IFS
 PENDINGPCT - pending % character
 pendingSED - short term placeholder to handle sed commands that need to be broken up due to token limitation
@@ -362,6 +363,9 @@ EOF
     #replace " in variable declaration values with pendingdq placeholder
     sed -i -e '/^set [[:alnum:]_]\+=/I s/\"/pendingdq/Ig' "$currentScript"
 
+    #PENDINGextip placeholder
+    sed -i -e 's|for /f "tokens=2 delims=.*findstr "Address.* do set ExtIP=.*|PENDINGextip|I' "$currentScript"
+
     #PENDINGsizedeclaration placeholder
     sed -i -e 's|FOR /F "tokens=3 USEBACKQ" %f% IN (`dir /-c /w`) DO set "size=%f%"[[:space:]\t]*$|PENDINGsizedeclaration|' "$currentScript"
 
@@ -492,7 +496,8 @@ EOF
     #remove DelayedExpansion global variables
     sed -i -e '/setlocal .*DelayedExpansion/Id' \
            -e '/SETLOCAL .*Extensions/Id' \
-           -e '/setlocal$/Id' "$currentScript"
+           -e '/setlocal[[:space:]\t]*$/Id' \
+           -e '/endlocal[[:space:]\t]*$/Id' "$currentScript"
     
     #remove current drive variable assignment
     sed -i -e '/set current=%CD:.*/d' "$currentScript"
@@ -1041,6 +1046,7 @@ EOF
     sed -i -e '$!N;/^for.*\n.*powershell.*Invoke-Web/I!P;D' "$currentScript"
     sed -i -e '$!N;/powershell.*Invoke-Web.*\n) Do Set ExtIP.*/I!P;D' "$currentScript"
     sed -i -e '/) Do Set ExtIP=.*/Ic extip=`curl -4 ident.me`' "$currentScript"
+    sed -i -e 's/PENDINGextip/extip=`curl -4 ident.me`/' "$currentScript"
     
     #convert for loop to obtain private IP
     sed -i -e '$!N;/^for.*tokens.*ipconfig.*\ndo.*/I!P;D' "$currentScript"
