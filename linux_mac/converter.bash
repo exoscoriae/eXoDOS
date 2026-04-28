@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-27
+# Revised: 2026-04-28
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1548,7 +1548,7 @@ EOF
            -e "s|source ./exo/Update/restore.py|python3 ./eXo/Update/restore.py|I" \
            -e "s|source ./exo/util/restore.py|python3 ./eXo/util/restore.py|I" \
            -e "/util\.zip/ s/restore\.exe/restore.py/Ig" \
-           -e "/restore\.py/ s/util\.zip/utilPENDINGAST.zip/" "$currentScript"
+           -e "/restore\.py/ s/util\.zip/util*.zip/" "$currentScript"
     
     #fix echo lines that already had quotes
     sed -i -e 's/echo "\\"\(.*\)\\""/echo "\1"/' "$currentScript"
@@ -3051,6 +3051,9 @@ TEMPDONECHOICE' "$currentScript"
     #convert :*/= declarations that use delayed expansion
     sed -i -e 's|\(.[^[:space:]\"~=]*\)=\\\!\(.[^[:space:]\"~=]*\):\*/=\\\!|\1=\$\{\2#*/\}|g' "$currentScript"
 
+    #convert declaration for leading tab removal
+    sed -i -e 's|^\([[:alnum:]_]\+\)=%\1:\t=%|\1=\$\{\1##+(\$'\''\\t'\'')\}|' "$currentScript"
+
     #convert ~[##],-[##] declarations
     sed -i -e 's/\(.[^[:space:]\"~=]*\)=\${\(.[^[:space:]\"~=]*\):~\([[:digit:]]\+\),-\([[:digit:]]\+\)}/\1=\$\{\2:\3:-\4\}/g' \
            -e 's/"\(.[^[:space:]\"~=]*\)=\(\${.[^[:space:]\"~=]*:[[:digit:]]\+:-[[:digit:]]\+}\)"/\1=\2/g' "$currentScript"
@@ -3815,6 +3818,9 @@ function goto\
     #convert certutil commands
     sed -i -e "s#certutil -hashfile \(.*\) SHA256 | findstr /v \"hash\" *> *\(.*\)#sha256sum \1 | awk '{print \$1}' > \2#g" \
            -e 's#sha256sum "\\\!#sha256sum \\\!"#g' "$currentScript"
+
+    #ensure Linux files are being extracted from Linux patch zips
+    sed -i -e 's/\(unzip -o util\)\(\.zip [[:alnum:]_]\+\.bsh\)/\1\\*\2/I' "$currentScript"
 
     #add bash header line, goto function and alias
     sed -i -e '1i\
