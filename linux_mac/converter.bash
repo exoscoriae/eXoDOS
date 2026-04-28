@@ -21,6 +21,7 @@ PENDINGEXECHECK - placeholder that is later substituted with Linux command to de
 pendingIFS - placeholder for IFS
 PENDINGPCT - pending % character
 pendingSED - short term placeholder to handle sed commands that need to be broken up due to token limitation
+PENDINGsizedeclaration - placeholder for variable declaration to determine free space
 PENDINGTONULL - pending &>/dev/null
 PENDINGTLTRU - pending top level true condition
 PENDINGTLFAL - pending top level false condition
@@ -360,7 +361,13 @@ EOF
     
     #replace " in variable declaration values with pendingdq placeholder
     sed -i -e '/^set [[:alnum:]_]\+=/I s/\"/pendingdq/Ig' "$currentScript"
-    
+
+    #PENDINGsizedeclaration placeholder
+    sed -i -e 's|FOR /F "tokens=3 USEBACKQ" %f% IN (`dir /-c /w`) DO set "size=%f%"[[:space:]\t]*$|PENDINGsizedeclaration|' "$currentScript"
+
+    #conversion to get length of variable
+    perl -0777 -pi -e 's/\bSETLOCAL\s+ENABLEDELAYEDEXPANSION\s+SET\s+Length\s*=\s*0\s+FOR\s+\/L\s+%a%\s+IN\s*\(\s*0\s*,\s*1\s*,\s*8100\s*\)\s+DO\s*\(\s*if\s+NOT\s+"!(\w+):~%a%,1!"\s*==\s*""\s*\(\s*SET\s+\/A\s+Length\s*=\s*%a%\s*\+\s*1\s*\)\s*\)\s*\(\s*ENDLOCAL\s+&\s+set\s+(\w+)\s*=\s*%length%\s*\)/\L$2\E=PENDINGDLR{#\L$1\E}/gi' "$currentScript"
+
     #prepare set variable to line in file
     sed -i -e 's|set /p \([[:alnum:]_]\+\)=<|set \1=PENDINGCAT|I' "$currentScript"
     
@@ -385,8 +392,8 @@ EOF
     #prepare shader type declarations
     sed -i -e "s|^for /f \"tokens=1 delims=\\\\\" %\([[:alnum:]_]\+\)% in (\"[%\!]\(.[^\"%\!]*\)[%\!]\") do set \(.[^=]*\)=%\1%|\L\3\E=PENDINGDLR{\L\2\EPENDINGPCTPENDINGPCT/*}|I"  "$currentScript"
 
-    #convert declarations from last line of txt file
-    sed -i -e 's#^for /F "delims=" %\([[:alnum:]_]\+\)% in (\([^"%()]\+\.txt\)) do set \([[:alnum:]_]\+\)=%\1%#\L\3\E=PENDINGDLR(tail -1 \2 | tr -d '\''PENDINGBACKSLASHr'\'')#I' "$currentScript"
+    #convert declarations from last line of txt/ver file
+    sed -i -e 's#^for /F "delims=" %\([[:alnum:]_]\+\)% in (\([^"%()]\+\.\(txt\|ver\)\)) do set \([[:alnum:]_]\+\)=%\1%#\L\4\E=PENDINGDLR(tail -1 \2 | tr -d '\''PENDINGBACKSLASHr'\'')#I' "$currentScript"
 
     #convert declarations from specified line of txt file (incremented to 1 line past skip)
     sed -i -e 's#^for /F "skip=\([[:digit:]]\+\) delims=" %\([[:alnum:]_]\+\)% in ('\''type "\([^"%()]\+\.txt\)"'\'') do set "\([[:alnum:]_]\+\)=%\2%" & goto #echo "\L\4\E=PENDINGDLR(sed -n '\''$((\1 + 1))p'\'' \\\"$(printf '\''%s'\'' "\3" | tr '\''\\\\'\'' '\''/'\'')\\\" | tr -d '\''PENDINGBACKSLASHr'\'') \& goto "#Ie' "$currentScript"
@@ -710,7 +717,7 @@ EOF
     sed -i -e '/^echo\|^#\|^[[:space:]]\+echo/I!s|/q /s||Ig' "$currentScript"
 
     #change unzip.exe to unzip
-    sed -i -e '/^echo\|^cp \|^#\| erase \|exist .*unzip\.exe echo \|exist .*unzip\.exe set \|^[[:space:]]\+echo\|^[[:space:]]\+cp /I!s|unzip\.exe |unzip |Ig' "$currentScript"
+    sed -i -e '/^echo\|^cp \|^#\| erase \|exist .*unzip\.exe echo \|exist .*unzip\.exe set \|exist .*unzip\.exe ([[:space:]\t\r]*$\|^[[:space:]]\+echo\|^[[:space:]]\+cp /I!s|unzip\.exe |unzip |Ig' "$currentScript"
 
     #change ./eXo/util/unzip to unzip
     sed -i -e '/^echo\|^#\|^[[:space:]]\+echo/I!s|[\./]*eXo/util/unzip |unzip |Ig' "$currentScript"
@@ -3441,6 +3448,9 @@ EOF
     
     #add cat command to set variables from files
     sed -i -e '/PENDINGCAT/ s/PENDINGCAT\(.*\)/"\$(cat \1 | head -n 1)"/' "$currentScript"
+
+    #change PENDINGsizedeclaration to size declaration (free space)
+    sed -i -e "s/PENDINGsizedeclaration/size=\"\$(df -B1 . | awk 'NR==2 {print \$4}')\"/" "$currentScript"
     
     #change pendingYYYYMMDD instances to today's value
     sed -i -e "s/pendingYYYYMMDD/\"\$(date +'%Y%m%d')\"/" "$currentScript"
