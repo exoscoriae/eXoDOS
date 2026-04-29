@@ -3459,7 +3459,7 @@ EOF
     sed -i -e '/PENDINGCAT/ s/PENDINGCAT\(.*\)/"\$(cat \1 | head -n 1)"/' "$currentScript"
 
     #change PENDINGsizedeclaration to size declaration (free space)
-    sed -i -e "s/PENDINGsizedeclaration/size=\"\$(df -B1 . | awk 'NR==2 {print \$4}')\"/" "$currentScript"
+    sed -i -e "s/PENDINGsizedeclaration/size=\"\$(df -P -k . | awk 'NR==2 {print \$4 * 1024}')\"/" "$currentScript"
     
     #change pendingYYYYMMDD instances to today's value
     sed -i -e "s/pendingYYYYMMDD/\"\$(date +'%Y%m%d')\"/" "$currentScript"
@@ -3469,7 +3469,7 @@ EOF
            -e 's#dosbox="\${folderpath:19}"dosbox.exe#dosbox="\$(cat ./util/alt_dosbox_linux.txt | head -n 1)"#' "$currentScript"
     
     #assign freespace variable bytes free on current partition
-    sed -i -e "s/freespace=DETERMINEBYTESFREE/freespace=\$(df -P -B 1 . | awk 'NR==2 {print \$4}')/" "$currentScript"
+    sed -i -e "s/freespace=DETERMINEBYTESFREE/freespace=\$(df -P -k . | awk 'NR==2 {print \$4 * 1024}')/" "$currentScript"
     
 #    #fix desktop icon creation process
     sed -i -e 's#^echo.* > .*{userprofile}/Desktop/eXoDOS.*#echo "\[Desktop Entry\]" > ~/Desktop/eXoDOS.desktop\
@@ -3816,11 +3816,16 @@ function goto\
     sed -i -e 's#svmini="/\${svm\:.*#svmini="$(grep -i "\^\${gamename}" ./util/scummvm.txt | tail -1 | tr -d '\''\\r'\'' | awk -F'\'';'\'' '\''{print "/" substr(\$3, 1, length(\$3)-11)}'\'' | sed -e '\''s|\\\\|/|'\'')"#' "$currentScript"
     
     #convert certutil commands
-    sed -i -e "s#certutil -hashfile \(.*\) SHA256 | findstr /v \"hash\" *> *\(.*\)#sha256sum \1 | awk '{print \$1}' > \2#g" \
-           -e 's#sha256sum "\\\!#sha256sum \\\!"#g' "$currentScript"
+    sed -i -e "s#certutil -hashfile \(.*\) SHA256 | findstr /v \"hash\" *> *\(.*\)#sha256sum \1 | awk '{print \$1}' > \2#Ig" \
+           -e 's#sha256sum "\\\!#sha256sum \\\!"#Ig' "$currentScript"
 
     #ensure Linux files are being extracted from Linux patch zips
     sed -i -e 's/\(unzip -o util\)\(\.zip [[:alnum:]_]\+\.bsh\)/\1\\*\2/I' "$currentScript"
+
+    #replace system32/findstr.exe check with a GNU SED check
+    sed -i -e 's#\[ -e "${windir}"/system32/findstr\.exe \]#[ "$(sed --version 2>/dev/null | grep -o -m 1 '\''GNU'\'')" == "GNU" ]#I' "$currentScript"
+    sed -i -e 's#\[ ! -e "${windir}"/system32/findstr\.exe \]#[ "$(sed --version 2>/dev/null | grep -o -m 1 '\''GNU'\'')" != "GNU" ]#I' "$currentScript"
+    sed -i -e 's/FINDSTR not found\. Ensure SYSTEM32 is in your SYSTEM PATH variable/GNU sed not found. Update and re-run install_dependencies.command/I' "$currentScript"
 
     #add bash header line, goto function and alias
     sed -i -e '1i\
