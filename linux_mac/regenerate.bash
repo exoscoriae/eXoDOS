@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-26
+# Revised: 2026-04-28
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -216,6 +216,7 @@ do
     [ -e "$file" ] && sed -i -e "s/exowin3x\\\/eXoWin3x\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exowin9x\\\/eXoWin9x\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exo\\\/eXo\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e 's/^cd content/cd Content/I' "$file"
     [ -e "$file" ] && sed -i -e 's/^cd exo/cd eXo/I' "$file"
     [ -e "$file" ] && sed -i -e 's/^cd eXodos/cd eXoDOS/I' "$file"
     [ -e "$file" ] && sed -i -e 's/^cd eXodreamm/cd eXoDREAMM/I' "$file"
@@ -1132,7 +1133,12 @@ do
     #[ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.bak/_mac.bak/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/_linux\.conf/_mac.conf/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.crt/_mac.crt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.def/_mac.def/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.int/_mac.int/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.ret/_mac.ret/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
@@ -1159,6 +1165,14 @@ tell application "Finder"\
    set name of result to "\1.app"\
 end tell\
 EOF#' "$file"
+    [ -e "$file" ] && sed -i -e '/^ffplay/i\
+for app in ./exogui/*.app\
+do\
+    [ -d "$app" ] || continue\
+    chmod -R u+w "$app"\
+    xattr -cr "$app"\
+    codesign --force --deep --sign - "$app"\
+done' "$file"
     [ -e "${file%.msh}.command" ] && sed -i '/cd "\$( dirname "\$BASH_SOURCE")"/a cd eXo/util || { logger -s "ERROR: Unable to change to eXo/util directory. Aborting."; exit 1; }' "${file%.msh}.command"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"
     [ -e "$file" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "$file"
