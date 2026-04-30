@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-28
+# Revised: 2026-04-29
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1021,7 +1021,8 @@ EOF
                }" "$currentScript"
     
     #removing setconsole lines
-    sed -i -e '/setconsole\.exe/Id' "$currentScript"
+    sed -i -e 's|^\([ \t]*\).*setconsole\.exe /minimize.*|\1console_minimize|I' "$currentScript"
+    sed -i -e 's|^\([ \t]*\).*setconsole\.exe /reset.*|\1console_restore|I' "$currentScript"
     
     #fix %cd% references
     sed -i -e 's/%cd%/$\{PWD\}/I' "$currentScript"
@@ -4110,6 +4111,52 @@ then\
     flatpak list --app --columns=application | grep "^com.retro_exo." | xargs -I {} flatpak override --user --env=SDL_AUDIODRIVER=alsa {}\
 fi\
 shopt -s dotglob\
+\
+if ! declare -F console_minimize > /dev/null || declare -F console_restore > /dev/null\
+then\
+    console_minimize() { true; }\
+    console_restore()  { true; }\
+\
+    if [[ "${XDG_SESSION_TYPE,,}" == "wayland" ]]\
+    then\
+        if [[ "${XDG_CURRENT_DESKTOP^^}" == *"HYPRLAND"* ]]\
+        then\
+            if command -v hyprctl &> /dev/null\
+            then\
+                console_minimize() { hyprctl dispatch movetoworkspacesilent special; }\
+                console_restore()  { hyprctl dispatch togglespecialworkspace; }\
+            fi\
+        elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"KDE"* ]]\
+        then\
+            if command -v kdotool &> /dev/null\
+            then\
+                console_minimize() { kdotool windowminimize "$(kdotool getactivewindow)"; }\
+                console_restore()  { kdotool windowactivate "$(kdotool getactivewindow)"; }\
+            fi\
+        elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"SWAY"* ]]\
+        then\
+            if command -v swaymsg &> /dev/null\
+            then\
+                console_minimize() { swaymsg move scratchpad; }\
+                console_restore()  { swaymsg scratchpad show; }\
+            fi\
+        fi\
+    elif [[ "${XDG_SESSION_TYPE,,}" == "x11" ]]\
+    then\
+        if command -v xdotool &> /dev/null\
+        then\
+            console_minimize() { xdotool windowminimize "$(xdotool getactivewindow)"; }\
+            console_restore()  { xdotool windowactivate "$(xdotool getactivewindow)"; }\
+        fi\
+    elif [[ "$(uname -s)" == "Darwin" ]]\
+    then\
+        if [[ "$TERM_PROGRAM" == "cool-retro-term" ]]\
+        then\
+            console_minimize() { osascript -e \'\''tell application "System Events" to keystroke "m" using command down'\''; }\
+            console_restore()  { osascript -e "tell application \"cool-retro-term\" to activate"; }\
+        fi\
+    fi\
+fi\
 ' "$currentScript"
     
 }

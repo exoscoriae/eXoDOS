@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-28
+# Revised: 2026-04-30
 #
 # This script was written and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -478,6 +478,8 @@ cd "$( dirname "$BASH_SOURCE")"
 
 if [[ "$OSTYPE" == "linux"* ]]
 then
+    source ~/.config/exogui/path 2>/dev/null
+    hash -r
     current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
     case "$current_term" in
         "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
@@ -513,7 +515,7 @@ then
     if command -v cool-retro-term &> /dev/null
     then
         cool-retro-term --profile "IBM VGA 8x16" --scaling "80%" -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
-        exit 0
+        osascript -e 'tell application "Terminal" to close front window' > /dev/null 2>&1 & exit 0
     elif [[ "$-" == *i* ]]
     then
         source "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")"
