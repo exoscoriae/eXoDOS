@@ -778,6 +778,7 @@ do\
     esac\
 done#I' Update/update_xml.bsh 2>/dev/null
 
+#eXoScummVM workarounds
 [ `ls -1 util/install_svm.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\[ -e \.\/eXoScummVM\/"\${gamename}"\.zip \]\|\[ ! -e \.\/eXoScummVM\/"\${gamename}"\.zip \]/i\
 if [ ! -e ./eXoScummVM/"${gamename}".zip ]\
 then\
@@ -817,6 +818,28 @@ do\
     [ -e "$file" ] && sed -i -e "s/\\\\\\Once Upon a Time - Baba Yaga (Multi-Platform)/\\\\\\Once Upon A Time - Baba Yaga (Multi-Platform)/g" "$file"\
     [ -e "$file" ] && sed -i -e "s/\\\\\\TeTRIks (Windows)/\\\\\\TeTriks (Windows)/g" "$file"\
 done' ../Setup\ eXoScummVM.bsh
+
+#sync case workaround to match update zips
+for file in util/install*.bsh
+do
+    [ -e "$file" ] && sed -i -e '/shopt -s dotglob/i \
+sync_case_and_unzip()\
+{\
+    unzip -Z1 "$1" | while IFS= read -r zip_path\
+    do\
+        local current_dest="$2"\
+        IFS='\''/'\'' read -ra parts <<< "$zip_path"\
+        for part in "${parts[@]}"\
+        do\
+            [ -z "$part" ] && continue\
+            find "$current_dest" -maxdepth 1 -mindepth 1 -iname "$part" ! -name "$part" -exec mv {} "$current_dest/${part}_TMP_$$" \\; -exec mv "$current_dest/${part}_TMP_$$" "$current_dest/$part" \\; -quit 2>/dev/null\
+            current_dest="$current_dest/$part"\
+        done\
+    done\
+    unzip -o "$1" -d "$2"\
+}' "$file"
+    [ -e "$file" ] && sed -i -e '/Update/ s/unzip -o \([^ ]*\) -d \([^ ]*\)/sync_case_and_unzip \1 \2/g' "$file"
+done
 
 echo "Applying Linux-only game fixes."
 [ `ls -1 emulators/dosbox/options_linux.conf 2>/dev/null | wc -w` -gt 0 ] && grep -iq usescancodes emulators/dosbox/options_linux.conf 2>/dev/null || sed -i -e 's/\(\[sdl\]\)/\1\nusescancodes=false/' emulators/dosbox/options_linux.conf 2>/dev/null
@@ -930,7 +953,7 @@ echo ""
 
 echo "Converting shell script reference files."
 
-rm -f util/\!*/texts*_linux.txt 2>/dev/null
+rm -f util/\!*/texts*_linux.txt util/\!*/texts*_mac.txt 2>/dev/null
 for file in util/\!*/texts*.txt
 do
     [ -e "$file" ] && cp "$file" "${file%.txt}_linux.txt"
@@ -945,12 +968,13 @@ do
     [ -e "$file" ] && sed -i -e 's/[[:space:]\t]*$//' "$file"
     [ -e "$file" ] && sed -i -e "s/$/\"/" "$file"
     [ -e "$file" ] && dos2unix "$file"
+    [ -e "$file" ] && cp "$file" "${file%.txt}_mac.txt"
 done
 
 cp util/alt_launch.txt util/alt_launch_linux.txt 2>/dev/null
 sed -i -e "s|\\\|/|Ig" util/alt_launch_linux.txt 2>/dev/null
 dos2unix util/alt_launch_linux.txt 2>/dev/null
-#note - these files are also used by the macOS port
+cp util/alt_launch_linux.txt util/alt_launch_mac.txt 2>/dev/null
 
 echo "Fixing dosbox.txt typos."
 #sed -i -e 's/\\\\/\\/g' util/dosbox.txt  2>/dev/null
@@ -981,7 +1005,7 @@ do
     [ -e "$file" ] && sed -i -e 's/:staging0\.80\.1\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-081-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:staging0\.81\.0a\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-081-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:staging0\.81\.1\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-081-2/I' "$file" 2>/dev/null
-    [ -e "$file" ] && sed -i -e 's/:staging0\.82\.0\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-082-0/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:staging0\.82\.0\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-082-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:staging0\.82\.2\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-082-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:staging0\.83\.0\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-083-0/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:x\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-x-08220/I' "$file" 2>/dev/null
@@ -1043,7 +1067,7 @@ sed -i -e 's/;svn3\.0\.0git19492\\scummvm.exe/;flatpak run com.retro_exo.scummvm
 dos2unix util/scummvm_linux.txt  2>/dev/null
 
 # Game specific fixes for scummvm_linux.txt
-[ `ls -1 util/scummvm.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm.txt 2>/dev/null
+[ `ls -1 util/scummvm_linux.txt 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^Escape from Hell (DOS);/ s/com\.retro_exo\.scummvm-2-9-0$/com.retro_exo.scummvm-2-9-0 --gfx-mode=opengl/' util/scummvm_linux.txt 2>/dev/null
 
 cp util/scummvm_linux.txt util/scummvm_mac.txt 2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-2-0|;scummvm-2-2-0|I' util/scummvm_mac.txt  2>/dev/null
@@ -1141,12 +1165,13 @@ do
     [ -e "$currentScript" ] && sed -i -e 's/_linux\.def/_mac.def/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/_linux\.int/_mac.int/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/_linux\.ret/_mac.ret/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's/_linux\.txt/_mac.txt/g' "$currentScript"
+#    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
+#    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
+#    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
+#    [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
+#    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac.txt/g' "$currentScript"
+#    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$file"
     [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
