@@ -207,8 +207,8 @@ for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.ba
 do
     [ -e "$file" ] && sed -i -e "s/\.\\\download\\\/.\\\DOWNLOAD\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exodos\\\/eXoDOS\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exoappleiigs\\\eXoAppleIIGS\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exodemoscn\\\eXoDemoScn\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exoappleiigs\\\/eXoAppleIIGS\\\/Ig" "$file"
+    [ -e "$file" ] && sed -i -e "s/exodemoscn\\\/eXoDemoScn\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exodreamm\\\/eXoDREAMM\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exoif\\\/eXoIF\\\/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/exopcjr\\\/eXoPCjr\\\/Ig" "$file"
