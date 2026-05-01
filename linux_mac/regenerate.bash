@@ -155,7 +155,7 @@ do
         *     ) printf "Invalid input.\\n";;
     esac
 done
-[ $errorlevel == '2' ] && exit 0
+[ "$errorlevel" == '2' ] && exit 0
 unset errorlevel
 
 #Prechecks
@@ -711,7 +711,7 @@ do
     [ -e "$file" ] && sed -i -e "/romdir/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/glshader/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.bak}_linux.bak"
-    [ -e "$file" ] "${file%.bak}_linux.bak" "${file%.bak}_mac.bak"
+    [ -e "$file" ] && cp "${file%.bak}_linux.bak" "${file%.bak}_mac.bak"
 done 2>/dev/null
 
 rm -f emulators/dosbox/alt_settings_linux.{crt,def,int,ret,txt} emulators/dosbox/alt_settings_mac.{crt,def,int,ret,txt} 2>/dev/null
@@ -763,7 +763,6 @@ do\
     read -p "\[Y\]es or \[N\]o " choice\
     case \$choice in\
         \[Yy\]* ) echo "\[Desktop Entry\]" > ~/Desktop/eXoDOS.desktop\
-                echo "Encoding=UTF-8" >> ~/Desktop/eXoDOS.desktop\
                 echo "Encoding=UTF-8" >> ~/Desktop/eXoDOS.desktop\
                 echo "Version=1.0" >> ~/Desktop/eXoDOS.desktop\
                 echo "Type=Application" >> ~/Desktop/eXoDOS.desktop\
@@ -1122,7 +1121,7 @@ do
     [ -e "$currentScript" ] && sed -i -e '/find .*\.msh/! s/\.bsh/.msh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/PENDINGbs/bsh/g' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 ' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 |' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /I' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-074r3-1 /dosbox-074r3-3 /I' "$currentScript" 2>/dev/null
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4301 /dosbox-ece-r4301 /I' "$currentScript" 2>/dev/null
@@ -1152,7 +1151,7 @@ do
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |I' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.wine/I s|flatpak run com\.retro_exo\.wine |wine |I' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.zenity/I s|flatpak run com\.retro_exo\.zenity |zenity |I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$file"
+    [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
     #[ -e "$currentScript" ] && sed -i -e '/(find \|^find \|^[[:space:]]\+find \| && find/ s/find/gfind/' "$currentScript"
@@ -1172,7 +1171,7 @@ do
 #    [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
 #    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac.txt/g' "$currentScript"
 #    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$file"
+    [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's/Linux 64/MacOS/gI' "$currentScript"
