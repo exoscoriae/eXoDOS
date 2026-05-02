@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-29
+# Revised: 2026-05-01
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1258,12 +1258,12 @@ EOF
            -e 's|\&\& [\./]*ssr |\&\& ssr |I' "$currentScript"
     
     #fix scummvm references
-    sed -i -e 's|^"[\./]*scummvm/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-2-0|I' \
-           -e 's|^"[\./]*emulators/scummvm/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-2-0|I' \
-           -e 's|^"scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|I' \
-           -e 's|^"emulators/scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|I' \
-           -e 's|^"\./scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|I' \
-           -e 's|^"\./emulators/scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|I' \
+    sed -i -e 's|^"[\./]*scummvm/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-8-0|I' \
+           -e 's|^"[\./]*emulators/scummvm/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-8-0|I' \
+           -e 's|^"scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-9-0|I' \
+           -e 's|^"emulators/scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-9-0|I' \
+           -e 's|^"\./scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-9-0|I' \
+           -e 's|^"\./emulators/scummvm/svn/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-9-0|I' \
            -e "s|^\"[\./]*emulators/scmvm/\(\${svm}\"\)|\"\1|I" \
            -e "s|^\"[\./]*emulators/scmvm/DELAYEDVARBEGsvmDELAYEDVAREND\"|\"\${svm}\"|I" \
            -e "s|\&\& \"[\./]*emulators/scvm/\(\${svm}\"\)|\&\& \"\1|I" \
@@ -1272,8 +1272,8 @@ EOF
            -e "s|scmvm_sml\.zip|scmvm_linuxmac_sml.zip|" \
            -e "s|scmvm_med\.zip|scmvm_linuxmac_med.zip|" \
            -e "s|scmvm_lrg\.zip|scmvm_linuxmac_lrg.zip|" \
-           -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-2-0|flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini|I' \
-           -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
+           -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-8-0|flatpak run com.retro_exo.scummvm-2-8-0 --config=./emulators/scummvm/scummvm_linux.ini|I' \
+           -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-9-0|flatpak run com.retro_exo.scummvm-2-9-0 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
     
     #fix gzdoom references
     sed -i -e 's|[\./]*gzdoom/gzdoom |flatpak run --env=DOOMWADDIR=./gzdoom com.retro_exo.gzdoom-4-11-3 -config ./gzdoom/gzdoom.ini |I' \
@@ -3533,8 +3533,8 @@ function goto\
     exit\
 }' "$currentScript"
     
-    #fix bash calls that should exit after execution
-    sed -i -e 's|^\([\./]*[[:alnum:]_/\"}{\$\!]\+\.bsh.*\)|source \1 \&\& exit 0|' "$currentScript"
+    #fix bash calls
+    sed -i -e 's|^\([\./]*[[:alnum:]_/\"}{\$\!]\+\.bsh.*\)|source \1|' "$currentScript"
     
     #make source commands use eval to prevent issues with quoted paths
     sed -i -e '/^source \|^[[:space:]]\+source / s/source/eval source/' \
@@ -4083,8 +4083,8 @@ then\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-x-08220"` ]] && missingDependencies=yes\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-x-20240701"` ]] && missingDependencies=yes\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.gzdoom-4-11-3"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-2-0"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-3-0-git15811-gf97bfb7ce1"` ]] && missingDependencies=yes\
+    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-8-0"` ]] && missingDependencies=yes\
+    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-9-0"` ]] && missingDependencies=yes\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.vlc"` ]] && missingDependencies=yes\
     ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.wine"` ]] && missingDependencies=yes\
 else\

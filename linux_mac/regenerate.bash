@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-04-30
+# Revised: 2026-05-01
 #
-# This script was written and tested with the following:
+# This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
 #  - Abiword 3.0.7 (Jul 30 2025)
 #  - aria2 version 1.37.0 (Nov 15 2023)
@@ -25,9 +25,10 @@
 #  - Falkon 25.12.2 (Feb 05 2026)
 #  - ffmpeg version 7.1.1-1ubuntu4.2
 #  - Flatpak 1.16.1
-#  - fold (uutils coreutils) 0.2.2
 #  - getconf (Ubuntu GLIBC 2.42-0ubuntu3.1) 2.42
 #  - GNU bash, version 5.2.37(1)-release (x86_64-pc-linux-gnu)
+#  - GNU coreutils 9.4 / uutils coreutils 0.2.2
+#  - GNU findutils 4.9.0
 #  - GNU Wget 1.25.0
 #  - Gnumeric 1.12.60 (Feb 10 2026)
 #  - GZDoom 4.11.3 (Oct 26 2023)
@@ -40,8 +41,6 @@
 #  - node v25.6.1 (npm v11.9.0)
 #  - perl 5, version 40, subversion 1 (v5.40.1)
 #  - Python 3.13.7 (Aug 14 2025)
-#  - ScummVM 2.2.0 (Oct 30 2020 19:42:51) ---------------------pending phase-out
-#  - ScummVM 2.3.0 Alpha git15811-gf97bfb7ce1 (Apr 28 2021) ---pending phase-out
 #  - ScummVM 2.8.0 (Dec 16 2023)
 #  - ScummVM 2.5.0 (Oct 01 2021)
 #  - ScummVM 2.9.0 (Dec 07 2024)
@@ -720,7 +719,7 @@ do
     [ -e emulators/dosbox/alt_settings.$ext ] && cp "emulators/dosbox/alt_settings.$ext" "emulators/dosbox/alt_settings_linux.$ext" 2>/dev/null
     [ -e emulators/dosbox/alt_settings_linux.$ext ] && dos2unix emulators/dosbox/alt_settings_linux.$ext 2>/dev/null
     [ -e emulators/dosbox/alt_settings_linux.$ext ] && sed -i -e "/glshader/ s|\\\|/|Ig" emulators/dosbox/alt_settings_linux.$ext
-    cp emulators/dosbox/alt_settings_linux.$ext emulators/dosbox/alt_settings_mac.$ext
+    [ -e emulators/dosbox/alt_settings_linux.$ext ] && cp emulators/dosbox/alt_settings_linux.$ext emulators/dosbox/alt_settings_mac.$ext
 done
 
 echo "Creating Linux ScummVM ini files."
@@ -858,6 +857,7 @@ echo "Applying Linux-only game fixes."
 [ `ls -1 eXoDOS/\!dos/LewLeon/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/LewLeon/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/LivingBa/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/LivingBa/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/LowBlow/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/mididevice=default/a mt32.romdir=./mt32' eXoDOS/\!dos/LowBlow/dosbox_linux.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/LSL6CD/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/LSL6CD/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/Mean18/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/Mean18/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/MechW2/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/MechW2/dosbox_linux.conf 2>/dev/null #can be merged into the main zip at a later date
 [ `ls -1 eXoDOS/\!dos/NFLChall/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/NFLChall/dosbox_linux.conf 2>/dev/null
@@ -890,8 +890,14 @@ echo "Applying Linux-only game fixes."
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_12/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|cd/pcgamer_1\.CUE|cd/pcgamer_1_linux.CUE|" Magazines/PCGamerUS/PCGamer_1997_12/dosbox_linux.conf 2>/dev/null
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1.CUE 2>/dev/null | wc -w` -gt 0 ] && cp Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1.CUE Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1_linux.CUE 2>/dev/null
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1_linux.CUE 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/pcgamer_1\.bin/pcgamer_1.BIN/" Magazines/PCGamerUS/PCGamer_1997_12/cd/pcgamer_1_linux.CUE 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/^flatpak run com\.retro_exo\.wine .\/eXoDOS\/120Deg\/sciAudio\/sciAudio.exe/,/^kill .*/ c\
-flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulators/scummvm/svn/scummvm_linux.ini -F -g3x --aspect-ratio -peXoDOS/120Deg sci-fanmade" eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^flatpak run com\.retro_exo\.wine \.\/eXoDOS\/120Deg\/sciAudio\/sciAudio\.exe/,/^kill .*/ c\
+[ -e ./util/FULL.SEL ] && screen=-f\
+[ -e ./util/WIN.SEL ] && screen=-F\
+[ -e ./util/AYES.SEL ] && screen="${screen} --aspect-ratio"\
+[ -e ./util/SML.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_sml.zip -d ./emulators/scummvm/\
+[ -e ./util/MED.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_med.zip -d ./emulators/scummvm/\
+[ -e ./util/LRG.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_lrg.zip -d ./emulators/scummvm/\
+eval flatpak run com.retro_exo.scummvm-2-9-0 $(echo "${screen}" | sed -e "s/\\\\$/\\\\\\\\$/g") --stretch-mode=pixel-perfect --config=./emulators/scummvm/2.9.0/scummvm_linux.ini --opl-driver=nuked --output-rate=44100 -peXoDOS/120Deg sci-fanmade' eXoDOS/\!dos/120Deg/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/BRcdoom/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/BRcdoom/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/BRmatrix/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/BRmatrix/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/ckrynn/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/ckrynn/exception.bsh 2>/dev/null
@@ -914,13 +920,32 @@ flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1 --config=./emulator
 [ `ls -1 eXoDOS/\!dos/gatesf/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/gatesf/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/gfterri/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|^\./eXoDOS/gfterri/gf_terri/gfupdate$|flatpak run com.retro_exo.wine ./eXoDOS/gfterri/gf_terri/GFUpdate.exe|gI" eXoDOS/\!dos/gfterri/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/gftracy/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|^\./eXoDOS/gftracy/gf/gfupdate$|flatpak run com.retro_exo.wine ./eXoDOS/gftracy/GF/GFUpdate.exe|gI" eXoDOS/\!dos/gftracy/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/gnomer/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/^flatpak run com\.retro_exo\.wine .\/eXoDOS\/gnomer\/sciAudio\/sciAudio.exe/,/^kill .*/ c\
-flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini -F -g3x --aspect-ratio -p./eXoDOS/gnomer sci-fanmade" eXoDOS/\!dos/gnomer/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/gnomer/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^flatpak run com\.retro_exo\.wine \.\/eXoDOS\/gnomer\/sciAudio\/sciAudio\.exe/,/^kill .*/ c\
+[ -e ./util/FULL.SEL ] && screen=-f\
+[ -e ./util/WIN.SEL ] && screen=-F\
+[ -e ./util/AYES.SEL ] && screen="${screen} --aspect-ratio"\
+[ -e ./util/SML.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_sml.zip -d ./emulators/scummvm/\
+[ -e ./util/MED.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_med.zip -d ./emulators/scummvm/\
+[ -e ./util/LRG.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_lrg.zip -d ./emulators/scummvm/\
+eval flatpak run com.retro_exo.scummvm-2-9-0 $(echo "${screen}" | sed -e "s/\\\\$/\\\\\\\\$/g") --stretch-mode=pixel-perfect --config=./emulators/scummvm/2.9.0/scummvm_linux.ini --opl-driver=nuked --output-rate=44100 -p./eXoDOS/gnomer sci-fanmade' eXoDOS/\!dos/gnomer/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/gob1/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|eXoDOS/gob1 gob|eXoDOS/gob1/GOB gob1|gI" eXoDOS/\!dos/gob1/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/gob2/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|eXoDOS/gob2 gob2|eXoDOS/gob2/GOB2 gob2|gI" eXoDOS/\!dos/gob2/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/GoldRush/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/echo \"Press 1 to play.*/,/^: dosbox$/ d" eXoDOS/\!dos/GoldRush/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/hoylebk3/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/SoundCanvas\.sf2.*scummvm/ s|/hoylebk3/scummvm |/hoylebk3 |gI" eXoDOS/\!dos/hoylebk3/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/LSL3/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|LSL3/scummvm|LSL3|gI" eXoDOS/\!dos/LSL3/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/mi1/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/flatpak run com\.retro_exo\.scummvm/ c\
+[ -e ./util/FULL.SEL ] && screen=-f\
+[ -e ./util/WIN.SEL ] && screen=-F\
+[ -e ./util/AYES.SEL ] && screen="${screen} --aspect-ratio"\
+[ -e ./util/SML.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_sml.zip -d ./emulators/scummvm/\
+[ -e ./util/MED.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_med.zip -d ./emulators/scummvm/\
+[ -e ./util/LRG.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_lrg.zip -d ./emulators/scummvm/\
+eval flatpak run com.retro_exo.scummvm-2-9-0 $(echo "${screen}" | sed -e "s/\\\\$/\\\\\\\\$/g") --stretch-mode=pixel-perfect --config=./emulators/scummvm/2.9.0/scummvm_linux.ini --opl-driver=nuked --output-rate=44100 -p\\\"./eXoDOS/mi1\\\" scumm:monkey' eXoDOS/\!dos/mi1/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/MortMano/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/flatpak run com\.retro_exo\.scummvm/ c\
+[ -e ./util/FULL.SEL ] && screen=-f\
+[ -e ./util/WIN.SEL ] && screen=-F\
+[ -e ./util/AYES.SEL ] && screen="${screen} --aspect-ratio"\
+[ -e ./util/SML.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_sml.zip -d ./emulators/scummvm/\
+[ -e ./util/MED.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_med.zip -d ./emulators/scummvm/\
+[ -e ./util/LRG.SEL ] && unzip -o ./emulators/scummvm/scummvm_linuxmac_lrg.zip -d ./emulators/scummvm/\
+eval flatpak run com.retro_exo.scummvm-2-8-0 $(echo "${screen}" | sed -e "s/\\\\$/\\\\\\\\$/g") --stretch-mode=pixel-perfect --config=./emulators/scummvm/scummvm_linux.ini --opl-driver=nuked --output-rate=44100 -p\\\"./eXoDOS/MortMano\\\" --language=en mortevielle:mortevielle' eXoDOS/\!dos/MortMano/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/pooldark/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/pooldark/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/poolrad/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/poolrad/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/RoboWar1/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|^\"\./eXoDOS/\${gamedir}/RW1_EDIT\.EXE\"|flatpak run com.retro_exo.wine \"./eXoDOS/\${gamedir}/RW1_EDIT.EXE\"|I" eXoDOS/\!dos/RoboWar1/exception.bsh 2>/dev/null
@@ -929,14 +954,6 @@ flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_lin
 [ `ls -1 eXoDOS/\!dos/Sigil2/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|^gzrun\.bat|eval source gzrun.bsh|gI" eXoDOS/\!dos/Sigil2/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/SystemSh/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/^SSP\.EXE/flatpak run com.retro_exo.wine SSP.exe/I" eXoDOS/\!dos/SystemSh/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/SkyNET/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|"${dosbox}"|ece4481/DOSBox.exe|gI' eXoDOS/\!dos/SkyNET/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/tagent/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^: end/i\
-: scummvm\
-cd ..\
-cd ..\
-cd ..\
-flatpak run com.retro_exo.scummvm-2-2-0 --config=./emulators/scummvm/scummvm_linux.ini -F -g3x --aspect-ratio -p./eXoDOS/tagent teenagent\
-goto end && [[ $0 != $BASH_SOURCE ]] && return\
-' eXoDOS/\!dos/tagent/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TermFS/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|"${dosbox}"|ece4481/DOSBox.exe|gI' eXoDOS/\!dos/TermFS/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|tnmdbwrp |tnmdbwrp.exe |gI' eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/*\.tnm/{p;s/*\.tnm/*.TNM/}' eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null
