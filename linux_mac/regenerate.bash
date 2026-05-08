@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-01
+# Revised: 2026-05-07
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -236,7 +236,6 @@ do
     [ -e "$file" ] && sed -i -e "s/c\*\.rom/C*.ROM/I" "$file"
     [ -e "$file" ] && sed -i -e "s/\.rom/.ROM/I" "$file"
     [ -e "$file" ] && sed -i -e "s|mt32\\\soundcanvas\.sf2|mt32\\\SoundCanvas.sf2|I" "$file"
-    [ -e "$file" ] && sed -i -e "s/update\.zip/update_linux.zip/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/magazines\.zip/Magazines.zip/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/books\.zip/Books.zip/Ig" "$file"
     [ -e "$file" ] && sed -i -e "s/catalogs\.zip/Catalogs.zip/Ig" "$file"
@@ -298,6 +297,7 @@ done
 [ `ls -1 eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/PQ2/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/PQ2/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null
@@ -405,7 +405,7 @@ done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'spawnConversion "$@"' _
 
 echo ""
 echo "Removing unnecessary dependency checks."
-for currentScript in ../xml/*.bsh emulators/*/*.bsh emulators/*/*/*.bsh Videos/*/*.bsh ../eXoMerge.bsh
+for currentScript in ../xml/*.bsh emulators/*/*.bsh emulators/*/*/*.bsh Videos/*/*.bsh ../eXoMerge.bsh util/*.bsh util/*/*.bsh Update/*.bsh
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
 done
@@ -433,9 +433,7 @@ for currentScript in eXoScummVM/\!*/*/*.bsh eXoScummVM/\!*/*/*/*.bsh util/*_svm.
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-8-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-5-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-9-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2026-1-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-3-0-git18903-g313a824fb9"` ]] \&\& missingDependencies=yes^' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-8-0-git9335-g00e72a17004"` ]] \&\& missingDependencies=yes^' "$currentScript"
@@ -646,6 +644,7 @@ done 2>/dev/null
 #[ -e eXoDOS/\!dos/shadcast/dosbox.conf ] && sed -i -e 's/"-t floppy/" -t floppy/' eXoDOS/\!dos/shadcast/dosbox.conf
 #[ -e eXoDOS/\!dos/SilkDust/dosbox.conf ] && sed -i -e "s/eXoDOS\\\silkdust/eXoDOS\\\SilkDust/" eXoDOS/\!dos/SilkDust/dosbox.conf
 [ -e eXoDOS/\!dos/SQ1/dosbox.conf ] && sed -i -e "s/eXoDOS\\\sq1/eXoDOS\\\SQ1/" eXoDOS/\!dos/SQ1/dosbox.conf
+[ -e eXoDOS/\!dos/SQ2/dosbox.conf ] && sed -i -e "s/eXoDOS\\\sq2/eXoDOS\\\SQ2/" eXoDOS/\!dos/SQ2/dosbox.conf
 #[ -e eXoDOS/\!dos/SSAPBAPF/dosbox.conf ] && sed -i -e "s/SSAPBAPF\\\cd\\\/SSAPBAPF\\\CD\\\/" eXoDOS/\!dos/SSAPBAPF/dosbox.conf
 #[ -e eXoDOS/\!dos/Syndicat/dosbox.conf ] && sed -i -e "s/Syndicat\\\cd\\\/Syndicat\\\CD\\\/" eXoDOS/\!dos/Syndicat/dosbox.conf
 #[ -e eXoDOS/\!dos/TankTheM/dosbox.conf ] && sed -i -e "s/TankTheM\\\cd\\\/TankTheM\\\CD\\\/" eXoDOS/\!dos/TankTheM/dosbox.conf
@@ -696,6 +695,7 @@ do
     [ -e "$file" ] && sed -i -e "/soundfont/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
     [ -e "$file" ] && sed -i -e "/romdir/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
     [ -e "$file" ] && sed -i -e "/glshader/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
+    [ -e "$file" ] && sed -i -e "/glshader/ s|Sharp|sharp|Ig" "${file%.conf}_linux.conf"
     [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.conf}_linux.conf"
 done 2>/dev/null
 
@@ -709,6 +709,7 @@ do
     [ -e "$file" ] && sed -i -e "/soundfont/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/romdir/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "/glshader/ s|\\\|/|Ig" "${file%.bak}_linux.bak"
+    [ -e "$file" ] && sed -i -e "/glshader/ s|Sharp|sharp|Ig" "${file%.bak}_linux.bak"
     [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.bak}_linux.bak"
     [ -e "$file" ] && cp "${file%.bak}_linux.bak" "${file%.bak}_mac.bak"
 done 2>/dev/null
@@ -719,6 +720,7 @@ do
     [ -e emulators/dosbox/alt_settings.$ext ] && cp "emulators/dosbox/alt_settings.$ext" "emulators/dosbox/alt_settings_linux.$ext" 2>/dev/null
     [ -e emulators/dosbox/alt_settings_linux.$ext ] && dos2unix emulators/dosbox/alt_settings_linux.$ext 2>/dev/null
     [ -e emulators/dosbox/alt_settings_linux.$ext ] && sed -i -e "/glshader/ s|\\\|/|Ig" emulators/dosbox/alt_settings_linux.$ext
+    [ -e emulators/dosbox/alt_settings_linux.$ext ] && sed -i -e "/glshader/ s|Sharp|sharp|Ig" emulators/dosbox/alt_settings_linux.$ext
     [ -e emulators/dosbox/alt_settings_linux.$ext ] && cp emulators/dosbox/alt_settings_linux.$ext emulators/dosbox/alt_settings_mac.$ext
 done
 
@@ -1154,7 +1156,7 @@ do
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20241001 /dosbox-x-20241001 /I' "$currentScript" 2>/dev/null
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20250201 /dosbox-x-20250201 /I' "$currentScript" 2>/dev/null
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20250503 /dosbox-x-20250503 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run --env=DOOMWADDIR=\./gzdoom com\.retro_exo\.gzdoom-4-11-3 |DOOMWADDIR=./gzdoom gzdoom-4-11-3 |I' "$currentScript" 2>/dev/null
+    [ -e "$currentScript" ] && sed -i -e 's|flatpak run --env=DOOMWADDIR=\./GZDOOM com\.retro_exo\.gzdoom-4-11-3 |DOOMWADDIR=./GZDOOM gzdoom-4-11-3 |I' "$currentScript" 2>/dev/null
     [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /I' "$currentScript"
     [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-2-0 |scummvm-2-2-0 |I' "$currentScript" 2>/dev/null
     [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0 |scummvm-2-8-0 |I' "$currentScript" 2>/dev/null
@@ -1195,8 +1197,57 @@ do
     [ -e "$currentScript" ] && sed -i -e '/^depcheck=flatpak/,/^fi/c\
 missingDependencies=no\
 ! [[ `which java` ]] && missingDependencies=yes\
-! [[ `which wget` ]] && missingDependencies=yes\
 ! [[ `which zenity` ]] && missingDependencies=yes' "$currentScript"
+done
+
+for currentScript in currentScript in eXoDOS/\!*/*/*.msh eXoDOS/\!*/*/*/*.msh eXoPCjr/\!*/*/*.msh eXoPCjr/\!*/*/*/*.msh ../Setup\ eXoDOS.msh
+do
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
+! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
+! [[ `which dosbox-ece-r4358` ]] && missingDependencies=yes\
+! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
+! [[ `which dosbox-gridc-4-3-1` ]] && missingDependencies=yes\
+! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
+! [[ `which dosbox-staging-082-2` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
+! [[ `which wine` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
+done
+
+for currentScript in currentScript in eXoDemoScn/\!*/*/*.msh eXoDemoScn/\!*/*/*/*.msh util/\ds_*.msh ../Setup\ eXoDemoScene.msh
+do
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
+! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
+! [[ `which dosbox-ece-r4358` ]] && missingDependencies=yes\
+! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
+! [[ `which dosbox-gridc-4-3-1` ]] && missingDependencies=yes\
+! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
+! [[ `which dosbox-staging-082-2` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
+! [[ `which wine` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
+done
+
+for currentScript in currentScript in eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*_svm.msh ../Setup\ eXoScummVM.msh
+do
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+! [[ `which scummvm-2-5-0` ]] && missingDependencies=yes\
+! [[ `which scummvm-2-8-0` ]] && missingDependencies=yes\
+! [[ `which scummvm-2-9-0` ]] && missingDependencies=yes\
+! [[ `which scummvm-2026-1-0` ]] && missingDependencies=yes\
+! [[ `which scummvm-2-3-0-git18903-g313a824fb9` ]] && missingDependencies=yes\
+! [[ `which scummvm-2-8-0-git9335-g00e72a17004` ]] && missingDependencies=yes\
+! [[ `which scummvm-3-0-0-git20192-g3ca9da6a1c3` ]] && missingDependencies=yes' "$currentScript"
+done
+
+for currentScript in currentScript in eXoWin9x/\!*/*/*/*.msh eXoWin9x/\!*/*/*/*/*.msh util/9x*.msh ../Setup\ eXoWin9x.msh
+do
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+! [[ `which dosbox-x-20250201` ]] && missingDependencies=yes' "$currentScript"
 done
 
 for file in ../Setup*.msh ../eXoMerge.msh

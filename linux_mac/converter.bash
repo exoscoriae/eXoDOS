@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-01
+# Revised: 2026-05-04
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1276,8 +1276,9 @@ EOF
            -e '/--config=/! s|flatpak run com.retro_exo.scummvm-2-9-0|flatpak run com.retro_exo.scummvm-2-9-0 --config=./emulators/scummvm/svn/scummvm_linux.ini|I' "$currentScript"
     
     #fix gzdoom references
-    sed -i -e 's|[\./]*gzdoom/gzdoom |flatpak run --env=DOOMWADDIR=./gzdoom com.retro_exo.gzdoom-4-11-3 -config ./gzdoom/gzdoom.ini |I' \
-           -e 's|[\./]*gzdoom/gzdoom\.exe |flatpak run --env=DOOMWADDIR=./gzdoom com.retro_exo.gzdoom-4-11-3 -config ./gzdoom/gzdoom.ini |I' "$currentScript"
+    sed -i -e 's|[\./]*gzdoom/gzdoom |flatpak run --env=DOOMWADDIR=./GZDOOM com.retro_exo.gzdoom-4-11-3 -config ./GZDOOM/gzdoom.ini |I' \
+           -e 's|[\./]*gzdoom/gzdoom\.exe |flatpak run --env=DOOMWADDIR=./GZDOOM com.retro_exo.gzdoom-4-11-3 -config ./GZDOOM/gzdoom.ini |I' "$currentScript"
+    #Note that the gzdoom directory is lowercase for Sigil and Sigil II!
     
     #fix 86Box references
     sed -i -e 's|^"\([\./]*emulators/86Box/\)86Box\.exe" -C|\186Box-Linux-x86_64-b6130.AppImage -R \1Roms -C|I' "$currentScript"
