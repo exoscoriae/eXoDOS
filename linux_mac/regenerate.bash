@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-07
+# Revised: 2026-05-08
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -290,35 +290,35 @@ done
 #[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.exe|TNMGS.EXE|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
 #[ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|TNMGS\.no|TNMGS.NO|Ig" eXoDOS/\!dos/TNM7SE/exception.bat 2>/dev/null
 #[ `ls -1 eXoDOS/\!dos/wastland/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|setup\.sel|setup.SEL|Ig" eXoDOS/\!dos/wastland/exception.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/BURGER/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/BURGER/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/BlakCaul/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/BlakCaul/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/FantasyW/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/FantasyW/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/GoldRush/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/GoldRush/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/PQ2/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/PQ2/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/SyndWars/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SyndWars/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TassTime/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/TassTime/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/bforce/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/bforce/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/demotomb/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/demotomb/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/ecoq2/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/ecoq2/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/fable/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fable/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/fallout1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fallout1/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/fqueen/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fqueen/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/losteden/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/losteden/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/mansiond/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/mansiond/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/mi1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/mi1/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/moonmist/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/moonmist/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/rw1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/rw1/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/shcrt/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/shcrt/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/sorc/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/sorc/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/spelbrek/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/spelbrek/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/ultima71/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/ultima71/Extras/Universal\ Hints\ System.bat 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/wastland/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/wastland/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/BURGER/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/BURGER/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/BlakCaul/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/BlakCaul/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/FantasyW/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/FantasyW/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/GoldRush/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/GoldRush/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MH1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MM6/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/MMansion/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/PQ2/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/PQ2/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/RedGuard/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SGate/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SQLost/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/SyndWars/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/SyndWars/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/TassTime/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/TassTime/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/bforce/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/bforce/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/demotomb/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/demotomb/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/ecoq2/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/ecoq2/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/fable/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fable/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/fallout1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fallout1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/fqueen/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/fqueen/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/losteden/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/losteden/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/mansiond/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/mansiond/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/mi1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/mi1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/moonmist/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/moonmist/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/rw1/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/rw1/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/shcrt/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/shcrt/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/sorc/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/sorc/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/spelbrek/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/spelbrek/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/ultima71/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/ultima71/Extras/Universal\ Hints\ System.bat 2>/dev/null
+#[ `ls -1 eXoDOS/\!dos/wastland/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/in (\*\.UHS) do/in (*.uhs) do/g" eXoDOS/\!dos/wastland/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoScummVM/\!ScummVM/Al\ Emmo\ And\ The\ Lost\ Dutchman\'s\ Mine\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Al\ Emmo\ And\ The\ Lost\ Dutchman\'s\ Mine\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoScummVM/\!ScummVM/Black\ Cauldron,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Black\ Cauldron,\ The\ \(Multi-Platform\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
 [ `ls -1 eXoScummVM/\!ScummVM/Blackwell\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/in (\*\.UHS) do/in (*.uhs) do/g' eXoScummVM/\!ScummVM/Blackwell\ \(Windows\)/Extras/Universal\ Hints\ System.bat 2>/dev/null
