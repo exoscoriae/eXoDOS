@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-04
+# Revised: 2026-05-09
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3537,9 +3537,9 @@ function goto\
     #fix bash calls
     sed -i -e 's|^\([\./]*[[:alnum:]_/\"}{\$\!]\+\.bsh.*\)|source \1|' "$currentScript"
     
-    #make source commands use eval to prevent issues with quoted paths
-    sed -i -e '/^source \|^[[:space:]]\+source / s/source/eval source/' \
-           -e 's/&& source /\&\& eval source /' "$currentScript"
+#    #make source commands use eval to prevent issues with quoted paths
+#    sed -i -e '/^source \|^[[:space:]]\+source / s/source/eval source/' \
+#           -e 's/&& source /\&\& eval source /' "$currentScript"
     
     #finish fixing true / false tests
     sed -i -e '/^PENDINGTLTRU$/,/^PENDINGTLEOC/ {
@@ -3828,6 +3828,13 @@ function goto\
     sed -i -e 's#\[ -e "${windir}"/system32/findstr\.exe \]#[ "$(sed --version 2>/dev/null | grep -o -m 1 '\''GNU'\'')" == "GNU" ]#I' "$currentScript"
     sed -i -e 's#\[ ! -e "${windir}"/system32/findstr\.exe \]#[ "$(sed --version 2>/dev/null | grep -o -m 1 '\''GNU'\'')" != "GNU" ]#I' "$currentScript"
     sed -i -e 's/FINDSTR not found\. Ensure SYSTEM32 is in your SYSTEM PATH variable/GNU sed not found. Update and re-run install_dependencies.command/I' "$currentScript"
+
+    #fix zip wildcard expansion
+    perl -pi -e 'if (/^(.*?)\b(unzip\s+(?:-\S+\s+)*)(\S*?\\[*?\[\]]\S*\.zip)(.*?)\s*$/) {
+                     my ($pre, $cmd, $zip, $post) = ($1, $2, $3, $4);
+                     $zip =~ s/\\([*?\[\]])/$1/g;
+                     $_ = "${pre}for zip_file in $zip; do ${cmd}\"\$zip_file\"${post}; done\n";
+                 }' "$currentScript"
 
     #add bash header line, goto function and alias
     sed -i -e '1i\
