@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-08
+# Revised: 2026-05-09
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -142,7 +142,7 @@ echo ""
 echo "This script was created for flexibility, not efficiency. That means it will"
 echo "run through and convert every bat file whether or not the code is duplicate."
 echo "Running this against a preinstalled copy of the base eXoDOS collection will"
-echo "possibly take over 17 hours to complete."
+echo "possibly take over 6 hours to complete."
 while true
 do
     read -p "Would you like to proceed (y/n)? " choice
@@ -268,6 +268,8 @@ do
     [ -e "$file" ] && sed -i -e "s/install\.bat/Install.bat/Ig" "$file"
 done
 
+#Change sha256sum for XODOSMetadata.zip to match eXoDOS 6.04 release
+[ `ls -1 util/Check\ for\ Corrupt\ Install\ Files.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|XO=5ce94ba959009c562fe5a09a5b35fe3cd1e2e4a89a58eaebd2907ef7af19b247|XO=0e9de781fe3a1ff146e00789b1b115b6e29d325b5b6900e541b0bfe1b6daef0f|' util/Check\ for\ Corrupt\ Install\ Files.bat 2>/dev/null
 #[ `ls -1 eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|tandy\.SEL|TANDY.SEL|Ig" eXoDOS/\!dos/BudokanT/exception.bat 2>/dev/null
 #[ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\mt32|ckrynn\\\MT32|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
 #[ `ls -1 eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ckrynn\\\sb16|ckrynn\\\SB16|Ig" eXoDOS/\!dos/ckrynn/exception.bat 2>/dev/null
@@ -419,7 +421,7 @@ do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-074r3-1"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-ece-r4482"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-081-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-082-0"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-08220"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20240701"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20241001"` ]] \&\& missingDependencies=yes^' "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-074r3-1"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-ece-r4482"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-081-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-082-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-08220"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20240701"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20241001"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20250503"` ]] \&\& missingDependencies=yes^' "$currentScript"
 
 done
 for currentScript in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh util/*_drm.bsh ../Setup\ eXoDREAMM.bsh
@@ -1213,23 +1215,21 @@ do
 ! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
 ! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
 ! [[ `which wine` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
+! [[ `which gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
 done
 
 for currentScript in currentScript in eXoDemoScn/\!*/*/*.msh eXoDemoScn/\!*/*/*/*.msh util/\ds_*.msh ../Setup\ eXoDemoScene.msh
 do
     [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
-! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
-! [[ `which dosbox-ece-r4358` ]] && missingDependencies=yes\
 ! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
-! [[ `which dosbox-gridc-4-3-1` ]] && missingDependencies=yes\
 ! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
 ! [[ `which dosbox-staging-082-2` ]] && missingDependencies=yes\
 ! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
 ! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
-! [[ `which wine` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
+! [[ `which dosbox-x-20241001` ]] && missingDependencies=yes\
+! [[ `which dosbox-x-20250503` ]] && missingDependencies=yes\
+! [[ `which wine` ]] && missingDependencies=yes' "$currentScript"
 done
 
 for currentScript in currentScript in eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*_svm.msh ../Setup\ eXoScummVM.msh
