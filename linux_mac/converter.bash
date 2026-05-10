@@ -4163,8 +4163,8 @@ then\
     then\
         if [[ "$TERM_PROGRAM" == "cool-retro-term" ]]\
         then\
-            console_minimize() { osascript -e \'\''tell application "System Events" to keystroke "m" using command down'\''; }\
-            console_restore()  { osascript -e \'\''tell application "cool-retro-term" to activate'\''; }\
+            console_minimize() { osascript -e '\''tell application "System Events" to keystroke "m" using command down'\''; }\
+            console_restore()  { osascript -e '\''tell application "cool-retro-term" to activate'\''; }\
         fi\
     fi\
 fi\
