@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-09
+# Revised: 2026-05-10
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -988,7 +988,7 @@ do
     [ -e "$file" ] && sed -i -e 's/[[:space:]\t]*$//' "$file"
     [ -e "$file" ] && sed -i -e "s/$/\"/" "$file"
     [ -e "$file" ] && dos2unix "$file"
-    [ -e "$file" ] && cp "$file" "${file%.txt}_mac.txt"
+    [ -e "$file" ] && cp "$file" "${file%_linux.txt}_mac.txt"
 done
 
 cp util/alt_launch.txt util/alt_launch_linux.txt 2>/dev/null
