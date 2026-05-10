@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-09
+# Revised: 2026-05-10
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -267,7 +267,7 @@ function convertScript
              close($fh);' "$currentScript"
 
     #prepare single-level multi-line if
-    perl -0777 -pi -e 's/^if\b([^\n\r()]*)\(([^\n\r()]*)\r?\n([^)]*)\)\r?$/
+    perl -0777 -pi -e 's/^if\b((?:"[^"\n\r]*"|[^"()\n\r])*)\(((?:"[^"\n\r]*"|[^"()\n\r])*)\r?\n([^)]*)\)\r?$/
                          my $pre  = $1;
                          my $post = $2;
                          my $mid  = $3;
@@ -281,11 +281,11 @@ function convertScript
                            $orig;
                          } else {
                            my $res = "if$pre(\n";
-                           $post =~ s{^[\s\xA0]+|[\s\xA0]+$}{}g;
+                           $post =~ s{^[ \t\xA0]+|[ \t\xA0]+$}{}g;
                            $res .= "  $post\n" if $post ne "";
 
                            for my $line (split m{\r?\n}, $mid) {
-                             $line =~ s{^[\s\xA0]+|[\s\xA0]+$}{}g;
+                             $line =~ s{^[ \t\xA0]+|[ \t\xA0]+$}{}g;
                              $res .= "  $line\n" if $line ne "";
                            }
 
@@ -1178,10 +1178,11 @@ EOF
                    s|\&|\\\&|g;
                    s|######|\&\&|g;
                }" "$currentScript"
-    
-    # remove quotes from if exist/if not exist statements
-    sed -i -e "s/\[ -e \"\([^\"]*\)\" \]/[ -e \1 ]/" \
-           -e "s/\[ ! -e \"\([^\"]*\)\" \]/[ ! -e \1 ]/" "$currentScript"
+
+    # remove quotes from if exist/if not exist statements (and escape spaces in the process)
+    sed -i -e '/\[ -e "[^"]*" \]/ { s/\[ -e "/[ -e "\n/; :a; s/\n\([^" ]*\) /\1\\ \n/; t a; s/\n//; s/\[ -e "\([^"]*\)" \]/[ -e \1 ]/; }' \
+           -e '/\[ ! -e "[^"]*" \]/ { s/\[ ! -e "/[ ! -e "\n/; :b; s/\n\([^" ]*\) /\1\\ \n/; t b; s/\n//; s/\[ ! -e "\([^"]*\)" \]/[ ! -e \1 ]/; }' \
+        "$currentScript"
 
     #fix if numeric comparisons
     sed -i -e "s/^if \(.[^[:space:]]*\) gtr \(.[^[:space:]]*\) \(.*\)/[ \1 -gt \2 ] \&\& \3/I" \
@@ -3705,20 +3706,20 @@ function goto\
     sed -i -e '/^wad[[:digit:]]\?=/I s/"//g' \
            -e 's/^\(wad[[:digit:]]\?\)=\(.*\)/\1="\2"/I' "$currentScript"
     
-    #escape spaces in unquoted file existence tests
-    sed -i -e '/^\[ -e [^"]* \]\|^\[ ! -e [^"]* \]\|^[[:space:]]\+\[ -e [^"]* \]\|^[[:space:]]\+\[ ! -e [^"]* \]/ {
-                   s|SPACE#|incrediblyunlikelytmpspace#|g;
-                   :a;
-                   s|^\(.[^]]*\] &&.*\) |\1SPACE#|g;
-                   s| \([^[:space:][]*\[ \)|SPACE#\1|g;
-                   ta;
-                   s|\[ -e |\[SPACE#-eSPACE#|;
-                   s|\[ ! -e |\[SPACE#!SPACE#-eSPACE#|;
-                   s| \] |SPACE#\]SPACE#|;
-                   s| |\\ |g;
-                   s|SPACE#| |g;
-                   s|incrediblyunlikelytmpspace#|SPACE#|g;
-                }' "$currentScript"
+#    #escape spaces in unquoted file existence tests
+#    sed -i -e '/^\[ -e [^"]* \]\|^\[ ! -e [^"]* \]\|^[[:space:]]\+\[ -e [^"]* \]\|^[[:space:]]\+\[ ! -e [^"]* \]/ {
+#                   s|SPACE#|incrediblyunlikelytmpspace#|g;
+#                   :a;
+#                   s|^\(.[^]]*\] &&.*\) |\1SPACE#|g;
+#                   s| \([^[:space:][]*\[ \)|SPACE#\1|g;
+#                   ta;
+#                   s|\[ -e |\[SPACE#-eSPACE#|;
+#                   s|\[ ! -e |\[SPACE#!SPACE#-eSPACE#|;
+#                   s| \] |SPACE#\]SPACE#|;
+#                   s| |\\ |g;
+#                   s|SPACE#| |g;
+#                   s|incrediblyunlikelytmpspace#|SPACE#|g;
+#                }' "$currentScript"
                 
     #requote directory paths for ScummVM collection
     sed -i -e 's#)/\([^[:space:]\%\${}"=]\+ [^\%\${}"=]\+\)\(\\" [^\%\${}"=]\+\)$#)/"\1"\2#' "$currentScript"
@@ -4138,8 +4139,9 @@ then\
         then\
             if command -v kdotool &> /dev/null\
             then\
-                console_minimize() { kdotool windowminimize "$(kdotool getactivewindow)"; }\
-                console_restore()  { kdotool windowactivate "$(kdotool getactivewindow)"; }\
+                exo_console="$(kdotool getactivewindow)"\
+                console_minimize() { kdotool windowminimize "$exo_console"; }\
+                console_restore()  { kdotool windowactivate "$exo_console"; }\
             fi\
         elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"SWAY"* ]]\
         then\
@@ -4153,15 +4155,16 @@ then\
     then\
         if command -v xdotool &> /dev/null\
         then\
-            console_minimize() { xdotool windowminimize "$(xdotool getactivewindow)"; }\
-            console_restore()  { xdotool windowactivate "$(xdotool getactivewindow)"; }\
+            exo_console="$(xdotool getactivewindow)"\
+            console_minimize() { xdotool windowminimize "$exo_console"; }\
+            console_restore()  { xdotool windowactivate "$exo_console"; }\
         fi\
     elif [[ "$(uname -s)" == "Darwin" ]]\
     then\
         if [[ "$TERM_PROGRAM" == "cool-retro-term" ]]\
         then\
             console_minimize() { osascript -e \'\''tell application "System Events" to keystroke "m" using command down'\''; }\
-            console_restore()  { osascript -e "tell application \"cool-retro-term\" to activate"; }\
+            console_restore()  { osascript -e \'\''tell application "cool-retro-term" to activate'\''; }\
         fi\
     fi\
 fi\
