@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-10
+# Revised: 2026-05-11
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -15,6 +15,8 @@ PENDINGBACKSLASH - pending \
 PENDINGBACKTICK - pending `
 PENDINGBASENOEXT - pending current script basename without extension
 PENDINGCAT - pending cat to set variable
+PENDINGconsole_minimize - pending eval command to minimize console - eval "$console_minimize $exo_console"
+PENDINGconsole_restore - pending eval command to restore console - eval "$console_restore $exo_console"
 PENDINGDLR - pending $ character
 pendingdq - pending double quote
 PENDINGEXECHECK - placeholder that is later substituted with Linux command to determine if process is running
@@ -1021,8 +1023,8 @@ EOF
                }" "$currentScript"
     
     #removing setconsole lines
-    sed -i -e 's|^\([ \t]*\).*setconsole\.exe /minimize.*|\1console_minimize|I' "$currentScript"
-    sed -i -e 's|^\([ \t]*\).*setconsole\.exe /reset.*|\1console_restore|I' "$currentScript"
+    sed -i -e 's|^\([ \t]*\).*setconsole\.exe /minimize.*|\1PENDINGconsole_minimize|I' "$currentScript"
+    sed -i -e 's|^\([ \t]*\).*setconsole\.exe /reset.*|\1PENDINGconsole_restore|I' "$currentScript"
     
     #fix %cd% references
     sed -i -e 's/%cd%/$\{PWD\}/I' "$currentScript"
@@ -3830,6 +3832,10 @@ function goto\
     sed -i -e 's#\[ ! -e "${windir}"/system32/findstr\.exe \]#[ "$(sed --version 2>/dev/null | grep -o -m 1 '\''GNU'\'')" != "GNU" ]#I' "$currentScript"
     sed -i -e 's/FINDSTR not found\. Ensure SYSTEM32 is in your SYSTEM PATH variable/GNU sed not found. Update and re-run install_dependencies.command/I' "$currentScript"
 
+    #set console_minimize and console_restore commands
+    sed -i -e 's/PENDINGconsole_minimize/eval "$console_minimize $exo_console"/' "$currentScript"
+    sed -i -e 's/PENDINGconsole_restore/eval "$console_restore $exo_console"/' "$currentScript"
+
     #fix zip wildcard expansion
     perl -pi -e 'if (/^(.*?)\b(unzip\s+(?:-\S+\s+)*)(\S*?\\[*?\[\]]\S*\.zip)(.*?)\s*$/) {
                      my ($pre, $cmd, $zip, $post) = ($1, $2, $3, $4);
@@ -4121,52 +4127,75 @@ then\
 fi\
 shopt -s dotglob\
 \
-if ! declare -F console_minimize > /dev/null || declare -F console_restore > /dev/null\
+if [[ "${XDG_SESSION_TYPE,,}" == "wayland" ]]\
 then\
-    console_minimize() { true; }\
-    console_restore()  { true; }\
-\
-    if [[ "${XDG_SESSION_TYPE,,}" == "wayland" ]]\
+    if [[ "${XDG_CURRENT_DESKTOP^^}" == *"HYPRLAND"* ]]\
     then\
-        if [[ "${XDG_CURRENT_DESKTOP^^}" == *"HYPRLAND"* ]]\
+        exo_console=""\
+        if command -v hyprctl &> /dev/null\
         then\
-            if command -v hyprctl &> /dev/null\
-            then\
-                console_minimize() { hyprctl dispatch movetoworkspacesilent special; }\
-                console_restore()  { hyprctl dispatch togglespecialworkspace; }\
-            fi\
-        elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"KDE"* ]]\
-        then\
-            if command -v kdotool &> /dev/null\
-            then\
-                exo_console="$(kdotool getactivewindow)"\
-                console_minimize() { kdotool windowminimize "$exo_console"; }\
-                console_restore()  { kdotool windowactivate "$exo_console"; }\
-            fi\
-        elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"SWAY"* ]]\
-        then\
-            if command -v swaymsg &> /dev/null\
-            then\
-                console_minimize() { swaymsg move scratchpad; }\
-                console_restore()  { swaymsg scratchpad show; }\
-            fi\
+            console_minimize="hyprctl dispatch movetoworkspacesilent special"\
+            console_restore="hyprctl dispatch togglespecialworkspace"\
+        else\
+            console_minimize="true"\
+            console_restore="true"\
         fi\
-    elif [[ "${XDG_SESSION_TYPE,,}" == "x11" ]]\
+    elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"KDE"* ]]\
     then\
-        if command -v xdotool &> /dev/null\
+        if command -v kdotool &> /dev/null\
         then\
-            exo_console="$(xdotool getactivewindow)"\
-            console_minimize() { xdotool windowminimize "$exo_console"; }\
-            console_restore()  { xdotool windowactivate "$exo_console"; }\
+            [ -z "$exo_console" ] && exo_console="$(kdotool getactivewindow)"\
+            console_minimize="kdotool windowminimize"\
+            console_restore="kdotool windowactivate"\
+        else\
+            exo_console=""\
+            console_minimize="true"\
+            console_restore="true"\
         fi\
-    elif [[ "$(uname -s)" == "Darwin" ]]\
+    elif [[ "${XDG_CURRENT_DESKTOP^^}" == *"SWAY"* ]]\
     then\
-        if [[ "$TERM_PROGRAM" == "cool-retro-term" ]]\
+        exo_console=""\
+        if command -v swaymsg &> /dev/null\
         then\
-            console_minimize() { osascript -e '\''tell application "System Events" to keystroke "m" using command down'\''; }\
-            console_restore()  { osascript -e '\''tell application "cool-retro-term" to activate'\''; }\
+            console_minimize="swaymsg move scratchpad"\
+            console_restore="swaymsg scratchpad show"\
+        else\
+            console_minimize="true"\
+            console_restore="true"\
         fi\
+    else\
+        exo_console=""\
+        console_minimize=true\
+        console_restore=true\
     fi\
+elif [[ "${XDG_SESSION_TYPE,,}" == "x11" ]]\
+then\
+    if command -v xdotool &> /dev/null\
+    then\
+        [ -z "$exo_console" ] && exo_console="$(xdotool getactivewindow)"\
+        console_minimize="xdotool windowminimize"\
+        console_restore="xdotool windowactivate"\
+    else\
+        exo_console=""\
+        console_minimize=true\
+        console_restore=true\
+    fi\
+elif [[ "$(uname -s)" == "Darwin" ]]\
+then\
+    if [[ "$TERM_PROGRAM" == "cool-retro-term" ]]\
+    then\
+        exo_console=""\
+        console_minimize="osascript -e '\''tell application \\"System Events\\" to keystroke \\"m\\" using command down'\''"\
+        console_restore="osascript -e '\''tell application \\"cool-retro-term\\" to activate'\''"\
+    else\
+        exo_console=""\
+        console_minimize=true\
+        console_restore=true\
+    fi\
+else\
+    exo_console=""\
+    console_minimize=true\
+    console_restore=true\
 fi\
 ' "$currentScript"
     
