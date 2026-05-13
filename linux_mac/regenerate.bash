@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-10
+# Revised: 2026-05-13
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1252,12 +1252,21 @@ done
 
 for file in ../Setup*.msh ../eXoMerge.msh
 do
-    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/\(.*\)\.desktop#osascript <<EOF\
+    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/\(.*\)\.desktop#ICON_PATH="${scriptDir}/exo${name,,}.png"\
+osascript <<EOF\
+use framework "Foundation"\
+use framework "AppKit"\
+use scripting additions\
+\
 tell application "Finder"\
    set myapp to POSIX file "${scriptDir%/eXo/util}/exogui.command" as alias\
-   make new alias to myapp at desktop\
-   set name of result to "\1.app"\
+   set newAlias to make new alias to myapp at desktop\
+   set name of newAlias to "\1.app"\
+   set aliasPath to POSIX path of (newAlias as text)\
 end tell\
+set theWorkspace to current application'\''s NSWorkspace'\''s sharedWorkspace()\
+set theImage to current application'\''s NSImage'\''s alloc()'\''s initWithContentsOfFile:"$ICON_PATH"\
+theWorkspace'\''s setIcon:theImage forFile:aliasPath options:0\
 EOF#' "$file"
     [ -e "$file" ] && sed -i -e '/^ffplay/i\
 for app in ./exogui/*.app\

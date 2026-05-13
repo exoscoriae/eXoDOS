@@ -3484,7 +3484,7 @@ echo "Type=Application" >> ~/Desktop/eXoDOS.desktop\
 echo "Terminal=false" >> ~/Desktop/eXoDOS.desktop\
 echo "Exec=\\"\${scriptDir%/eXo/util}/exogui.command\\"" >> ~/Desktop/eXoDOS.desktop\
 echo "Name=eXoDOS" >> ~/Desktop/eXoDOS.desktop\
-echo "Icon=\${scriptDir}/exodos.ico" >> ~/Desktop/eXoDOS.desktop#I' \
+echo "Icon=\${scriptDir}/exodos.png" >> ~/Desktop/eXoDOS.desktop#I' \
            -e '/echo.* >> .*{userprofile}\/Desktop\/eXoDOS.*/Id' \
            -e 's#^echo.* > .*{userprofile}/Desktop/eXoDREAMM.*#echo "\[Desktop Entry\]" > ~/Desktop/eXoDREAMM.desktop\
 echo "Encoding=UTF-8" >> ~/Desktop/eXoDREAMM.desktop\
@@ -3502,7 +3502,7 @@ echo "Type=Application" >> ~/Desktop/eXo\${name}.desktop\
 echo "Terminal=false" >> ~/Desktop/eXo\${name}.desktop\
 echo "Exec=\\"\${scriptDir%/eXo/util}/exogui.command\\"" >> ~/Desktop/eXo\${name}.desktop\
 echo "Name=eXo\${name}" >> ~/Desktop/eXo\${name}.desktop\
-echo "Icon=\${scriptDir}/exo\${name,,}.ico" >> ~/Desktop/eXo\${name}.desktop#I' \
+echo "Icon=\${scriptDir}/exo\${name,,}.png" >> ~/Desktop/eXo\${name}.desktop#I' \
            -e '/echo.* >> .*{userprofile}\/Desktop\/eXo\${name}.*/Id' "$currentScript"
     
     #change userprofile references to ~
