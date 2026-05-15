@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-13
+# Revised: 2026-05-14
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -142,7 +142,7 @@ echo ""
 echo "This script was created for flexibility, not efficiency. That means it will"
 echo "run through and convert every bat file whether or not the code is duplicate."
 echo "Running this against a preinstalled copy of the base eXoDOS collection will"
-echo "possibly take over 6 hours to complete."
+echo "possibly take over 4 hours to complete (based on an 8-core CPU)."
 while true
 do
     read -p "Would you like to proceed (y/n)? " choice
@@ -200,7 +200,7 @@ cd eXo
 
 echo "Fixing zip archive references."
 
-echo "Fixing batch file reference inconsistencies. (ETA over 20 minutes)"
+echo "Fixing batch file reference inconsistencies. (ETA over 30 minutes)"
 [ `ls -1 Update/*.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/^goto :eof/goto :end/" Update/*.bat 2>/dev/null
 for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.bat Magazines/*.bat Magazines/*/*.bat Magazines/*/*/*.bat Videos/*.bat Videos/*/*.bat Videos/*/*/*.bat emulators/dosbox/*.bat emulators/dosbox/*/*.bat util/*.bat util/*/*.bat ../xml/*.bat ../*.bat
 do
@@ -397,7 +397,7 @@ done
 #    [ -e "$file" ] && sed -i -e "/ssr.*\.bat/I d" "$file"
 #    [ -e "$file" ] && sed -i -e "/ssr/I s/^\(.*\)\.bsh\(.*\)/&\n\1.bat\2/" "$file"
 #done
-echo "Converting file syntax from Windows batch to bash. (ETA 8 hours)"
+echo "Converting file syntax from Windows batch to bash. (ETA 2 hours)"
 echo ""
 
 for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
@@ -1132,7 +1132,7 @@ do
     [ -e "$file" ] && cp "$file" "${file%.bsh}.msh"
 done
 
-echo "Converting macOS shell files..."
+echo "Converting macOS shell files... (ETA 1.5 hours)"
 for currentScript in eXo*/\!*/*/*.msh eXo*/\!*/*/*/*.msh eXo*/\!*/*/*/*/*.msh Magazines/*.msh Magazines/*/*.msh Magazines/*/*/*.msh Videos/*.msh Videos/*/*.msh Videos/*/*/*.msh Update/*.msh emulators/dosbox/*.msh emulators/dosbox/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
     [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' "$currentScript"
@@ -1252,6 +1252,30 @@ done
 
 for file in ../Setup*.msh ../eXoMerge.msh
 do
+    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/eXoDOS\.desktop#ICON_PATH="${scriptDir}/exodos.png"\
+osascript <<EOF\
+use framework "Foundation"\
+use framework "AppKit"\
+use scripting additions\
+\
+tell application "Finder"\
+   set myapp to POSIX file "${scriptDir%/eXo/util}/exogui.command" as alias\
+   set newAlias to make new alias to myapp at desktop with properties {name:"eXoDOS"}\
+   set aliasPath to POSIX path of (newAlias as text)\
+end tell\
+delay 0.5\
+set theWorkspace to current application'\''s NSWorkspace'\''s sharedWorkspace()\
+set theImage to current application'\''s NSImage'\''s alloc()'\''s initWithContentsOfFile:"$ICON_PATH"\
+if theImage is missing value then\
+    error "Failed to load icon image from path: $ICON_PATH"\
+end if\
+\
+set success to theWorkspace'\''s setIcon:theImage forFile:aliasPath options:0\
+\
+if success is false then\
+    error "NSWorkspace failed to apply the icon to the file."\
+end if\
+EOF#' "$file"
     [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/\(.*\)\.desktop#ICON_PATH="${scriptDir}/exo${name,,}.png"\
 osascript <<EOF\
 use framework "Foundation"\
@@ -1260,13 +1284,21 @@ use scripting additions\
 \
 tell application "Finder"\
    set myapp to POSIX file "${scriptDir%/eXo/util}/exogui.command" as alias\
-   set newAlias to make new alias to myapp at desktop\
-   set name of newAlias to "\1.app"\
+   set newAlias to make new alias to myapp at desktop with properties {name:"eXo${name}"}\
    set aliasPath to POSIX path of (newAlias as text)\
 end tell\
+delay 0.5\
 set theWorkspace to current application'\''s NSWorkspace'\''s sharedWorkspace()\
 set theImage to current application'\''s NSImage'\''s alloc()'\''s initWithContentsOfFile:"$ICON_PATH"\
-theWorkspace'\''s setIcon:theImage forFile:aliasPath options:0\
+if theImage is missing value then\
+    error "Failed to load icon image from path: $ICON_PATH"\
+end if\
+\
+set success to theWorkspace'\''s setIcon:theImage forFile:aliasPath options:0\
+\
+if success is false then\
+    error "NSWorkspace failed to apply the icon to the file."\
+end if\
 EOF#' "$file"
     [ -e "$file" ] && sed -i -e '/^ffplay/i\
 for app in ./exogui/*.app\
