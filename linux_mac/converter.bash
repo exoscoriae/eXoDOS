@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-13
+# Revised: 2026-05-14
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -4179,10 +4179,10 @@ then\
     fi\
 elif [[ "$(uname -s)" == "Darwin" ]]\
 then\
-    if [[ "$TERM_PROGRAM" == "cool-retro-term" ]]\
+    if [[ "$(ps -o ppid= -p "$$" | xargs ps -o comm= -p | awk -F/ '\''{print $NF}'\'')" == "cool-retro-term" ]]\
     then\
-        [ -z "$console_minimize" ] && console_minimize="osascript -e '\''tell application \\"cool-retro-term\\" to activate'\'' -e '\''delay 0.2'\'' -e '\''tell application \\"System Events\\" to keystroke \\"m\\" using command down'\''"\
-        [ -z "$console_restore" ] && console_restore="osascript -e '\''tell application \\"cool-retro-term\\" to reopen'\'' -e '\''tell application \\"cool-retro-term\\" to activate'\''"\
+        [ -z "$console_minimize" ] && console_minimize="osascript -e '\''tell application \\"System Events\\" to tell process \\"cool-retro-term\\" to set value of attribute \\"AXMinimized\\" of window 1 to true'\''"\
+        [ -z "$console_restore" ] && console_restore="osascript -e '\''tell application \\"System Events\\" to tell process \\"cool-retro-term\\" to set value of attribute \\"AXMinimized\\" of window 1 to false'\'' -e '\''tell application \\"System Events\\" to tell process \\"cool-retro-term\\" to set frontmost to true'\''"\
     else\
         console_minimize=true\
         console_restore=true\
