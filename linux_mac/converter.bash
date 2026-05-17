@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-14
+# Revised: 2026-05-17
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -414,7 +414,7 @@ EOF
     
     #prepare localdatetime variable assignments
     sed -i -e 's|for /f "tokens=2 delims==" %\([[:alpha:]]\)% in (.wmic OS Get localdatetime /value.) do set "\([[:alnum:]_]\+\)=%\1%"|\2=pendingYYYYMMDD|I' "$currentScript"
-    
+
     #fix findstr declarations
     sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"\2\" \"\3\")\" \] \&\& \4=\`grep \"\2\" \"\3\"\`|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do (set \(.[^=]*\)=%\1%)[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"\2\" \"\3\")\" \] \&\& \4=\`grep -i \"\2\" \"\3\"\`|I" \
@@ -436,14 +436,14 @@ EOF
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"\2\" \3)\" \] \&\& \4=\`grep -i \"\2\" \3\`|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep \"^\2\" \3)\" \] \&\& \4=\`grep \"^\2\" \3\`|I" \
            -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^')]*\)') do set \(.[^=]*\)=%\1%[[:space:]\t\r]*$|\[ \"PENDINGDLR(grep -i \"^\2\" \3)\" \] \&\& \4=\`grep -i \"^\2\" \3\`|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -q \"\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -iq \"\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -q \"^\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|grep -iq \"^\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|grep -q \"\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|grep -iq \"\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|grep -q \"^\2\" \"\3\"\ndo|I" "$currentScript"
-    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|grep -iq \"^\2\" \"\3\"\ndo|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|if grep -q \"\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|if grep -iq \"\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|if grep -q \"^\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\"') do ([[:space:]\t\r]*$|if grep -iq \"^\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|if grep -q \"\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|if grep -iq \"\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|if grep -q \"^\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
+    sed -i -e "s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in ('findstr /i /b /C:\"\(.[^\"]*\)\" \([^'\")]*\)') do ([[:space:]\t\r]*$|if grep -iq \"^\2\" \"\3\"\nPENDINGfthen|I" "$currentScript"
     
     #fix standalone findstr commands
     sed -i -e "/^findstr \|^[[:space:]]\+findstr /I s#findstr /C:\"\(.[^\"]*\)\" \"\([^'\")]*\)\" PENDINGTONULL#grep -q \"\1\" \"\2\" PENDINGTONULL#I" \
@@ -458,7 +458,31 @@ EOF
            -e "/^findstr \|^[[:space:]]\+findstr /I s#findstr /i /C:\"\(.[^\"]*\)\" \([^')]*\) PENDINGTONULL#grep -i \"\1\" \2 PENDINGTONULL#I" \
            -e "/^findstr \|^[[:space:]]\+findstr /I s#findstr /b /C:\"\(.[^\"]*\)\" \([^')]*\) PENDINGTONULL#grep \"^\1\" \2 PENDINGTONULL#I" \
            -e "/^findstr \|^[[:space:]]\+findstr /I s#findstr /i /b /C:\"\(.[^\"]*\)\" \([^')]*\) PENDINGTONULL#grep -i \"^\1\" \2 PENDINGTONULL#I" "$currentScript"
-    
+
+    #fix multi-line findstr declarations
+    perl -i -pe 'BEGIN { $in_pending = 0; $depth = 0; }
+        if (!$in_pending && s/PENDINGfthen/then/g) {
+            $in_pending = 1;
+            $depth = 0;
+        }
+        if ($in_pending) {
+            if (/^(.*)(\)\s*)$/) {
+                my $prefix = $1;
+                my $suffix = $2;
+                my $opens  = () = $prefix =~ /\(/g;
+                my $closes = () = $prefix =~ /\)/g;
+                if ($depth + $opens - $closes <= 0) {
+                    $suffix =~ s/\)/fi/;
+                    $_ = $prefix . $suffix;
+                    $in_pending = 0;
+                } else {
+                    $depth += (() = $_ =~ /\(/g) - (() = $_ =~ /\)/g);
+                }
+            } else {
+                $depth += (() = $_ =~ /\(/g) - (() = $_ =~ /\)/g);
+            }
+        }' "$currentScript"
+
     #fix sourced text files
     sed -i -e "/\.txt/s|^for /F \"delims=\" %\([[:alnum:]_]\+\)% in (\(.*\)\.txt) do (set \"\%\1\%\")[[:space:]\t\r]*$|. \"\2.txt\"|I" "$currentScript"
     
