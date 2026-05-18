@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-14
+# Revised: 2026-05-18
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -124,6 +124,161 @@ fi\
 }
 export -f spawnConversion
 
+#function to fix batch reference inconsistencies
+function fixBatchReferenceInconsistencies
+{
+    local file="$1"
+    [ ! -e "$file" ] && return
+    sed -i -e "s/\.\\\download\\\/.\\\DOWNLOAD\\\/Ig" \
+           -e "s/exodos\\\/eXoDOS\\\/Ig" \
+           -e "s/exoappleiigs\\\/eXoAppleIIGS\\\/Ig" \
+           -e "s/exodemoscn\\\/eXoDemoScn\\\/Ig" \
+           -e "s/exodreamm\\\/eXoDREAMM\\\/Ig" \
+           -e "s/exoif\\\/eXoIF\\\/Ig" \
+           -e "s/exopcjr\\\/eXoPCjr\\\/Ig" \
+           -e "s/exoscummvm\\\/eXoScummVM\\\/Ig" \
+           -e "s/exowin3x\\\/eXoWin3x\\\/Ig" \
+           -e "s/exowin9x\\\/eXoWin9x\\\/Ig" \
+           -e "s/exo\\\/eXo\\\/Ig" \
+           -e 's/^cd content/cd Content/I' \
+           -e 's/^cd exo/cd eXo/I' \
+           -e 's/^cd eXodos/cd eXoDOS/I' \
+           -e 's/^cd eXodreamm/cd eXoDREAMM/I' \
+           -e 's/^cd eXoscummvm/cd eXoScummVM/I' \
+           -e 's/^cd eXowin3x/cd eXoWin3x/I' \
+           -e "s/\.\\\content/.\\\Content/Ig" \
+           -e "s/\.\\\data/.\\\Data/Ig" \
+           -e "s/\.\\\Emulators/.\\\emulators/Ig" \
+           -e 's/launchbox\.exe/LaunchBox.exe/I' \
+           -e "s/\.\\\magazines/.\\\Magazines/Ig" \
+           -e "s/magazines\\\bbd/Magazines\\\BBD/Ig" \
+           -e "s|sumatraPDF\.exe|SumatraPDF.exe|Ig" \
+           -e "s|util\\\sumatra|util\\\Sumatra|Ig" \
+           -e "s/exo\\\update/eXo\\\Update/Ig" \
+           -e "s/\\\update\\\/\\\Update\\\/Ig" \
+           -e "s/cd update/cd Update/Ig" \
+           -e "s/PPMode/PPmode/I" \
+           -e "s/c\*\.rom/C*.ROM/I" \
+           -e "s/\.rom/.ROM/I" \
+           -e "s|mt32\\\soundcanvas\.sf2|mt32\\\SoundCanvas.sf2|I" \
+           -e "s/magazines\.zip/Magazines.zip/Ig" \
+           -e "s/books\.zip/Books.zip/Ig" \
+           -e "s/catalogs\.zip/Catalogs.zip/Ig" \
+           -e "s/soundtracks\.zip/Soundtracks.zip/Ig" \
+           -e "s/videos\.zip/Videos.zip/Ig" \
+           -e "s/launch\.bat/launch.bat/Ig" \
+           -e "s/install\.bat/install.bat/Ig" \
+           -e "s/choice\.exe/CHOICE.EXE/Ig" \
+           -e "s/xml\\\ALL/xml\\\all/Ig" "$file"
+    # For now, we are skipping any precision search string substitutions related to language packs
+    # as language packs may follow different text file formatting conventions than the base pack or other language.
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/multilanguage\.txt/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I" "$file"
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/dosbox\.txt/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I" "$file"
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/multiplayer\.txt/I { /findstr \/i \/C:/I s/\(\/C:\"\)\(%GameName\)/\1:\2/I }" "$file"
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/multiplayer\.txt/I { /findstr \/C:/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I }" "$file"
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/index\.txt/I { /findstr \/C:/I s/\(\/C:\"\)\(%GameName\)/\1:\2/I }" "$file"
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/lang/I! { /index\.txt/I { /findstr \/C:/I s/\(\/C:\"\)\(%FileName\)/\1:\2/I } }" "$file"
+#    [[ "$file" != *"lang"* ]] && sed -i -e "/index\.txt/I { /findstr \/C:/I s/\(\/C:\"\)\(GameData\)/\1:\2/I }" "$file"
+
+    #Linux patch related changes
+    #sed -i -e "s/ver\.exo/ver_linux.exo/Ig" "$file"
+    #sed -i -e "s/ver\.txt/ver_linux.txt/Ig" "$file"
+    #sed -i -e "/ver/I s/\.txt/_linux.txt/Ig" "$file"
+    #sed -i -e 's/MediaPack\.txt/MediaPack_linux.txt/Ig' "$file"
+    #sed -i -e "s/util\.zip/util_linux.zip/Ig" "$file"
+    #sed -i -e '/DownloadFile/I s/\.exo/_linux.exo/Ig' "$file"
+}
+export -f fixBatchReferenceInconsistencies
+
+#function to create Linux DOSBox conf files
+function createLinuxConf
+{
+    local file="$1"
+    [ ! -e "$file" ] && return
+    cp "$file" "${file%.conf}_linux.conf"
+    sed -i -e "/mount/ s|\\\|/|Ig" \
+           -e "/boot/ s|\\\|/|Ig" \
+           -e "/soundfont/ s|\\\|/|Ig" \
+           -e "/romdir/ s|\\\|/|Ig" \
+           -e "/glshader/ s|\\\|/|Ig" \
+           -e "/glshader/ s|Sharp|sharp|Ig" "${file%.conf}_linux.conf"
+    sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.conf}_linux.conf"
+}
+export -f createLinuxConf
+
+#function to convert macOS shell files
+function convertMacShell
+{
+    local currentScript="$1"
+    [ ! -e "$currentScript" ] && return
+    sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' \
+           -e 's/BASH_SOURCE%\.bsh}\.msh/BASH_SOURCE%.msh}.PENDINGbs/' \
+           -e 's/\(Setup eXo.[^\.]*\)\.bsh/\1.msh/Ig' \
+           -e 's/\(Setup_.[^\.]*\)\.bsh/\1.msh/Ig' \
+           -e '/find .*\.msh/! s/\.bsh/.msh/g' \
+           -e 's/PENDINGbs/bsh/g' \
+           -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' \
+           -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 |' \
+           -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-074r3-1 /dosbox-074r3-3 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4301 /dosbox-ece-r4301 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4358 /dosbox-ece-r4358 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4482 /dosbox-ece-r4482 /I' \
+           -e 's|flatpak run com\.retro_exo\.dosbox-gridc-4-3-1 |dosbox-gridc-4-3-1 |I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-staging-081-2 /dosbox-staging-081-2 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-staging-082-0 /dosbox-staging-082-0 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-staging-082-2 /dosbox-staging-082-2 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-staging-083-0 /dosbox-staging-083-0 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-x-08220 /dosbox-x-08220 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-x-20240701 /dosbox-x-20240701 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-x-20241001 /dosbox-x-20241001 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-x-20250201 /dosbox-x-20250201 /I' \
+           -e 's/flatpak run com\.retro_exo\.dosbox-x-20250503 /dosbox-x-20250503 /I' \
+           -e 's|flatpak run --env=DOOMWADDIR=\./GZDOOM com\.retro_exo\.gzdoom-4-11-3 |DOOMWADDIR=./GZDOOM gzdoom-4-11-3 |I' \
+           -e 's/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-2-0 |scummvm-2-2-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0 |scummvm-2-8-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-5-0 |scummvm-2-5-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-9-0 |scummvm-2-9-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2026-1-0 |scummvm-2026-1-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git15811-gf97bfb7ce1 |scummvm-2-3-0-git15811-gf97bfb7ce1 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git18903-g313a824fb9 |scummvm-2-3-0-git18903-g313a824fb9 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0-git9335-g00e72a17004 |scummvm-2-8-0-git9335-g00e72a17004 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-3-0-0-git20192-g3ca9da6a1c3 |scummvm-3-0-0-git20192-g3ca9da6a1c3 |I' \
+           -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |I' \
+           -e '/flatpak run com\.retro_exo\.wine/I s|flatpak run com\.retro_exo\.wine |wine |I' \
+           -e '/flatpak run com\.retro_exo\.zenity/I s|flatpak run com\.retro_exo\.zenity |zenity |I' "$currentScript"
+    sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$currentScript"
+    sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' \
+           -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
+    #sed -i -e '/(find \|^find \|^[[:space:]]\+find \| && find/ s/find/gfind/' "$currentScript"
+    #sed -i -e 's/^sed /gsed /' "$currentScript"
+    #sed -i -e 's/(sed /(gsed /g' "$currentScript"
+    #sed -i -e 's/ sed / gsed /g' "$currentScript"
+    sed -i -e 's/_linux\.bak/_mac.bak/g' \
+           -e 's/_linux\.conf/_mac.conf/g' \
+           -e 's/_linux\.crt/_mac.crt/g' \
+           -e 's/_linux\.def/_mac.def/g' \
+           -e 's/_linux\.int/_mac.int/g' \
+           -e 's/_linux\.ret/_mac.ret/g' \
+           -e 's/_linux\.txt/_mac.txt/g' "$currentScript"
+#    sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
+#    sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
+#    sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
+#    sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
+#    sed -i -e 's/launch_linux\.txt/launch_mac.txt/g' "$currentScript"
+#    sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
+    sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$currentScript"
+    sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' \
+           -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' \
+           -e 's/Linux 64/MacOS/gI' "$currentScript"
+    sed -i -e '/^depcheck=flatpak/,/^fi/c\
+missingDependencies=no\
+! [[ `which java` ]] && missingDependencies=yes\
+! [[ `which zenity` ]] && missingDependencies=yes' "$currentScript"
+}
+export -f convertMacShell
+
 #determine available threads for parallel script conversion
 totalThreads=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 
@@ -142,7 +297,7 @@ echo ""
 echo "This script was created for flexibility, not efficiency. That means it will"
 echo "run through and convert every bat file whether or not the code is duplicate."
 echo "Running this against a preinstalled copy of the base eXoDOS collection will"
-echo "possibly take over 4 hours to complete (based on an 8-core CPU)."
+echo "possibly take over 1.5 hours to complete (based on an 8-core CPU)."
 while true
 do
     read -p "Would you like to proceed (y/n)? " choice
@@ -200,69 +355,12 @@ cd eXo
 
 echo "Fixing zip archive references."
 
-echo "Fixing batch file reference inconsistencies. (ETA over 30 minutes)"
+echo "Fixing batch file reference inconsistencies. (ETA 2 minutes)"
 [ `ls -1 Update/*.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/^goto :eof/goto :end/" Update/*.bat 2>/dev/null
 for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.bat Magazines/*.bat Magazines/*/*.bat Magazines/*/*/*.bat Videos/*.bat Videos/*/*.bat Videos/*/*/*.bat emulators/dosbox/*.bat emulators/dosbox/*/*.bat util/*.bat util/*/*.bat ../xml/*.bat ../*.bat
 do
-    [ -e "$file" ] && sed -i -e "s/\.\\\download\\\/.\\\DOWNLOAD\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exodos\\\/eXoDOS\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exoappleiigs\\\/eXoAppleIIGS\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exodemoscn\\\/eXoDemoScn\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exodreamm\\\/eXoDREAMM\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exoif\\\/eXoIF\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exopcjr\\\/eXoPCjr\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exoscummvm\\\/eXoScummVM\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exowin3x\\\/eXoWin3x\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exowin9x\\\/eXoWin9x\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exo\\\/eXo\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e 's/^cd content/cd Content/I' "$file"
-    [ -e "$file" ] && sed -i -e 's/^cd exo/cd eXo/I' "$file"
-    [ -e "$file" ] && sed -i -e 's/^cd eXodos/cd eXoDOS/I' "$file"
-    [ -e "$file" ] && sed -i -e 's/^cd eXodreamm/cd eXoDREAMM/I' "$file"
-    [ -e "$file" ] && sed -i -e 's/^cd eXoscummvm/cd eXoScummVM/I' "$file"
-    [ -e "$file" ] && sed -i -e 's/^cd eXowin3x/cd eXoWin3x/I' "$file"
-    [ -e "$file" ] && sed -i -e "s/\.\\\content/.\\\Content/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/\.\\\data/.\\\Data/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/\.\\\Emulators/.\\\emulators/Ig" "$file"
-    [ -e "$file" ] && sed -i -e 's/launchbox\.exe/LaunchBox.exe/I' "$file"
-    [ -e "$file" ] && sed -i -e "s/\.\\\magazines/.\\\Magazines/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/magazines\\\bbd/Magazines\\\BBD/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s|sumatraPDF\.exe|SumatraPDF.exe|Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s|util\\\sumatra|util\\\Sumatra|Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/exo\\\update/eXo\\\Update/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/\\\update\\\/\\\Update\\\/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/cd update/cd Update/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/PPMode/PPmode/I" "$file"
-    [ -e "$file" ] && sed -i -e "s/c\*\.rom/C*.ROM/I" "$file"
-    [ -e "$file" ] && sed -i -e "s/\.rom/.ROM/I" "$file"
-    [ -e "$file" ] && sed -i -e "s|mt32\\\soundcanvas\.sf2|mt32\\\SoundCanvas.sf2|I" "$file"
-    [ -e "$file" ] && sed -i -e "s/magazines\.zip/Magazines.zip/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/books\.zip/Books.zip/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/catalogs\.zip/Catalogs.zip/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/soundtracks\.zip/Soundtracks.zip/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/videos\.zip/Videos.zip/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/launch\.bat/launch.bat/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/install\.bat/install.bat/Ig" "$file"
-    [ -e "$file" ] && sed -i -e "s/choice\.exe/CHOICE.EXE/Ig" "$file"
-    # For now, we are skipping any precision search string substitutions related to language packs
-    # as language packs may follow different text file formatting conventions than the base pack or other language.
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/multilanguage\.txt/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I" "$file"
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/dosbox\.txt/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I" "$file"
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/multiplayer\.txt/I { /findstr \/i \/C:/I s/\(\/C:\"\)\(%GameName\)/\1:\2/I }" "$file"
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/multiplayer\.txt/I { /findstr \/C:/I s|findstr \(/C:\"%GameName\)|findstr /b \1|I }" "$file"
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/index\.txt/I { /findstr \/C:/I s/\(\/C:\"\)\(%GameName\)/\1:\2/I }" "$file"
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/lang/I! { /index\.txt/I { /findstr \/C:/I s/\(\/C:\"\)\(%FileName\)/\1:\2/I } }" "$file"
-#    [ -e "$file" ] && [[ "$file" != *"lang"* ]] && sed -i -e "/index\.txt/I { /findstr \/C:/I s/\(\/C:\"\)\(GameData\)/\1:\2/I }" "$file"
-    [ -e "$file" ] && sed -i -e "s/xml\\\ALL/xml\\\all/Ig" "$file"
-    
-    #Linux patch related changes
-    #sed -i -e "s/ver\.exo/ver_linux.exo/Ig" "$file"
-    #sed -i -e "s/ver\.txt/ver_linux.txt/Ig" "$file"
-    #[ -e "$file" ] && sed -i -e "/ver/I s/\.txt/_linux.txt/Ig" "$file"
-    #[ -e "$file" ] && sed -i -e 's/MediaPack\.txt/MediaPack_linux.txt/Ig' "$file"
-    #sed -i -e "s/util\.zip/util_linux.zip/Ig" "$file"
-    #[ -e "$file" ] && sed -i -e '/DownloadFile/I s/\.exo/_linux.exo/Ig' "$file"
-done
+    [ -e "$file" ] && printf "%s\0" "$file"
+done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'fixBatchReferenceInconsistencies "$@"' _
 for file in util/9x*.bat
 do
     [ -e "$file" ] && sed -i -e "s/install\.bat/Install.bat/Ig" "$file"
@@ -397,7 +495,7 @@ done
 #    [ -e "$file" ] && sed -i -e "/ssr.*\.bat/I d" "$file"
 #    [ -e "$file" ] && sed -i -e "/ssr/I s/^\(.*\)\.bsh\(.*\)/&\n\1.bat\2/" "$file"
 #done
-echo "Converting file syntax from Windows batch to bash. (ETA 2 hours)"
+echo "Converting file syntax from Windows batch to bash. (ETA 1.25 hours)"
 echo ""
 
 for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
@@ -464,7 +562,7 @@ echo "Removing unnecessary files..."
 [ -e util/openuhs/OpenUHS.bsh ] && rm util/openuhs/OpenUHS.bsh
 
 echo ""
-echo "Creating universal launch files."
+echo "Creating universal launch files. (ETA 4 minutes)"
 for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$currentScript" ] && cat << 'EOF' > "${currentScript%.bsh}.command"
@@ -691,15 +789,8 @@ echo "Creating Linux DOSBox configuration files. This may take a few minutes."
 rm eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf 2>/dev/null
 for file in eXo*/\!*/*/*.conf eXo*/\!*/*/*/*.conf dosbox/*.conf dosbox/*/*.conf emulators/dosbox/*.conf emulators/dosbox/*/*.conf Magazines/*/*.conf Magazines/*/*/*.conf
 do
-    [ -e "$file" ] && cp "$file" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "/mount/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "/boot/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "/soundfont/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "/romdir/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "/glshader/ s|\\\|/|Ig" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "/glshader/ s|Sharp|sharp|Ig" "${file%.conf}_linux.conf"
-    [ -e "$file" ] && sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.conf}_linux.conf"
-done 2>/dev/null
+    [ -e "$file" ] && printf "%s\0" "$file"
+done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'createLinuxConf "$@"' _
 
 rm dosbox/*_{linux,mac}.bak dosbox/*/*_{linux,mac}.bak emulators/dosbox/*_{linux,mac}.bak emulators/dosbox/*/*_{linux,mac}.bak 2>/dev/null
 for file in dosbox/*.bak dosbox/*/*.bak emulators/dosbox/*.bak emulators/dosbox/*/*.bak
@@ -1125,82 +1216,18 @@ sed -i -e 's|:2\.1\.2\\dreamm\.exe|:2.1.2/macOS/dreamm.app/Contents/MacOS/dreamm
 sed -i -e 's|:3\.01\\dreamm\.exe|:3.01/macOS/dreamm.app/Contents/MacOS/dreamm|I' util/dreamm_mac.txt  2>/dev/null
 dos2unix util/dreamm_mac.txt  2>/dev/null
 
-echo "Preparing macOS shell files..."
+echo "Preparing macOS shell files... (ETA 1.5 minutes)"
 #skipping eXoDOS and eXoScummVM files for now. They will need some additional changes in the converting macOS shell files section.
 for file in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$file" ] && cp "$file" "${file%.bsh}.msh"
 done
 
-echo "Converting macOS shell files... (ETA 1.5 hours)"
+echo "Converting macOS shell files... (ETA 3 minutes)"
 for currentScript in eXo*/\!*/*/*.msh eXo*/\!*/*/*/*.msh eXo*/\!*/*/*/*/*.msh Magazines/*.msh Magazines/*/*.msh Magazines/*/*/*.msh Videos/*.msh Videos/*/*.msh Videos/*/*/*.msh Update/*.msh emulators/dosbox/*.msh emulators/dosbox/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
-    [ -e "$currentScript" ] && sed -i -e 's/"\$OSTYPE" == "darwin"/"\$OSTYPE" == "linux"/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/BASH_SOURCE%\.bsh}\.msh/BASH_SOURCE%.msh}.PENDINGbs/' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/\(Setup eXo.[^\.]*\)\.bsh/\1.msh/Ig' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/\(Setup_.[^\.]*\)\.bsh/\1.msh/Ig' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/find .*\.msh/! s/\.bsh/.msh/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/PENDINGbs/bsh/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 |' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-074r3-1 /dosbox-074r3-3 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4301 /dosbox-ece-r4301 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4358 /dosbox-ece-r4358 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4482 /dosbox-ece-r4482 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.dosbox-gridc-4-3-1 |dosbox-gridc-4-3-1 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-081-2 /dosbox-staging-081-2 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-082-0 /dosbox-staging-082-0 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-082-2 /dosbox-staging-082-2 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-staging-083-0 /dosbox-staging-083-0 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-08220 /dosbox-x-08220 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20240701 /dosbox-x-20240701 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20241001 /dosbox-x-20241001 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20250201 /dosbox-x-20250201 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.dosbox-x-20250503 /dosbox-x-20250503 /I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run --env=DOOMWADDIR=\./GZDOOM com\.retro_exo\.gzdoom-4-11-3 |DOOMWADDIR=./GZDOOM gzdoom-4-11-3 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-2-0 |scummvm-2-2-0 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0 |scummvm-2-8-0 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-5-0 |scummvm-2-5-0 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-9-0 |scummvm-2-9-0 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2026-1-0 |scummvm-2026-1-0 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git15811-gf97bfb7ce1 |scummvm-2-3-0-git15811-gf97bfb7ce1 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git18903-g313a824fb9 |scummvm-2-3-0-git18903-g313a824fb9 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0-git9335-g00e72a17004 |scummvm-2-8-0-git9335-g00e72a17004 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e 's|flatpak run com\.retro_exo\.scummvm-3-0-0-git20192-g3ca9da6a1c3 |scummvm-3-0-0-git20192-g3ca9da6a1c3 |I' "$currentScript" 2>/dev/null
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.wine/I s|flatpak run com\.retro_exo\.wine |wine |I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/flatpak run com\.retro_exo\.zenity/I s|flatpak run com\.retro_exo\.zenity |zenity |I' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
-    #[ -e "$currentScript" ] && sed -i -e '/(find \|^find \|^[[:space:]]\+find \| && find/ s/find/gfind/' "$currentScript"
-    #[ -e "$currentScript" ] && sed -i -e 's/^sed /gsed /' "$currentScript"
-    #[ -e "$currentScript" ] && sed -i -e 's/(sed /(gsed /g' "$currentScript"
-    #[ -e "$currentScript" ] && sed -i -e 's/ sed / gsed /g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.bak/_mac.bak/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.conf/_mac.conf/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.crt/_mac.crt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.def/_mac.def/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.int/_mac.int/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.ret/_mac.ret/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/_linux\.txt/_mac.txt/g' "$currentScript"
-#    [ -e "$currentScript" ] && sed -i -e 's/demoscn_linux\.txt/demoscn_mac.txt/g' "$currentScript"
-#    [ -e "$currentScript" ] && sed -i -e 's/dosbox3x_linux\.txt/dosbox3x_mac.txt/g' "$currentScript"
-#    [ -e "$currentScript" ] && sed -i -e 's/dosbox_linux\.txt/dosbox_mac.txt/g' "$currentScript"
-#    [ -e "$currentScript" ] && sed -i -e 's/dreamm_linux\.txt/dreamm_mac.txt/g' "$currentScript"
-#    [ -e "$currentScript" ] && sed -i -e 's/launch_linux\.txt/launch_mac.txt/g' "$currentScript"
-#    [ -e "$currentScript" ] && sed -i -e 's/scummvm_linux\.txt/scummvm_mac.txt/g' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e 's/Linux 64/MacOS/gI' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/^depcheck=flatpak/,/^fi/c\
-missingDependencies=no\
-! [[ `which java` ]] && missingDependencies=yes\
-! [[ `which zenity` ]] && missingDependencies=yes' "$currentScript"
-done
+    [ -e "$currentScript" ] && printf "%s\0" "$currentScript"
+done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'convertMacShell "$@"' _
 
 for currentScript in currentScript in eXoDOS/\!*/*/*.msh eXoDOS/\!*/*/*/*.msh eXoPCjr/\!*/*/*.msh eXoPCjr/\!*/*/*/*.msh ../Setup\ eXoDOS.msh
 do
@@ -1318,7 +1345,7 @@ done
 
 chmod +x ../*.command 2>/dev/null
 
-echo "Creating MacOS DOSBox configuration files. This may take a few minutes."
+echo "Creating macOS DOSBox configuration files. This may take a few minutes."
 rm eXo*/\!*/*/*_mac.conf eXo*/\!*/*/*/*_mac.conf dosbox/*_mac.conf dosbox/*/*_mac.conf emulators/dosbox/*_mac.conf emulators/dosbox/*/*_mac.conf Magazines/*/*_mac.conf Magazines/*/*/*_mac.conf 2>/dev/null
 for file in eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf
 do
