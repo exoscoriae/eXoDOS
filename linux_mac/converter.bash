@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-17
+# Revised: 2026-05-19
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3081,7 +3081,7 @@ TEMPDONECHOICE' "$currentScript"
     sed -i -e 's|\(.[^[:space:]\"~=]*\)=\\\!\(.[^[:space:]\"~=]*\):\*/=\\\!|\1=\$\{\2#*/\}|g' "$currentScript"
 
     #convert declaration for leading tab removal
-    sed -i -e 's|^\([[:alnum:]_]\+\)=%\1:\t=%|\1=\$\{\1##+(\$'\''\\t'\'')\}|' "$currentScript"
+    sed -i -e 's|^\([[:space:]]*\)\([[:alnum:]_]\+\)=%\2:\t=%\(.*\)|\1shopt -s extglob\n\1\2=\$\{\2##+(\$'\''\\t'\'')\}\3\n\1shopt -u extglob|' "$currentScript"
 
     #convert ~[##],-[##] declarations
     sed -i -e 's/\(.[^[:space:]\"~=]*\)=\${\(.[^[:space:]\"~=]*\):~\([[:digit:]]\+\),-\([[:digit:]]\+\)}/\1=\$\{\2:\3:-\4\}/g' \
