@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-18
+# Revised: 2026-05-20
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -14,6 +14,7 @@
 #  - DOSBox ECE r4358 (Sep 02 2020)
 #  - DOSBox ECE r4482 (Mar 17 2023)
 #  - DOSBox GRIDC 4.3.1 (Mar 04 2019)
+#  - DOSBox GunStick (altered with 0.74-3 as a base)
 #  - DOSBox Staging 0.81.2 (Jul 21 2024)
 #  - DOSBox Staging 0.82.0 (Oct 26 2024)
 #  - DOSBox Staging 0.82.2 (Jun 17 2025)
@@ -247,7 +248,8 @@ function convertMacShell
            -e 's|flatpak run com\.retro_exo\.scummvm-3-0-0-git20192-g3ca9da6a1c3 |scummvm-3-0-0-git20192-g3ca9da6a1c3 |I' \
            -e '/flatpak run com\.retro_exo\.vlc/I s|flatpak run com\.retro_exo\.vlc |VLC |I' \
            -e '/flatpak run com\.retro_exo\.wine/I s|flatpak run com\.retro_exo\.wine |wine |I' \
-           -e '/flatpak run com\.retro_exo\.zenity/I s|flatpak run com\.retro_exo\.zenity |zenity |I' "$currentScript"
+           -e '/flatpak run com\.retro_exo\.zenity/I s|flatpak run com\.retro_exo\.zenity |zenity |I' \
+           -e 's/="zenity --file-selection --directory --title=\\"\(.*\)\\""/="osascript -e '\''try'\'' -e '\''POSIX path of (choose folder with prompt \\"\1\\")'\'' -e '\''end try'\''"/g' "$currentScript"
     sed -i -e "#macOS/m1/# s#^\(.*\)/m1/\(.*\)#&\n\1/x64/\2#" "$currentScript"
     sed -i -e '#macOS/m1/# s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' \
            -e '#macOS/x64/# s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' "$currentScript"
@@ -1126,7 +1128,7 @@ do
     [ -e "$file" ] && sed -i -e 's/:mingw\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20241001/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:dosbox0.63\\dosbox\.exe|:flatpak run com.retro_exo.wine emulators/dosbox/dosbox0.63/dosbox.exe|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:DWDdosbox\\dosbox\.exe|:flatpak run com.retro_exo.dosbox-gridc-4-3-1|I' "$file" 2>/dev/null
-    [ -e "$file" ] && sed -i -e 's|:GunStick_dosbox\\dosbox\.exe|:flatpak run com.retro_exo.wine emulators/dosbox/GunStick_dosbox/dosbox.exe|I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's|:GunStick_dosbox\\dosbox\.exe|:flatpak run com.retro_exo.dosbox-gunstick|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:daum\\dosbox\.exe|:flatpak run com.retro_exo.wine emulators/dosbox/daum/dosbox.exe|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:mpubuild_dosbox\\dosbox\.exe|:flatpak run com.retro_exo.wine emulators/dosbox/mpubuild_dosbox/dosbox.exe|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:STdosbox\\dosbox\.exe|:flatpak run com.retro_exo.wine emulators/dosbox/STdosbox/dosbox.exe|I' "$file" 2>/dev/null
@@ -1151,6 +1153,7 @@ do
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-ece-r4358/:dosbox-ece-r4358/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-ece-r4482/:dosbox-ece-r4482/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:flatpak run com.retro_exo.dosbox-gridc-4-3-1|:dosbox-gridc-4-3-1|I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's|:flatpak run com.retro_exo.dosbox-gunstick|:dosbox-gunstick|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-081-2/:dosbox-staging-081-2/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-082-0/:dosbox-staging-082-0/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-staging-082-2/:dosbox-staging-082-2/I' "$file" 2>/dev/null
@@ -1192,13 +1195,13 @@ sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;scum
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;scummvm-3-0-0-git20192-g3ca9da6a1c3|I' util/scummvm_mac.txt  2>/dev/null
 
 #remove Linux conf files for games running DOSBox through Wine
-rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/CosmicSh/*_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/MikeGunn/*_linux.conf eXoDOS/\!dos/PackRega/*_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
+rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
 
 #remove MacOS conf files for games running DOSBox through Wine
-rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/CosmicSh/*_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/desund/*_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/dune2/*_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/MikeGunn/*_mac.conf eXoDOS/\!dos/PackRega/*_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TermFS/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf eXoDOS/\!dos/WarCraft/*_mac.conf 2>/dev/null
+rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/desund/*_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/dune2/*_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TermFS/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf eXoDOS/\!dos/WarCraft/*_mac.conf 2>/dev/null
 
 #recopy Windows conf files to Linux and macOS naming convention for games running DOSBox through Wine
-for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/CosmicSh/*.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/desund/*.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/dune2/*.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/MikeGunn/*.conf eXoDOS/\!dos/PackRega/*.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TermFS/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf eXoDOS/\!dos/WarCraft/*.conf
+for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/desund/*.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/dune2/*.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TermFS/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf eXoDOS/\!dos/WarCraft/*.conf
 do
     [ -e "$file" ] && cp "$file" "${file%.conf}_linux.conf"
     [ -e "$file" ] && cp "$file" "${file%.conf}_mac.conf"

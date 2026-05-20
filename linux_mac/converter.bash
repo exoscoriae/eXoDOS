@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-19
+# Revised: 2026-05-20
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1327,6 +1327,7 @@ EOF
            -e 's|^"dosbox/ece_svn/dosbox\.exe"|flatpak run com.retro_exo.dosbox-ece-r4482|I' \
            -e 's|^"[\./]*emulators/dosbox/ece4460/dosbox\.exe"|flatpak run com.retro_exo.dosbox-ece-r4482|I' \
            -e 's|^"[\./]*emulators/dosbox/ece4481/dosbox\.exe"|flatpak run com.retro_exo.dosbox-ece-r4482|I' \
+           -e 's|^"[\./]*emulators/dosbox/GunStick_dosbox/DOSBox\.exe"|flatpak run com.retro_exo.dosbox-gunstick|I' \
            -e 's|^"dosbox/x/dosbox\.exe"|flatpak run com.retro_exo.dosbox-x-08220|I' \
            -e 's|^"[\./]*emulators/dosbox/x/dosbox\.exe"|flatpak run com.retro_exo.dosbox-x-08220|I' \
            -e 's|^"[\./]*emulators/dosbox/x2/dosbox\.exe"|flatpak run com.retro_exo.dosbox-x-20240701|I' \
@@ -1342,6 +1343,7 @@ EOF
            -e 's|dosbox=[\./]*emulators/dosbox/ece4230/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4301"|I' \
            -e 's|dosbox=[\./]*emulators/dosbox/ece4460/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' \
            -e 's|dosbox=[\./]*emulators/dosbox/ece4481/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' \
+           -e 's|dosbox=[\./]*emulators/dosbox/GunStick_dosbox/DOSBox\.exe|dosbox="flatpak run com.retro_exo.dosbox-gunstick"|I' \
            -e 's|dosbox=[\./]*emulators/dosbox/x/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-08220"|I' \
            -e 's|dosbox=[\./]*emulators/dosbox/x2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20240701"|I' \
            -e 's|dosbox=[\./]*emulators/dosbox/x98/dosbox-x\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20250201"|I' \
@@ -1356,6 +1358,7 @@ EOF
            -e 's|dosbox=[\./]*dosbox/ece4230/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4301"|I' \
            -e 's|dosbox=[\./]*dosbox/ece4460/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' \
            -e 's|dosbox=[\./]*dosbox/ece4481/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' \
+           -e 's|dosbox=[\./]*dosbox/GunStick_dosbox/DOSBox\.exe|dosbox="flatpak run com.retro_exo.dosbox-gunstick"|I' \
            -e 's|dosbox=[\./]*dosbox/x/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-08220"|I' \
            -e 's|dosbox=[\./]*dosbox/x2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20240701"|I' \
            -e 's|dosbox=[\./]*dosbox/x98/dosbox-x\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20250201"|I' \
@@ -1370,6 +1373,7 @@ EOF
            -e 's|dosbox=[\./]*ece4230/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4301"|I' \
            -e 's|dosbox=[\./]*ece4460/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' \
            -e 's|dosbox=[\./]*ece4481/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-ece-r4482"|I' \
+           -e 's|dosbox=[\./]*GunStick_dosbox/DOSBox\.exe|dosbox="flatpak run com.retro_exo.dosbox-gunstick"|I' \
            -e 's|dosbox=[\./]*x/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-08220"|I' \
            -e 's|dosbox=[\./]*x2/dosbox\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20240701"|I' \
            -e 's|dosbox=[\./]*x98/dosbox-x\.exe|dosbox="flatpak run com.retro_exo.dosbox-x-20250201"|I' \
@@ -3201,6 +3205,7 @@ TEMPDONECHOICE' "$currentScript"
            -e "s|^dosbox=\"dosbox/ece_svn/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-ece-r4482\"|I" \
            -e "s|^dosbox=\"ece4460/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-ece-r4482\"|I" \
            -e "s|^dosbox=\"ece4481/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-ece-r4482\"|I" \
+           -e "s|^dosbox=\"GunStick_dosbox/DOSBox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-gunstick\"|I" \
            -e "s|^dosbox=\"dosbox/x/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-08220\"|I" \
            -e "s|^dosbox=\"dosbox/x/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-08220\"|I" \
            -e "s|^dosbox=\"x/dosbox\.exe\"|dosbox=\"flatpak run com.retro_exo.dosbox-x-08220\"|I" \
