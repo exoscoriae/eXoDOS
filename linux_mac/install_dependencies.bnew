@@ -1,90 +1,54 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2024-10-10
+# Revised: 2026-05-29
 
 #--------------------------------------------------------------------------------------
-if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
-then
-    LD_PRELOAD=""
-fi
-clear
-
-setupversion="Version 6.04.universal1"
-
-[[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
-scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
-[ $# -gt 0 ] && parameterone="$1"
-[ $# -gt 1 ] && parametertwo="$2"
-[ $# -gt 2 ] && parameterthree="$3"
-[ $# -gt 3 ] && parameterfour="$4"
-
-if [[ "$OSTYPE" == "darwin"* ]]
-then
-    source "$scriptDir/../../$(basename -- "${BASH_SOURCE%.bsh}.command")"
-    exit 0
-fi
-
-cd ../..
-
-if [ ! -d Content ]
-then
-    printf "\n\e[1;31;47mCannot find ./Content subdirectory.\e[0m\n\n"
+shopt -s extglob
+function abortScript
+{
+    printf "\n\e[1;31;47m%s\e[0m\n\n" "$1"
     read -s -n 1 -p "Press any key to abort."
     printf "\n\n"
     exit 1
-fi
-if [ ! -d "eXo/util" ]
-then
-    printf "\n\e[1;31;47mCannot find ./eXo/util subdirectory.\e[0m\n\n"
-    read -s -n 1 -p "Press any key to abort."
-    printf "\n\n"
-    exit 1
-fi
-if [[ $(ls -1 eXo/util/util*linux*.zip 2>/dev/null | wc -l) == 0 ]]
-then
-    printf "\n\e[1;31;47mCannot find ./eXo/util/util*linux*.zip.\e[0m\n\n"
-    read -s -n 1 -p "Press any key to abort."
-    printf "\n\n"
-    exit 1
-fi
-
-initialDir=$PWD
+}
 
 function beginLinux
 {
-    missingPackages=no
+    missing_packages=no
     remove_exo=no
-    runupdate=no
-    distroeol=no
-    distroid="$(cat /etc/os-release 2>/dev/null | grep '^ID=' | sed -e 's/^ID=//')"
-    distroversion="$(cat /etc/os-release 2>/dev/null | grep '^VERSION_ID=' | sed -e 's/^VERSION_ID=//' | sed -e 's/"//g')"
-    distrolike="$(cat /etc/os-release 2>/dev/null | grep '^ID_LIKE=' | sed -e 's/^ID_LIKE=//')"
+    run_update=no
+    distro_id="$(cat /etc/os-release 2>/dev/null | grep '^ID=' | sed -e 's/^ID=//' | sed -e 's/"//g')"
+    distro_like="$(cat /etc/os-release 2>/dev/null | grep '^ID_LIKE=' | sed -e 's/^ID_LIKE=//')"
     
     clear
-    printf "\n\e[1;31;40mWelcome to the eXo Dependency Installer.\e[0m\n\n%s\n%s\n%s\n%s\n\n" \
-        "This setup will install the software required by the collection." \
-        "If system packages are needed, you may be asked for your password (for sudo)." \
-        "If your account lacks sudo access, this script cannot install system packages." \
-        "In such cases, you will need to install the missing system packages yourself."
-    printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
-        "[" "P" "]roceed with installation" "[" "D" "]ownload the latest setup" "[" "R" "]emove all installed eXo packages" "[" "A" "]bort installation" 
-    while true
-    do
-        read -p "(P/D/R/A)? " choice
-        case $choice in
-            [Pp]* ) break;;
-            [Dd]* ) runupdate=yes
-                break;;
-            [Rr]* ) remove_exo=yes
-                break;;
-            [Aa]* ) printf "\n"
-                exit 1
-                break;;
-            *   ) printf "Invalid input.\n";;
-        esac
-    done
-    
+    if [ "$parameterone" == "update" ]
+    then
+        run_update=yes
+    else
+        printf "\n\e[1;31;40mWelcome to the eXo Dependency Installer.\e[0m\n\n%s\n%s\n%s\n%s\n\n" \
+            "This setup will install the software required by the collection." \
+            "If system packages are needed, you may be asked for your password (for sudo)." \
+            "If your account lacks sudo access, this script cannot install system packages." \
+            "In such cases, you will need to install the missing system packages yourself."
+        printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
+            "[" "P" "]roceed with installation" "[" "D" "]ownload updates" "[" "R" "]emove all installed eXo packages" "[" "A" "]bort installation"
+        while true
+        do
+            read -p "(P/D/R/A)? " choice
+            case $choice in
+                [Pp]* ) break;;
+                [Dd]* ) run_update=yes
+                        break;;
+                [Rr]* ) remove_exo=yes
+                        break;;
+                [Aa]* ) printf "\n"
+                        exit 0
+                        break;;
+                *     ) printf "Invalid input.\n";;
+            esac
+        done
+    fi
     if [ "$remove_exo" == "yes" ]
     then
         clear
@@ -96,32 +60,15 @@ function beginLinux
             case $choice in
                 [Yy]* ) break;;
                 [Nn]* ) exit 0
-                    break;;
-                *   ) printf "Invalid input.\n";;
+                        break;;
+                *     ) printf "Invalid input.\n";;
             esac
         done
-        if ! [ `which flatpak` ]
-        then
-            printf "\nflatpak is not present. There are no eXo packages to uninstall.\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            exit 1
-        fi
-        if [ "$(flatpak list | grep com.retro_exo | wc -l)" -eq 0 ]
-        then
-            printf "\nThere are no eXo packages to uninstall.\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            exit 1
-        fi
+        command -v flatpak &>/dev/null || abortScript "flatpak is not present. There are no eXo packages to uninstall."
+        flatpak list | grep -q "com.retro_exo" || abortScript "There are no eXo packages to uninstall."
         for package in `flatpak list | grep com.retro_exo | sed -e 's/^.*com.retro_exo/com.retro_exo/' | sed -e 's/[[:space:]].*//'`
         do
-            flatpak remove -y "$package" 2>/dev/null
-            if [ $? != 0 ]
-            then
-                printf "\n\e[1;31;47mFailed to uninstall package.\e[0m\n\n"
-                read -s -n 1 -p "Press any key to abort."
-                printf "\n\n"
-                exit 1
-            fi
+            flatpak remove --delete-data -y "$package" 2>/dev/null || abortScript "Failed to uninstall $package package."
         done
         printf "\nAll eXo flatpaks have been successfully uninstalled.\n"
         read -s -n 1 -p "Press any key to exit."
@@ -132,75 +79,367 @@ function beginLinux
     printf "Checking for missing system packages...\n\n"
     for check in curl ffmpeg flatpak fold perl python3 sed sha256sum tput unzip wget zip
     do
-        if ! [ `which $check` ]
-        then
-            missingPackages=yes
-            printf "$check: \e[1;37;41mmissing\e[0m\n"
-        else
-            printf "$check: \e[1;37;44mpresent\e[0m\n"
-        fi
+        command -v "$check" &>/dev/null && printf "%s: \e[1;37;44mpresent\e[0m\n" "$check" || { missing_packages=yes; printf "%s: \e[1;37;41mmissing\e[0m\n" "$check"; }
     done
-    if [ $missingPackages == yes ]
+    if [ "$missing_packages" == "yes" ]
     then
         printf "\nNot all system dependencies installed.\n"
         read -s -n 1 -p "Press any key to proceed..."
-        if [ "$distroid" == "arch" ]
-        then
-            goarch
-        elif [ "$distroid" == "debian" ]
-        then
-            goapt
-        elif [ "$distroid" == "fedora" ]
-        then
-            godnf
-        elif [ "$distroid" == "linuxmint" ]
-        then
-            goapt
-        elif [ "$distroid" == "manjaro" ]
-        then
-            goarch
-        elif [ "$distroid" == "ubuntu" ]
-        then
-            goapt
-        elif [ "$distrolike" == "arch" ]
-        then
-            goarch
-        elif [ "$distrolike" == "debian" ]
-        then
-            goapt
-        elif [ "$distrolike" == "ubuntu" ]
-        then
-            goapt
-        else
-            setupother
-        fi
+        case "$distro_id" in
+            alpine ) goApk;;
+            debian|elementary|linuxmint|pop|ubuntu|zorin ) goApt;;
+            almalinux|centos|fedora|rhel|rocky ) goDnf;;
+            solus ) goEopkg;;
+            nixos ) goNixenv;;
+            arch|endeavouros|garuda|manjaro ) goPacman;;
+            void ) goXbps;;
+            opensuse*|sles|suse ) goZypper;;
+            * ) case "$distro_like" in
+                    *alpine* ) goApk;;
+                    *debian*|*ubuntu* ) goApt;;
+                    *centos*|*fedora*|*rhel* ) goDnf;;
+                    *solus* ) goEopkg;;
+                    *arch* ) goPacman;;
+                    *void* ) goXbps;;
+                    *suse* ) goZypper;;
+                    * ) setupOther;;
+                esac;;
+        esac
     else
         printf "\nAll system dependencies satisfied.\n"
         read -s -n 1 -p "Press any key to proceed..."
-        [ "$runupdate" == "yes" ] && goupdate
+        [ "$run_update" == "yes" ] && getUpdate
         extractPackages
-        installflatpaks
+        installFlatpaks
     fi
     
     clear
-    printf "\nAll required dependencies are now satisfied.\n%s\e[1;33;40m%s\e[0m%s\n\n" \
-        "You may proceed with running the appropriate " "Setup eXo<collection>.command" " file."
+    if [ "$parameterone" == "update" ]
+    then
+        printf "\nUpdates complete.\n%s\e[1;37;44m%s\e[0m%s\n\n" \
+            "You may launch exogui with the desktop icon or the " "exogui.command" " script."
+    else
+        printf "\nAll required dependencies are now satisfied.\n%s\e[1;33;40m%s\e[0m%s\n\n" \
+            "You may proceed with running the appropriate " "Setup eXo<collection>.command" " file."
+    fi
     read -s -n 1 -p "Press any key to exit..."
     printf "\n\n"
 }
 
+# File naming convention for Linux/macOS Content containing packages:
+# A Linux/macOS patch must follow one of two naming conventions depending on whether its files need to be extracted last.
+#
+# If a collection does not require Linux/MacOS Content to be extracted last:
+# Base pack : XO*_linux*_Metadata.zip (e.g. XODOS_linuxmac_Metadata.zip)
+# Base language pack: eXo*_linux*_Metadata.zip (e.g. eXoDOS_SLP_linuxmac_Metadata.zip)
+# Addon, standard pack: ${pack_id}_linux*_*.zip (e.g. DOS_linuxmac_Videos.zip)
+# Addon, language pack: eXo${pack_id}_Addonpack_linux*_*.zip (e.g. eXoDOS_GLP_Addonpack_linuxmac_MagazinesGLP.zip)
+#
+# If a collection requires Linux/MacOS Content to be extracted last:
+# Base pack: XO*zz_linux*_Metadata.zip (e.g. XODOSzz_linuxmac_Metadata.zip)
+# Base language pack: eXo*zz_linux*_Metadata.zip (e.g. eXoDOS_SLPzz_linuxmac_Metadata.zip)
+# Addon, standard pack: ${pack_id}zz_linux*_*.zip (e.g. DOSzz_linuxmac_Videos.zip)
+# Addon, language pack: eXo${pack_id}_Addonpackzz_linux*_*.zip (e.g. eXoDOS_GLP_Addonpackzz_linuxmac_MagazinesGLP.zip)
+#
+# Note that base Linux packs must contain eXo/Update/linux_mac/getVer_${pack_id}.sh files for updates to work!
+# Update package naming conventions listed by getUpdate function.
 function extractPackages
 {
     printf "\nExtracting packages...\n"
     cd eXo
-    unzip -o -q ./util/util\*_linux\*.zip EXT\*_linux\*.zip -d ./util
-    [ $? != 0 ] && failedunzip
-    unzip -o -q ./util/EXT\*_linux\*.zip Flatpaks/\* -d ./
-    [ $? != 0 ] && failedunzip
-    cd ..
+    rm -rf ./dmg/*/ &>/dev/null
+    rm -rf ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app &>/dev/null
+    for zip_file in ./util/util*_linux*.zip
+    do
+        [ -e "$zip_file" ] || continue
+        unzip -o "$zip_file" 'EXT*_linux*.zip' -d ./util || abortScript "Failed to unzip EXT packages."
+    done
+    for zip_file in ./util/EXT*_linux*.zip
+    do
+        [ -e "$zip_file" ] || continue
+        unzip -o "$zip_file" 'Flatpaks/*' -d ./ || abortScript "Failed to unzip Flatpaks."
+    done
+    for zip_file in ./util/EXT*_linuxmac*.zip
+    do
+        [ -e "$zip_file" ] || continue
+        unzip -o "$zip_file" 'dmg/*' -d ./ || abortScript "Failed to unzip dmg packages."
+        if unzip -l "$zip_file" 'emulators/*/macOS/*' &>/dev/null
+        then
+            unzip -o "$zip_file" 'emulators/*/macOS/*' -d ./ || abortScript "Failed to unzip macOS emulators."
+        fi
+    done
+    
+    mkdir -p Update/linux_mac
+    cd Update/linux_mac/
+    if [ -e ver_current_linuxmac.txt ]
+    then
+        updateversion="$(sed -n '1p' ver_current_linuxmac.txt)" || abortScript "Missing version tracking file contents!"
+        [ "$setupversion" != "$updateversion" ] && abortScript "Version mismatch for universal package update zip!"
+        universal_package_sum="$(sed -n '7p' ver_current_linuxmac.txt)"
+        echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for downloaded file invalid."; }
+        unzip -o update_universalpackages_linuxmac.zip -d ../../../ || abortScript "Failed to unzip universal update."
+        
+        for file in ../../../Content/XO!(*zz)_linux*_Metadata.zip ../../../Content/eXo!(*zz)_linux*_Metadata.zip
+        do
+            [ -e "$file" ] || continue
+            [ -e "${file/_linux/zz_linux}" ] && continue
+            [[ "$file" =~ Content/(eXo|XO)(.*)_linux ]] && pack_id="${BASH_REMATCH[2]}" || abortScript "Failed to set pack_id."
+            for _ in 1
+            do
+                line_match=$(grep -n "^http.*\/update_${pack_id}_linux.*" ver_current_linuxmac.txt | head -n 1)
+                if [ -z "$line_match" ]
+                then
+                    unset line_match
+                    break
+                fi
+                url_line_num=$(echo "$line_match" | cut -d: -f1)
+                sum_line_num=$((url_line_num + 1))
+                ver_line_num=$((url_line_num - 1))
+                custom_package_url="$(sed -n "${url_line_num}p" ver_current_linuxmac.txt)"
+                custom_package_file="${custom_package_url##*/}"
+                custom_package_sum="$(sed -n "${sum_line_num}p" ver_current_linuxmac.txt)"
+                custom_package_ver="$(sed -n "${ver_line_num}p" ver_current_linuxmac.txt)"
+                unset line_match url_line_num sum_line_num ver_line_num
+                if [ ! -e "$custom_package_file" ]
+                then
+                    unset custom_package_url custom_package_file custom_package_sum custom_package_ver
+                    break
+                fi
+                unzip -j -o -q "$file" "eXo/Update/linux_mac/getVer_${pack_id}.sh" -d ./ 2>/dev/null
+                if [ $? != 0 ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset custom_package_url custom_package_file custom_package_sum custom_package_ver
+                    break
+                fi
+                #ensure update is for the same major release as the local version
+                [ ! -e "getVer_${pack_id}.sh" ] && abortScript "getVer_${pack_id}.sh missing!"
+                local_version="$(head -n 1 "getVer_${pack_id}.sh" | bash)"
+                if [ "$local_version" != "$custom_package_ver" ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset custom_package_url custom_package_file custom_package_sum custom_package_ver local_version
+                    break
+                fi
+                echo "$custom_package_sum" | sha256sum --check || { rm "$custom_package_file"; abortScript "Checksum for $custom_package_file invalid."; }
+                unzip -o "$custom_package_file" -d ../../../ || abortScript "Failed to unzip $custom_package_file"
+                unset custom_package_file custom_package_url custom_package_sum custom_package_ver local_version
+            done
+            for mediafile in ../../../Content/${pack_id}_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpack_linux*_*.zip
+            do
+                [ -e "$mediafile" ] || continue
+                [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+                line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" ver_current_linuxmac.txt | head -n 1)
+                if [ -z "$line_match" ]
+                then
+                    unset addon_type line_match
+                    continue
+                fi
+                url_line_num=$(echo "$line_match" | cut -d: -f1)
+                sum_line_num=$((url_line_num + 1))
+                ver_line_num=$((url_line_num - 1))
+                custom_addon_url="$(sed -n "${url_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_file="${custom_addon_url##*/}"
+                custom_addon_sum="$(sed -n "${sum_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_ver="$(sed -n "${ver_line_num}p" ver_current_linuxmac.txt)"
+                unset line_match url_line_num sum_line_num ver_line_num
+                if [ ! -e "$custom_addon_file" ]
+                then
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver
+                    continue
+                fi
+                echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+                #unlike base packs, addons store getVer files in the update files themselves
+                unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+                #ensure update is for the same major release as the local version
+                [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+                local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+                if [ "$local_version" != "$custom_addon_ver" ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                    continue
+                fi
+                unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+                unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+            done
+            for mediafile in ../../../Content/${pack_id}zz_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpackzz_linux*_*.zip
+            do
+                [ -e "$mediafile" ] || continue
+                [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)zz_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+                line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" ver_current_linuxmac.txt | head -n 1)
+                if [ -z "$line_match" ]
+                then
+                    unset addon_type line_match
+                    continue
+                fi
+                url_line_num=$(echo "$line_match" | cut -d: -f1)
+                sum_line_num=$((url_line_num + 1))
+                ver_line_num=$((url_line_num - 1))
+                custom_addon_url="$(sed -n "${url_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_file="${custom_addon_url##*/}"
+                custom_addon_sum="$(sed -n "${sum_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_ver="$(sed -n "${ver_line_num}p" ver_current_linuxmac.txt)"
+                unset line_match url_line_num sum_line_num ver_line_num
+                if [ ! -e "$custom_addon_file" ]
+                then
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver
+                    continue
+                fi
+                echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+                #unlike base packs, addons store getVer files in the update files themselves
+                unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+                #ensure update is for the same major release as the local version
+                [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+                local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+                if [ "$local_version" != "$custom_addon_ver" ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                    continue
+                fi
+                unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+                unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+            done
+            unset pack_id
+        done
+
+        for file in ../../../Content/XO*zz_linux*_Metadata.zip ../../../Content/eXo*zz_linux*_Metadata.zip
+        do
+            [ -e "$file" ] || continue
+            [[ "$file" =~ Content/(eXo|XO)(.*)zz_linux ]] && pack_id="${BASH_REMATCH[2]}" || abortScript "Failed to set pack_id."
+            for _ in 1
+            do
+                line_match=$(grep -n "^http.*\/update_${pack_id}_linux.*" ver_current_linuxmac.txt | head -n 1)
+                if [ -z "$line_match" ]
+                then
+                    unset line_match
+                    break
+                fi
+                url_line_num=$(echo "$line_match" | cut -d: -f1)
+                sum_line_num=$((url_line_num + 1))
+                ver_line_num=$((url_line_num - 1))
+                custom_package_url="$(sed -n "${url_line_num}p" ver_current_linuxmac.txt)"
+                custom_package_file="${custom_package_url##*/}"
+                custom_package_sum="$(sed -n "${sum_line_num}p" ver_current_linuxmac.txt)"
+                custom_package_ver="$(sed -n "${ver_line_num}p" ver_current_linuxmac.txt)"
+                unset line_match url_line_num sum_line_num ver_line_num
+                if [ ! -e "$custom_package_file" ]
+                then
+                    unset custom_package_url custom_package_file custom_package_sum custom_package_ver
+                    break
+                fi
+                unzip -j -o -q "$file" "eXo/Update/linux_mac/getVer_${pack_id}.sh" -d ./ 2>/dev/null
+                if [ $? != 0 ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset custom_package_url custom_package_file custom_package_sum custom_package_ver
+                    break
+                fi
+                #ensure update is for the same major release as the local version
+                [ ! -e "getVer_${pack_id}.sh" ] && abortScript "getVer_${pack_id}.sh missing!"
+                local_version="$(head -n 1 "getVer_${pack_id}.sh" | bash)"
+                if [ "$local_version" != "$custom_package_ver" ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset custom_package_url custom_package_file custom_package_sum custom_package_ver local_version
+                    break
+                fi
+                echo "$custom_package_sum" | sha256sum --check || { rm "$custom_package_file"; abortScript "Checksum for $custom_package_file invalid."; }
+                unzip -o "$custom_package_file" -d ../../../ || abortScript "Failed to unzip $custom_package_file"
+                unset custom_package_file custom_package_url custom_package_sum custom_package_ver local_version
+            done
+            for mediafile in ../../../Content/${pack_id}_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpack_linux*_*.zip
+            do
+                [ -e "$mediafile" ] || continue
+                [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+                line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" ver_current_linuxmac.txt | head -n 1)
+                if [ -z "$line_match" ]
+                then
+                    unset addon_type line_match
+                    continue
+                fi
+                url_line_num=$(echo "$line_match" | cut -d: -f1)
+                sum_line_num=$((url_line_num + 1))
+                ver_line_num=$((url_line_num - 1))
+                custom_addon_url="$(sed -n "${url_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_file="${custom_addon_url##*/}"
+                custom_addon_sum="$(sed -n "${sum_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_ver="$(sed -n "${ver_line_num}p" ver_current_linuxmac.txt)"
+                unset line_match url_line_num sum_line_num ver_line_num
+                if [ ! -e "$custom_addon_file" ]
+                then
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver
+                    continue
+                fi
+                echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+                #unlike base packs, addons store getVer files in the update files themselves
+                unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+                #ensure update is for the same major release as the local version
+                [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+                local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+                if [ "$local_version" != "$custom_addon_ver" ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                    continue
+                fi
+                unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+                unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+            done
+            for mediafile in ../../../Content/${pack_id}zz_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpackzz_linux*_*.zip
+            do
+                [ -e "$mediafile" ] || continue
+                [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)zz_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+                line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" ver_current_linuxmac.txt | head -n 1)
+                if [ -z "$line_match" ]
+                then
+                    unset addon_type line_match
+                    continue
+                fi
+                url_line_num=$(echo "$line_match" | cut -d: -f1)
+                sum_line_num=$((url_line_num + 1))
+                ver_line_num=$((url_line_num - 1))
+                custom_addon_url="$(sed -n "${url_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_file="${custom_addon_url##*/}"
+                custom_addon_sum="$(sed -n "${sum_line_num}p" ver_current_linuxmac.txt)"
+                custom_addon_ver="$(sed -n "${ver_line_num}p" ver_current_linuxmac.txt)"
+                unset line_match url_line_num sum_line_num ver_line_num
+                if [ ! -e "$custom_addon_file" ]
+                then
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver
+                    continue
+                fi
+                echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+                #unlike base packs, addons store getVer files in the update files themselves
+                unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+                #ensure update is for the same major release as the local version
+                [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+                local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+                if [ "$local_version" != "$custom_addon_ver" ]
+                then
+                    echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                    echo "Please download the latest torrent."
+                    unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                    continue
+                fi
+                unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+                unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+            done
+            unset pack_id
+        done
+    fi
+    cd ../../..
 }
 
-function failedinstall
+function failedInstall
 {
     printf "\n\e[1;31;47mAn error occurred while attempting to install packages.\e[0m\n\n%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n" \
         "Possible causes may include:" \
@@ -217,267 +456,32 @@ function failedinstall
     exit 1
 }
 
-function failedunzip
+# File naming convention for updates:
+# Dependency installer updates: install_dependencies.bnew, install_dependencies.cnew
+# Universal package updates: update_universalpackages_linuxmac.zip
+# Base pack: update_${pack_id}_linux*.zip
+#            Examples: update_DOS_FLP_linuxmac.zip, update_ScummVM_linuxmac.zip
+# Addon pack: update_addon_${pack_id}_${addon_type}_linux*.zip
+#            Examples: update_addon_DOS_Videos_linuxmac.zip, update_addon_DOS_GLP_MagazinesGLP_linuxmac.zip
+# Note that Linux base packs must contain eXo/Update/linux_mac/getVer_${pack_id}.sh files for updates to work
+# Note that Linux ADDON UPDATES must contain eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh to work
+function getUpdate
 {
-    printf "\n\e[1;31;47mFailed to unzip packages.\e[0m\n\n"
-    read -s -n 1 -p "Press any key to abort."
-    printf "\n\n"
-    exit 1
-}
-
-function goapt
-{
-    if [ "$runupdate" == "yes" ]
+    cd eXo
+    if [ ! -d Update/linux_mac ]
     then
-        if ! [ `which apt` ]
-        then
-            echo "Missing apt!"
-            failedinstall
-        fi
-        if ! [ `which wget` ]
-        then
-            echo "Wget is not present. Attempting to install..."
-            sudo apt update
-            [ $? != 0 ] && failedinstall
-            sudo apt install -y wget
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            echo "Sha256sum is not present. Attempting to install..."
-            sudo apt update
-            [ $? != 0 ] && failedinstall
-            sudo apt install -y coreutils
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which unzip` ]
-        then
-            echo "Unzip is not present. Attempting to install..."
-            sudo apt update
-            [ $? != 0 ] && failedinstall
-            sudo apt install -y unzip
-            [ $? != 0 ] && failedinstall
-        fi
-        goupdate
-        exit 1
-    else
-        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
-        if ! [ `which apt` ]
-        then
-            echo "Missing apt!"
-            failedinstall
-        fi
-        
-        [ $? != 0 ] && failedinstall
-        if ! [ `which fold` ]
-        then
-            sudo apt update
-            sudo apt install -y coreutils
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            sudo apt update
-            sudo apt install -y coreutils
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which tput` ]
-        then
-            sudo apt update
-            sudo apt install -y ncurses-bin
-            [ $? != 0 ] && failedinstall
-        fi
-        for check in curl ffmpeg flatpak perl python3 sed unzip wget zip
-        do
-            if ! [ `which $check` ]
-            then
-                echo "$check is not present. Attempting to install..."
-                sudo apt update
-                sudo apt install -y $check
-                [ $? != 0 ] && failedinstall
-            fi
-        done
-        extractPackages
-        installflatpaks
+        mkdir -p Update/linux_mac || abortScript "Error creating Update directory."
     fi
-}
-
-function goarch
-{
-    if [ "$runupdate" == "yes" ]
+    cd Update/linux_mac
+    if [ -d tmp ]
     then
-        if ! [ `which pacman` ]
-        then
-            echo "Missing pacman!"
-            failedinstall
-        fi
-        if ! [ `which wget` ]
-        then
-            echo "Wget is not present. Updating packages and attempting to install..."
-            sudo pacman --noconfirm -Syu
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -S wget
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -Sy
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            echo "Sha256sum is not present. Updating packages and attempting to install..."
-            sudo pacman --noconfirm -Syu
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -S coreutils
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -Sy
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which unzip` ]
-        then
-            echo "Unzip is not present. Updating packages and attempting to install..."
-            sudo pacman --noconfirm -Syu
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -S unzip
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -Sy
-            [ $? != 0 ] && failedinstall
-        fi
-        goupdate
-        exit 1
-    else
-        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
-        if ! [ `which pacman` ]
-        then
-            echo "Missing pacman!"
-            failedinstall
-        fi
-        if ! [ `which fold` ]
-        then
-            sudo pacman --noconfirm -Syu
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -S coreutils
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -Sy
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            sudo pacman --noconfirm -Syu
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -S coreutils
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -Sy
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which tput` ]
-        then
-            sudo pacman --noconfirm -Syu
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -S ncurses
-            [ $? != 0 ] && failedinstall
-            sudo pacman --noconfirm -Sy
-            [ $? != 0 ] && failedinstall
-        fi
-        for check in curl ffmpeg flatpak perl python3 sed unzip wget zip
-        do
-            if ! [ `which $check` ]
-            then
-                echo "$check is not present. Attempting to install..."
-                sudo pacman --noconfirm -Syu
-                [ $? != 0 ] && failedinstall
-                sudo pacman --noconfirm -S $check
-                [ $? != 0 ] && failedinstall
-                sudo pacman --noconfirm -Sy
-                [ $? != 0 ] && failedinstall
-            fi
-        done
-
-        extractPackages
-        installflatpaks
+        rm -rf tmp || abortScript "Error removing existing tmp download directory."
     fi
-}
-
-function godnf
-{
-    if [ "$runupdate" == "yes" ]
-    then
-        if ! [ `which dnf` ]
-        then
-            echo "Missing dnf!"
-            failedinstall
-        fi
-        if ! [ `which wget` ]
-        then
-            echo "Wget is not present. Attempting to install..."
-            sudo dnf install -y wget
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            echo "Sha256sum is not present. Attempting to install..."
-            sudo dnf install -y coreutils
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which unzip` ]
-        then
-            echo "Unzip is not present. Attempting to install..."
-            sudo dnf install -y unzip
-            [ $? != 0 ] && failedinstall
-        fi
-        goupdate
-        exit 1
-    else
-        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
-        if ! [ `which dnf` ]
-        then
-            echo "Missing dnf!"
-            failedinstall
-        fi
-        if ! [ `which fold` ]
-        then
-            sudo dnf install -y coreutils
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            sudo dnf install -y coreutils
-            [ $? != 0 ] && failedinstall
-        fi
-        if ! [ `which tput` ]
-        then
-            sudo dnf install -y ncurses
-            [ $? != 0 ] && failedinstall
-        fi
-        
-        for check in curl ffmpeg flatpak perl python3 sed unzip wget zip
-        do
-            if ! [ `which $check` ]
-            then
-                echo "$check is not present. Attempting to install..."
-                sudo dnf install -y $check
-                [ $? != 0 ] && failedinstall
-            fi
-        done
-        extractPackages
-        installflatpaks
-    fi
-}
-
-function goupdate
-{
+    mkdir tmp || abortScript "Error creating tmp download directory."
     clear
     printf "\nChecking for updates...\n\n"
-    [ -e "ver_universal_linuxmac.txt" ] && rm ver_universal_linuxmac.txt
-    [ -e "install_dependencies.cnew" ] && rm install_dependencies.cnew
-    [ -e "install_dependencies.bnew" ] && rm install_dependencies.bnew
-    [ -e "update_universalpackages_linuxmac.zip" ] && rm update_universalpackages_linuxmac.zip
-    wget "https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/ver_universal_linuxmac.txt" -O ver_universal_linuxmac.txt
-    if [ ! -e "ver_universal_linuxmac.txt" ]
-    then
-        printf "\n\e[1;31;47mFailed to retrieve update information.\e[0m\n\n"
-        read -s -n 1 -p "Press any key to abort."
-        printf "\n\n"
-        exit 1
-    fi
+    cd tmp
+    wget "https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/ver_universal_linuxmac.txt" -O ver_universal_linuxmac.txt || abortScript "Failed to retrieve update information."
     updateversion="$(sed -n '1p' ver_universal_linuxmac.txt)"
     universal_depmac_url="$(sed -n '2p' ver_universal_linuxmac.txt)"
     universal_depmac_sum="$(sed -n '3p' ver_universal_linuxmac.txt)"
@@ -485,198 +489,686 @@ function goupdate
     universal_deplin_sum="$(sed -n '5p' ver_universal_linuxmac.txt)"
     universal_package_url="$(sed -n '6p' ver_universal_linuxmac.txt)"
     universal_package_sum="$(sed -n '7p' ver_universal_linuxmac.txt)"
-    rm ver_universal_linuxmac.txt
     clear
+    
+    if [ -e ../ver_current_linuxmac.txt ]
+    then
+        local_update=$(grep "Version " ../ver_current_linuxmac.txt | head -n 1)
+        if [ "$setupversion" == "$updateversion" ]
+        then
+            cd ..
+            if [ "$local_update" != "$setupversion" ] || ! echo "$universal_depmac_sum" | sha256sum --check || ! echo "$universal_deplin_sum" | sha256sum --check
+            then
+                setupversion="$setupversion (bad state)"
+            fi
+            cd tmp
+        fi
+        unset local_update
+    fi
     if [ "$setupversion" == "$updateversion" ]
     then
-        printf "\nYou already have the latest version of the setup.\n\n"
-        read -s -n 1 -p "Press any key to close..."
-        printf "\n\n"
-        exit 0
+        printf "\nYou already have the latest version of the dependency installer.\n\n"
     else
         printf "\n%s\e[1;37;40m%s\e[0m%s\n\n%s\t\t$setupversion\n%s\t$updateversion\n\n" \
-        "An update is " "available" "." "Local version: " "Available version: "
-        printf "%s\n\n%s\e[4;37;40m%s\e[0m%s\n\t%s\e[1;33;40m%s\e[0m%s\n\t%s\e[1;33;40m%s\e[0m%s\n\t%s\e[1;34;40m%s\e[0m%s\e[1;34;40m%s\e[0m%s\n\t%s\n\n" \
-            "Note that proceeding will ONLY update this setup and critical dependencies." \
-            "To update " "games" ", do one of the following after the packs are fully installed:" \
-            "- Direct (Linux): Run " "./eXo/Update/update.command " "(eXoDOS)"\
-            "- Direct (Linux): Run " "./eXo/Update/updateScummVM.command " "(eXoScummVM)"\
-            "- exogui (Linux): Select the " "Check for updates" " options on the " "Home" " tab" \
-            "- LaunchBox (Windows): Use normally documented method to update "
-            
+        "A dependency installer update is " "available" "." "Local version: " "Available version: "
         read -s -n 1 -p "Press any key to continue..."
         printf "\n\n"
-        wget "$universal_depmac_url" -O install_dependencies.cnew
-        if [ ! -e "install_dependencies.cnew" ]
-        then
-            printf "\n\e[1;31;47mFailed to download dependency setup.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        fi
-        echo "$universal_depmac_sum" | sha256sum --check
-        if [ $? != 0 ]
-        then
-            rm install_dependencies.cnew
-            printf "\n\e[1;31;47mChecksum for downloaded file invalid.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        else
-            mv install_dependencies.cnew install_dependencies.command
-            if [ $? != 0 ]
-            then
-                printf "\n\e[1;31;47mError replacing install_dependencies.command.\e[0m\n\n"
-                read -s -n 1 -p "Press any key to abort."
-                printf "\n\n"
-                exit 1
-            fi
-            chmod +x install_dependencies.command
-            if [ $? != 0 ]
-            then
-                printf "\n\e[1;31;47mError making install_dependencies.command executable.\e[0m\n\n"
-                read -s -n 1 -p "Press any key to abort."
-                printf "\n\n"
-                exit 1
-            fi
-        fi
-        wget "$universal_deplin_url" -O install_dependencies.bnew
-        if [ ! -e "install_dependencies.bnew" ]
-        then
-            printf "\n\e[1;31;47mFailed to download dependency setup.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        fi
-        echo "$universal_deplin_sum" | sha256sum --check
-        if [ $? != 0 ]
-        then
-            rm install_dependencies.bnew
-            printf "\n\e[1;31;47mChecksum for downloaded file invalid.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        else
-            mv install_dependencies.bnew eXo/util/install_dependencies.bsh
-            if [ $? != 0 ]
-            then
-                printf "\n\e[1;31;47mError replacing install_dependencies.bsh.\e[0m\n\n"
-                read -s -n 1 -p "Press any key to abort."
-                printf "\n\n"
-                exit 1
-            fi
-        fi
-        wget "$universal_package_url" -O update_universalpackages_linuxmac.zip
-        if [ ! -e "update_universalpackages_linuxmac.zip" ]
-        then
-            printf "\n\e[1;31;47mFailed to download packages.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        fi
-        echo "$universal_package_sum" | sha256sum --check
-        if [ $? != 0 ]
-        then
-            rm update_universalpackages_linuxmac.zip
-            printf "\n\e[1;31;47mChecksum for downloaded file invalid.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        fi
-        unzip -o update_universalpackages_linuxmac.zip -d ./
-        if [ $? != 0 ]
-        then
-            printf "\n\e[1;31;47mFailed to unzip update.\e[0m\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            printf "\n\n"
-            exit 1
-        fi
-        rm update_universalpackages_linuxmac.zip
+        wget "$universal_depmac_url" -O install_dependencies.cnew || abortScript "Failed to download dependency setup."
+        echo "$universal_depmac_sum" | sha256sum --check || { rm install_dependencies.cnew; abortScript "Checksum for install_dependencies.cnew invalid."; }
+        mv install_dependencies.cnew ../install_dependencies.cnew || abortScript "Error replacing install_dependencies.cnew."
+        wget "$universal_deplin_url" -O install_dependencies.bnew || abortScript "Failed to download dependency setup."
+        echo "$universal_deplin_sum" | sha256sum --check || { rm install_dependencies.bnew; abortScript "Checksum for install_dependencies.bnew invalid."; }
+        mv install_dependencies.bnew ../install_dependencies.bnew || abortScript "Error replacing install_dependencies.bnew."
+        rm ver_universal_linuxmac.txt
         clear
-        printf "\nUpdate completed successfully.\n\n%s\n\n" \
-            "Run this setup again for new features and added package / distribution support."
+        printf "\nDependency installer updated.\n\n%s\e[1;33;40m%s\e[0m%s\e[1;37;45m%s\e[0m%s\n\n" \
+            "Run " "install_dependencies.command" " again and select [" "D" "]ownload updates."
         read -s -n 1 -p "Press any key to close..."
         printf "\n\n"
         exit 0
     fi
+    
+    #universal package updates
+    needsDownload=yes
+    [[ "$universal_package_sum" =~ ^0{64} ]] && needsDownload=no
+    if [ -e ../update_universalpackages_linuxmac.zip ]
+    then
+        cd ..
+        echo "$universal_package_sum" | sha256sum --check && needsDownload=no
+        cd tmp
+    fi
+    if [ "$needsDownload" == "yes" ]
+    then
+        wget "$universal_package_url" -O update_universalpackages_linuxmac.zip || abortScript "Failed to download packages."
+        echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for update_universalpackages_linuxmac.zip invalid."; }
+        mv update_universalpackages_linuxmac.zip ../ || abortScript "Error moving universal packages update zip."
+    fi
+    unset needsDownload
+    cd ..
+    #unzip -o update_universalpackages_linuxmac.zip -d ../../../ || abortScript "Failed to unzip update."
+    head -n 7 tmp/ver_universal_linuxmac.txt > ver_current_linuxmac.txt
+    
+    #Pack specific updates for collections that do not require patch to extract last (no zz) - XO*_linux*_Metadata.zip for standard, eXo*_linux*_Metadata.zip for language packs
+    for file in ../../../Content/XO!(*zz)_linux*_Metadata.zip ../../../Content/eXo!(*zz)_linux*_Metadata.zip
+    do
+        [ -e "$file" ] || continue
+        [ -e "${file/_linux/zz_linux}" ] && continue
+        needsDownload=yes
+        [[ "$file" =~ Content/(eXo|XO)(.*)_linux ]] && pack_id="${BASH_REMATCH[2]}" || abortScript "Failed to set pack_id."
+        for _ in 1
+        do
+            line_match=$(grep -n "^http.*\/update_${pack_id}_linux.*" tmp/ver_universal_linuxmac.txt | head -n 1)
+            if [ -z "$line_match" ]
+            then
+                unset line_match
+                break
+            fi
+            url_line_num=$(echo "$line_match" | cut -d: -f1)
+            sum_line_num=$((url_line_num + 1))
+            ver_line_num=$((url_line_num - 1))
+            custom_package_url="$(sed -n "${url_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_package_file="${custom_package_url##*/}"
+            custom_package_sum="$(sed -n "${sum_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_package_ver="$(sed -n "${ver_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            unset line_match url_line_num sum_line_num ver_line_num
+            unzip -j -o -q "$file" "eXo/Update/linux_mac/getVer_${pack_id}.sh" -d ./ 2>/dev/null
+            if [ $? != 0 ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset custom_package_url custom_package_file custom_package_sum custom_package_ver needsDownload
+                break
+            fi
+            #ensure update is for the same major release as the local version
+            local_version="$(head -n 1 "getVer_${pack_id}.sh" | bash)"
+            if [ "$local_version" != "$custom_package_ver" ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset custom_package_url custom_package_file custom_package_sum custom_package_ver local_version needsDownload
+                break
+            fi
+            if [ -e "$custom_package_file" ]
+            then
+                echo "$custom_package_sum" | sha256sum --check && needsDownload=no
+            fi
+            if [ "$needsDownload" == "yes" ]
+            then
+                cd tmp
+                wget "$custom_package_url" -O "$custom_package_file" || abortScript "Failed to download $custom_package_file."
+                echo "$custom_package_sum" | sha256sum --check || abortScript "Checksum for $custom_package_file invalid."
+                mv "$custom_package_file" ../ || abortScript "Error moving $custom_package_file."
+                cd ..
+            fi
+            unset needsDownload
+            #unzip -o "$custom_package_file" -d ../../../ || abortScript "Failed to unzip $custom_package_file."
+            echo "$custom_package_ver" >> ver_current_linuxmac.txt
+            echo "$custom_package_url" >> ver_current_linuxmac.txt
+            echo "$custom_package_sum" >> ver_current_linuxmac.txt
+            unset custom_package_file custom_package_url custom_package_sum custom_package_ver local_version needsDownload
+        done
+        for mediafile in ../../../Content/${pack_id}_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpack_linux*_*.zip
+        do
+            [ -e "$mediafile" ] || continue
+            needsDownload=yes
+            [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+            line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" tmp/ver_universal_linuxmac.txt | head -n 1)
+            if [ -z "$line_match" ]
+            then
+                unset addon_type line_match
+                continue
+            fi
+            url_line_num=$(echo "$line_match" | cut -d: -f1)
+            sum_line_num=$((url_line_num + 1))
+            ver_line_num=$((url_line_num - 1))
+            custom_addon_url="$(sed -n "${url_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_file="${custom_addon_url##*/}"
+            custom_addon_sum="$(sed -n "${sum_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_ver="$(sed -n "${ver_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            unset line_match url_line_num sum_line_num ver_line_num
+            if [ -e "$custom_addon_file" ]
+            then
+                echo "$custom_addon_sum" | sha256sum --check && needsDownload=no
+            fi
+            if [ "$needsDownload" == "yes" ]
+            then
+                cd tmp
+                wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
+                echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
+                mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                cd ..
+            fi
+            unset needsDownload
+            echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+            #unlike base packs, addons store getVer files in the update files themselves
+            unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+            #ensure update is for the same major release as the local version
+            [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+            local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+            if [ "$local_version" != "$custom_addon_ver" ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                continue
+            fi
+            #unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+            echo "$custom_addon_ver" >> ver_current_linuxmac.txt
+            echo "$custom_addon_url" >> ver_current_linuxmac.txt
+            echo "$custom_addon_sum" >> ver_current_linuxmac.txt
+            unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+        done
+        for mediafile in ../../../Content/${pack_id}zz_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpackzz_linux*_*.zip
+        do
+            [ -e "$mediafile" ] || continue
+            needsDownload=yes
+            [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)zz_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+            line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" tmp/ver_universal_linuxmac.txt | head -n 1)
+            if [ -z "$line_match" ]
+            then
+                unset addon_type line_match
+                continue
+            fi
+            url_line_num=$(echo "$line_match" | cut -d: -f1)
+            sum_line_num=$((url_line_num + 1))
+            ver_line_num=$((url_line_num - 1))
+            custom_addon_url="$(sed -n "${url_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_file="${custom_addon_url##*/}"
+            custom_addon_sum="$(sed -n "${sum_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_ver="$(sed -n "${ver_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            unset line_match url_line_num sum_line_num ver_line_num
+            if [ -e "$custom_addon_file" ]
+            then
+                echo "$custom_addon_sum" | sha256sum --check && needsDownload=no
+            fi
+            if [ "$needsDownload" == "yes" ]
+            then
+                cd tmp
+                wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
+                echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
+                mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                cd ..
+            fi
+            unset needsDownload
+            echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+            #unlike base packs, addons store getVer files in the update files themselves
+            unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+            #ensure update is for the same major release as the local version
+            [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+            local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+            if [ "$local_version" != "$custom_addon_ver" ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                continue
+            fi
+            #unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+            echo "$custom_addon_ver" >> ver_current_linuxmac.txt
+            echo "$custom_addon_url" >> ver_current_linuxmac.txt
+            echo "$custom_addon_sum" >> ver_current_linuxmac.txt
+            unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+        done
+        unset pack_id
+    done
+
+    #Pack specific updates for collections that required patch to extract last - XO*zz_linux*_Metadata.zip for standard, eXo*zz_linux*_Metadata.zip for language packs
+    for file in ../../../Content/XO*zz_linux*_Metadata.zip ../../../Content/eXo*zz_linux*_Metadata.zip
+    do
+        [ -e "$file" ] || continue
+        needsDownload=yes
+        [[ "$file" =~ Content/(eXo|XO)(.*)zz_linux ]] && pack_id="${BASH_REMATCH[2]}" || abortScript "Failed to set pack_id."
+        for _ in 1
+        do
+            line_match=$(grep -n "^http.*\/update_${pack_id}_linux.*" tmp/ver_universal_linuxmac.txt | head -n 1)
+            if [ -z "$line_match" ]
+            then
+                unset line_match
+                break
+            fi
+            url_line_num=$(echo "$line_match" | cut -d: -f1)
+            sum_line_num=$((url_line_num + 1))
+            ver_line_num=$((url_line_num - 1))
+            custom_package_url="$(sed -n "${url_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_package_file="${custom_package_url##*/}"
+            custom_package_sum="$(sed -n "${sum_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_package_ver="$(sed -n "${ver_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            unset line_match url_line_num sum_line_num ver_line_num
+            unzip -j -o -q "$file" "eXo/Update/linux_mac/getVer_${pack_id}.sh" -d ./ 2>/dev/null
+            if [ $? != 0 ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset custom_package_url custom_package_file custom_package_sum custom_package_ver needsDownload
+                break
+            fi
+            #ensure update is for the same major release as the local version
+            local_version="$(head -n 1 "getVer_${pack_id}.sh" | bash)"
+            if [ "$local_version" != "$custom_package_ver" ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset custom_package_url custom_package_file custom_package_sum custom_package_ver local_version needsDownload
+                break
+            fi
+            if [ -e "$custom_package_file" ]
+            then
+                echo "$custom_package_sum" | sha256sum --check && needsDownload=no
+            fi
+            if [ "$needsDownload" == "yes" ]
+            then
+                cd tmp
+                wget "$custom_package_url" -O "$custom_package_file" || abortScript "Failed to download $custom_package_file."
+                echo "$custom_package_sum" | sha256sum --check || abortScript "Checksum for $custom_package_file invalid."
+                mv "$custom_package_file" ../ || abortScript "Error moving $custom_package_file."
+                cd ..
+            fi
+            unset needsDownload
+            #unzip -o "$custom_package_file" -d ../../../ || abortScript "Failed to unzip $custom_package_file."
+            echo "$custom_package_ver" >> ver_current_linuxmac.txt
+            echo "$custom_package_url" >> ver_current_linuxmac.txt
+            echo "$custom_package_sum" >> ver_current_linuxmac.txt
+            unset custom_package_file custom_package_url custom_package_sum custom_package_ver local_version needsDownload
+        done
+        for mediafile in ../../../Content/${pack_id}_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpack_linux*_*.zip
+        do
+            [ -e "$mediafile" ] || continue
+            needsDownload=yes
+            [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+            line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" tmp/ver_universal_linuxmac.txt | head -n 1)
+            if [ -z "$line_match" ]
+            then
+                unset addon_type line_match
+                continue
+            fi
+            url_line_num=$(echo "$line_match" | cut -d: -f1)
+            sum_line_num=$((url_line_num + 1))
+            ver_line_num=$((url_line_num - 1))
+            custom_addon_url="$(sed -n "${url_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_file="${custom_addon_url##*/}"
+            custom_addon_sum="$(sed -n "${sum_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_ver="$(sed -n "${ver_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            unset line_match url_line_num sum_line_num ver_line_num
+            if [ -e "$custom_addon_file" ]
+            then
+                echo "$custom_addon_sum" | sha256sum --check && needsDownload=no
+            fi
+            if [ "$needsDownload" == "yes" ]
+            then
+                cd tmp
+                wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
+                echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
+                mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                cd ..
+            fi
+            unset needsDownload
+            echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+            #unlike base packs, addons store getVer files in the update files themselves
+            unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+            #ensure update is for the same major release as the local version
+            [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+            local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+            if [ "$local_version" != "$custom_addon_ver" ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                continue
+            fi
+            #unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+            echo "$custom_addon_ver" >> ver_current_linuxmac.txt
+            echo "$custom_addon_url" >> ver_current_linuxmac.txt
+            echo "$custom_addon_sum" >> ver_current_linuxmac.txt
+            unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+        done
+        for mediafile in ../../../Content/${pack_id}zz_linux*_*.zip ../../../Content/eXo${pack_id}_Addonpackzz_linux*_*.zip
+        do
+            [ -e "$mediafile" ] || continue
+            needsDownload=yes
+            [[ "$mediafile" =~ Content/(eXo)?"${pack_id}"(.*)zz_linux[^_]*_(.*)\.zip$ ]] && addon_type="${BASH_REMATCH[3]}" || abortScript "Failed to set media_type."
+            line_match=$(grep -n "^http.*\/update_addon_${pack_id}_${addon_type}_linux.*" tmp/ver_universal_linuxmac.txt | head -n 1)
+            if [ -z "$line_match" ]
+            then
+                unset addon_type line_match
+                continue
+            fi
+            url_line_num=$(echo "$line_match" | cut -d: -f1)
+            sum_line_num=$((url_line_num + 1))
+            ver_line_num=$((url_line_num - 1))
+            custom_addon_url="$(sed -n "${url_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_file="${custom_addon_url##*/}"
+            custom_addon_sum="$(sed -n "${sum_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            custom_addon_ver="$(sed -n "${ver_line_num}p" tmp/ver_universal_linuxmac.txt)"
+            unset line_match url_line_num sum_line_num ver_line_num
+            if [ -e "$custom_addon_file" ]
+            then
+                echo "$custom_addon_sum" | sha256sum --check && needsDownload=no
+            fi
+            if [ "$needsDownload" == "yes" ]
+            then
+                cd tmp
+                wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
+                echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
+                mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                cd ..
+            fi
+            unset needsDownload
+            echo "$custom_addon_sum" | sha256sum --check || { rm "$custom_addon_file"; abortScript "Checksum for $custom_addon_file invalid."; }
+            #unlike base packs, addons store getVer files in the update files themselves
+            unzip -j -o -q "$custom_addon_file" "eXo/Update/linux_mac/getVer_addon_${pack_id}_${addon_type}.sh" -d ./ 2>/dev/null || abortScript "Failed to extract getVer_addon_${pack_id}_${addon_type}.sh!"
+            #ensure update is for the same major release as the local version
+            [ ! -e "getVer_addon_${pack_id}_${addon_type}.sh" ] && abortScript "getVer_addon_${pack_id}_${addon_type}.sh missing!"
+            local_version="$(head -n 1 "getVer_addon_${pack_id}_${addon_type}.sh" | bash)"
+            if [ "$local_version" != "$custom_addon_ver" ]
+            then
+                echo "Linux/Mac update for eXo${pack_id} ${addon_type} addon not compatible with your local copy."
+                echo "Please download the latest torrent."
+                unset addon_type custom_addon_url custom_addon_file custom_addon_sum custom_addon_ver local_version
+                continue
+            fi
+            #unzip -o "$custom_addon_file" -d ../../../ || abortScript "Failed to unzip $custom_addon_file"
+            echo "$custom_addon_ver" >> ver_current_linuxmac.txt
+            echo "$custom_addon_url" >> ver_current_linuxmac.txt
+            echo "$custom_addon_sum" >> ver_current_linuxmac.txt
+            unset addon_type custom_addon_file custom_addon_url custom_addon_sum custom_addon_ver local_version
+        done
+        unset pack_id
+    done
+    
+    rm tmp/ver_universal_linuxmac.txt
+    cd ../../..
+    clear
+    printf "\nUpdates downloaded successfully.\n\n"
 }
 
-function installflatpaks
+function goApk
 {
-    flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.freedesktop.Platform//24.08
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.freedesktop.Platform.Compat.i386//24.08
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.freedesktop.Platform//23.08
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.freedesktop.Platform.Compat.i386//23.08
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.gnome.Platform//46
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.kde.Platform//6.7
-    [ $? != 0 ] && failedinstall
-    flatpak install --user -y flathub org.kde.Platform//5.15-23.08
-    [ $? != 0 ] && failedinstall
-    flatpak update --user -y
-    [ $? != 0 ] && failedinstall
-    if [ `flatpak list 2>/dev/null | grep DOSBox | wc -l` -gt 0 ]
+    command -v apk &>/dev/null || { echo "Missing apk!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    if [ "$run_update" != "yes" ]
     then
-        echo "Removing deprecated eXoDOS DOSBox flatpaks."
-        [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-X"` ]] && flatpak remove -y com.dosbox.DOSBox-X 2>/dev/null
-        [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-ECE-r4358"` ]] && flatpak remove -y com.dosbox.DOSBox-ECE-r4358 2>/dev/null
-        [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-ECE-r4301"` ]] && flatpak remove -y com.dosbox.DOSBox-ECE-r4301 2>/dev/null
-        [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox-ECE"` ]] && flatpak remove -y com.dosbox.DOSBox-ECE 2>/dev/null
-        [[ `flatpak list 2>/dev/null | grep "com\.dosbox\.DOSBox"` ]] && flatpak remove -y com.dosbox.DOSBox 2>/dev/null
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed unzip wget zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
     fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo apk update || failedInstall
+        sudo apk add "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goApt
+{
+    command -v apt &>/dev/null || { echo "Missing apt!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses-bin")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo apt update || failedInstall
+        sudo apt install -y "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goDnf
+{
+    command -v dnf &>/dev/null || { echo "Missing dnf!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo dnf install -y "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goEopkg
+{
+    command -v eopkg &>/dev/null || { echo "Missing eopkg!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo eopkg update-repo || failedInstall
+        sudo eopkg install -y "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goNixenv
+{
+    printf "\n\e[1;37;41mWARNING: NixOS IS NOT FHS COMPLIANT\e[0m\n\e[1;31;47mWe make no promises that any eXo collections will work with it.\e[0m\n\n"
+    command -v nix-env &>/dev/null || { echo "Missing nix-env!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("nixos.coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("nixos.unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("nixos.wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("nixos.ncurses")
+        for check in curl ffmpeg flatpak perl python3 zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("nixos.$check")
+        done
+        command -v sed &>/dev/null || missing_pkgs+=("nixos.gnused")
+    fi
+
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\n"
+        echo "Attempting to install missing packages via nix-env: ${missing_pkgs[*]}"
+        nix-env -iA "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goPacman
+{
+    command -v pacman &>/dev/null || { echo "Missing pacman!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo pacman --noconfirm -Syu "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goXbps
+{
+    command -v xbps-install &>/dev/null || { echo "Missing xbps-install!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo xbps-install -Sy "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goZypper
+{
+    command -v zypper &>/dev/null || { echo "Missing zypper!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses-utils")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo zypper --non-interactive refresh || failedInstall
+        sudo zypper --non-interactive install "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function installFlatpaks
+{
+    if [ "$arch" == "x86_64" ]
+    then
+        flatpak_ext="x86_64.flatpak"
+    elif [ "$arch" == "aarch64" ]
+    then
+        flatpak_ext="aarch64.flatpak"
+    else
+        echo "Unsupported architecture: $arch"
+        exit 1
+    fi
+    flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || failedInstall
+    if [ "$arch" == "x86_64" ]
+    then
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.Compat.i386//25.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.codecs_extra.i386//25.08-extra
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08
+        if lspci | grep -iE 'vga|3d' | grep -iq 'intel'
+        then
+            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
+        elif lspci | grep -iE 'vga|3d' | grep -iq 'nvidia'
+        then
+            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
+        fi
+    fi
+    flatpak update --user -y || failedInstall
+
     echo "Installing retro_exo flatpaks..."
-    for pkg in ./eXo/Flatpaks/*.flatpak
+    shopt -s nullglob
+    for pkg in ./eXo/Flatpaks/*.$flatpak_ext
     do
-        flatpak info "`basename "${pkg%.*}"`" &>/dev/null && flatpak remove -y "`basename "${pkg%.*}"`"
-        flatpak install --user --reinstall -y "$pkg"
-        [ $? != 0 ] && failedinstall
+        flatpak info "`basename "${pkg%.$flatpak_ext}"`" &>/dev/null && flatpak remove --delete-data -y "`basename "${pkg%.$flatpak_ext}"`"
+        flatpak install --user --reinstall -y "$pkg" || failedInstall
         #https://github.com/flatpak/flatpak/pull/5546
         #Note that --reinstall will not work until the above flatpak pull request is rolled out, work around implemented in prior line
     done
+    shopt -u nullglob
 }
 
-function setupother
+function setupOther
 {
-    if [ "$runupdate" == "yes" ]
+    if [ "$run_update" == "yes" ]
     then
-        if ! [ `which wget` ]
-        then
-            printf "\nWget is not present. Please install it before proceeding.\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            exit 1
-        fi
-        if ! [ `which sha256sum` ]
-        then
-            printf "\nCoreutils (sha256sum) is not present. Please install it before proceeding.\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            exit 1
-        fi
-        if ! [ `which unzip` ]
-        then
-            printf "\nUnzip is not present. Please install it before proceeding.\n\n"
-            read -s -n 1 -p "Press any key to abort."
-            exit 1
-        fi
-        goupdate
-        exit 1
+        { command -v fold && command -v sha256sum; } &>/dev/null || abortScript "Coreutils (sha256sum/fold) is not present. Please install it before proceeding."
+        command -v unzip &>/dev/null || abortScript "Unzip is not present. Please install it before proceeding."
+        command -v wget &>/dev/null || abortScript "Wget is not present. Please install it before proceeding."
+        getUpdate
     fi
     
-    if [ $missingPackages == "no" ]
+    if [ "$missing_packages" == "no" ]
     then
         printf "\nSystem dependencies satisfied. Proceeding to install flatpaks.\n\n"
         extractPackages
-        installflatpaks
-    fi
-    
-    if [ $missingPackages == "yes" ]
+        installFlatpaks
+    elif [ "$missing_packages" == "yes" ]
     then
-        printf "\nYour distribution, $distroid, is not officially supported.\n%s\n\n%s\n%s\n\n%s\n\n" \
+        printf "\nYour distribution, $distro_id, is not officially supported.\n%s\n\n%s\n%s\n\n%s\n\n" \
             "As such, you will need to install the missing system dependencies manually." \
             "If a problem is encountered, you may make a support request in our Discord." \
             "If support is added, you will need to update this installer to access it." \
@@ -686,5 +1178,59 @@ function setupother
         exit 1
     fi
 }
+
+if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
+then
+    LD_PRELOAD=""
+fi
+clear
+
+setupversion="Version 6.04b.universal1_beta"
+
+[[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
+scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
+[ $# -gt 0 ] && parameterone="$1"
+[ $# -gt 1 ] && parametertwo="$2"
+[ $# -gt 2 ] && parameterthree="$3"
+[ $# -gt 3 ] && parameterfour="$4"
+
+if [[ "${BASH_SOURCE[0]}" == *.bsh ]]
+then
+    cd ../..
+    updated_uds="$PWD/eXo/Update/linux_mac/$(basename -- "${BASH_SOURCE%.bsh}.bnew")"
+    if [[ -f "$updated_uds" ]]
+    then
+        new_version=$(grep -m 1 '^setupversion=' "$updated_uds" | cut -d'"' -f2)
+        if [[ -n "$new_version" && "$setupversion" != "$new_version" ]]
+        then
+            source "$updated_uds"
+            exit 0
+        fi
+    fi
+    macUDSext=command
+    linUDSext=bsh
+    udspath="."
+elif [[ "${BASH_SOURCE[0]}" == *.bnew ]]
+then
+    cd ../../..
+    macUDSext=cnew
+    linUDSext=bnew
+    udspath="eXo/Update/linux_mac"
+else
+    abortScript "Invalid script extension!"
+fi
+
+if [[ "$OSTYPE" == "darwin"* ]]
+then
+    source "$scriptDir/$udspath/$(basename -- "${BASH_SOURCE%.$linUDSext}.$macUDSext")"
+    exit 0
+fi
+
+[ ! -d Content ] && abortScript "Cannot find ./Content subdirectory."
+[ ! -d "eXo/util" ] && abortScript "Cannot find ./eXo/util subdirectory."
+[[ $(ls -1 eXo/util/util*linux*.zip 2>/dev/null | wc -l) == 0 ]] && abortScript "Cannot find ./eXo/util/util*linux*.zip."
+chmod +x *.command
+
+initialDir=$PWD
 
 beginLinux

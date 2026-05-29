@@ -1,7 +1,81 @@
-Version 6.04.universal1
-https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/install_dependencies.cnew
-c719e727714a80783861720008af70474acf6edbb14d868616e0824cdd9774aa  install_dependencies.cnew
-https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/install_dependencies.bnew
-5f7d0182f11eeee1da5ae3412f70501bddadc54b99725200d8e1d67b0931cde3  install_dependencies.bnew
-https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/update_universalpackages_linuxmac.zip
-2a5d95233ed5a2f2e3f237af412052bd1f70485dfbbc3f357ef8d0d176b2bc8e  update_universalpackages_linuxmac.zip
+Version 6.04b.universal1_beta
+https://exampleurlsitethingy.com/install_dependencies.cnew
+f6214fbd5338c7f04dde2590fd6b95199c02d4681a47ee9ef7c78a834060aefb  install_dependencies.cnew
+https://exampleurlsitethingy.com/install_dependencies.bnew
+679443d93f2b9b42bf948eb3c697c1ec5c6c693126cf5fcf0a60841dfa41a065  install_dependencies.bnew
+https://exampleurlsitethingy.com/update_universalpackages_linuxmac.zip
+0000000000000000000000000000000000000000000000000000000000000000  update_universalpackages_linuxmac.zip
+
+
+Base Update Packages:
+
+3a60f3d89a766f28c437924b453e3ad6ae2090a483fe1a1e0c14e7a1fdb7f886  ../../util/utilAppleIIGS.zip
+#https://exampleurlsitethingy.com/update_AppleIIGS_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_AppleIIGS_linuxmac.zip
+
+v2.1
+~https://exampleurlsitethingy.com/update_DemoScene_linuxmac.zip
+~0000000000000000000000000000000000000000000000000000000000000000  update_DemoScene_linuxmac.zip
+
+v6.04
+~https://exampleurlsitethingy.com/update_DOS_linuxmac.zip
+~0000000000000000000000000000000000000000000000000000000000000000  update_DOS_linuxmac.zip
+
+####Version string returned by command in the eXo/Update/linux_mac/getVer_DOS_ALP.sh file found in Content/eXoDOS_ALPzz_linux_Metadata.zip
+#https://exampleurlsitethingy.com/update_DOS_ALP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_DOS_ALP_linuxmac.zip
+
+####Version string returned by command in the eXo/Update/linux_mac/getVer_DOS_FLP.sh file found in Content/eXoDOS_FLPzz_linux_Metadata.zip
+#https://exampleurlsitethingy.com/update_DOS_FLP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_DOS_FLP_linuxmac.zip
+
+47f69e168a726c3212c7e6d125a46979c9f5c604f206ef64682f6ae9a7314924  ../../../eXoDOS Handbuch.pdf
+#https://exampleurlsitethingy.com/update_DOS_GLP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_DOS_GLP_linuxmac.zip
+
+####Version string returned by command in the eXo/Update/linux_mac/getVer_DOS_ILP.sh file found in Content/eXoDOS_ILPzz_linux_Metadata.zip
+#https://exampleurlsitethingy.com/update_DOS_ILP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_DOS_ILP_linuxmac.zip
+
+df3b5d811847129da16b76cea74876f90885dc6e42c9980e7293fe37a0eac3cd  ../../../eXoDOS PLP box-front.jpg
+#https://exampleurlsitethingy.com/update_DOS_PLP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_DOS_PLP_linuxmac.zip
+
+5c550322e34d529d84b99b12e4e0817da255e8263ef3488e6e676688d4368e5c  ../../../eXoDOS SLP box-front.png
+#https://exampleurlsitethingy.com/update_DOS_SLP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_DOS_SLP_linuxmac.zip
+
+4.0.0
+~https://exampleurlsitethingy.com/update_DREAMM_linuxmac.zip
+~0000000000000000000000000000000000000000000000000000000000000000  update_DREAMM_linuxmac.zip
+
+v1.00
+#https://exampleurlsitethingy.com/update_IF_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_IF_linuxmac.zip
+
+eXoScummVM Collection v2016.1.0
+~https://exampleurlsitethingy.com/update_ScummVM_linuxmac.zip
+~0000000000000000000000000000000000000000000000000000000000000000  update_ScummVM_linuxmac.zip
+
+v2
+>https://exampleurlsitethingy.com/update_Win3x_linuxmac.zip
+>0000000000000000000000000000000000000000000000000000000000000000  update_Win3x_linuxmac.zip
+
+v1
+~https://exampleurlsitethingy.com/update_Win9x_linuxmac.zip
+~0000000000000000000000000000000000000000000000000000000000000000  update_Win9x_linuxmac.zip
+
+
+Addon Update Packages:
+
+This Media Pack is for eXoDOS Version 6.04
+https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b-beta/update_addon_DOS_Magazines_linuxmac.zip
+0ac5a2401bf52e66aeef90887c15bc2d1ba4c31fa4e9417fffacf5de06478b70  update_addon_DOS_Magazines_linuxmac.zip
+
+This Media Pack is for eXoDOS Version 6.04
+https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b-beta/update_addon_DOS_Videos_linuxmac.zip
+b11f419383ee27560db91c5f76a43de208454cc9cec4d185e5f7b236c14589e2  update_addon_DOS_Videos_linuxmac.zip
+
+####Version string returned by command in the eXo/Update/linux_mac/getVer_addon_DOS_GLP_MagazinesGLP.sh file found in the update archive itself.
+#https://exampleurlsitethingy.com/update_addon_DOS_GLP_MagazinesGLP_linuxmac.zip
+#0000000000000000000000000000000000000000000000000000000000000000  update_addon_DOS_GLP_MagazinesGLP_linuxmac.zip
