@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-20
+# Revised: 2026-05-29
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -276,8 +276,53 @@ function convertMacShell
            -e 's/Linux 64/MacOS/gI' "$currentScript"
     sed -i -e '/^depcheck=flatpak/,/^fi/c\
 missingDependencies=no\
-! [[ `which java` ]] && missingDependencies=yes\
-! [[ `which zenity` ]] && missingDependencies=yes' "$currentScript"
+! [[ `which java` ]] && missingDependencies=yes' "$currentScript"
+    perl -i -e 'use strict;
+                use warnings;
+                use Text::ParseWords;
+                while (my $line = <>) {
+                    if ($line =~ m/^(\s*)wine\s+SumatraPDF\.exe\s+(.*)$/) {
+                        my $indent = $1;
+                        my $args_str = $2;
+                        my @parsed_args = shellwords($args_str);
+                        my ($fullscreen, $page, $view_book, $zoom_fit, $file);
+                        for (my $i = 0; $i < @parsed_args; $i++) {
+                            my $arg = $parsed_args[$i];
+                            if ($arg eq "-fullscreen") {
+                                $fullscreen = 1;
+                            } elsif ($arg eq "-page") {
+                                $page = $parsed_args[++$i];
+                            } elsif ($arg eq "-view") {
+                                my $val = $parsed_args[++$i];
+                                $view_book = 1 if $val eq "book view";
+                            } elsif ($arg eq "-zoom") {
+                                my $val = $parsed_args[++$i];
+                                $zoom_fit = 1 if $val eq "fit page";
+                            } else {
+                                $file = $arg;
+                            }
+                        }
+                        print "${indent}open -a \"\$(dirname \"\$(dirname \"\$(dirname \"\$(command -v Skim)\")\")\")\" \"\$(realpath \"$file\")\"\n";
+                        print "${indent}sleep 0.5\n";
+                        print "${indent}osascript <<EOF\n";
+                        print "${indent}tell application \"Skim\"\n";
+                        print "${indent}    activate\n";
+                        print "${indent}    tell document 1\n";
+                        my @view_settings;
+                        push @view_settings, "display mode:two up continuous, displays as book:true" if $view_book;
+                        push @view_settings, "auto scales:true" if $zoom_fit;
+                        if (@view_settings) {
+                            print "${indent}        set view settings to {" . join(", ", @view_settings) . "}\n";
+                        }
+                        print "${indent}        go to page $page\n" if defined $page;
+                        print "${indent}        set interaction mode to full screen mode\n" if $fullscreen;
+                        print "${indent}    end tell\n";
+                        print "${indent}end tell\n";
+                        print "${indent}EOF\n";
+                    } else {
+                        print $line;
+                    }
+                }' "$currentScript"
 }
 export -f convertMacShell
 
@@ -1234,7 +1279,7 @@ done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'convertMacShell "$@"' _
 
 for currentScript in currentScript in eXoDOS/\!*/*/*.msh eXoDOS/\!*/*/*/*.msh eXoPCjr/\!*/*/*.msh eXoPCjr/\!*/*/*/*.msh ../Setup\ eXoDOS.msh
 do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
 ! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
 ! [[ `which dosbox-ece-r4358` ]] && missingDependencies=yes\
@@ -1250,7 +1295,7 @@ done
 
 for currentScript in currentScript in eXoDemoScn/\!*/*/*.msh eXoDemoScn/\!*/*/*/*.msh util/\ds_*.msh ../Setup\ eXoDemoScene.msh
 do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
 ! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
 ! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
@@ -1264,7 +1309,7 @@ done
 
 for currentScript in currentScript in eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*_svm.msh ../Setup\ eXoScummVM.msh
 do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which scummvm-2-5-0` ]] && missingDependencies=yes\
 ! [[ `which scummvm-2-8-0` ]] && missingDependencies=yes\
 ! [[ `which scummvm-2-9-0` ]] && missingDependencies=yes\
@@ -1276,7 +1321,7 @@ done
 
 for currentScript in currentScript in eXoWin9x/\!*/*/*/*.msh eXoWin9x/\!*/*/*/*/*.msh util/9x*.msh ../Setup\ eXoWin9x.msh
 do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which zenity` \]\] && missingDependencies=yes/a\
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-x-20250201` ]] && missingDependencies=yes' "$currentScript"
 done
 
