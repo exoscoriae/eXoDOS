@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Universal Dependency Setup For eXo Collections
+# Linux Dependency Setup For eXo Collections
 # Revised: 2026-05-29
 
 #--------------------------------------------------------------------------------------
@@ -13,30 +13,34 @@ function abortScript
     exit 1
 }
 
-function beginMac
+function beginLinux
 {
+    missing_packages=no
+    remove_exo=no
     run_update=no
-    move_fix_only=no
-    (( $(sw_vers -productVersion | cut -d. -f1) < 11 )) && abortScript "MacOS version is too old."
+    distro_id="$(cat /etc/os-release 2>/dev/null | grep '^ID=' | sed -e 's/^ID=//' | sed -e 's/"//g')"
+    distro_like="$(cat /etc/os-release 2>/dev/null | grep '^ID_LIKE=' | sed -e 's/^ID_LIKE=//')"
+    
     clear
     if [ "$parameterone" == "update" ]
     then
         run_update=yes
     else
-        printf "\n\e[1;37;41mWelcome to the eXo Dependency Installer.\e[0m\n\n%s\n%s\n%s\n\n" \
+        printf "\n\e[1;31;40mWelcome to the eXo Dependency Installer.\e[0m\n\n%s\n%s\n%s\n%s\n\n" \
             "This setup will install the software required by the collection." \
             "If system packages are needed, you may be asked for your password (for sudo)." \
-            "If your account lacks sudo access, this script cannot install system packages."
+            "If your account lacks sudo access, this script cannot install system packages." \
+            "In such cases, you will need to install the missing system packages yourself."
         printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
-            "[" "P" "]roceed with installation" "[" "D" "]ownload updates" "[" "F" "]ix gatekeeper permissions" "[" "A" "]bort installation"
+            "[" "P" "]roceed with installation" "[" "D" "]ownload updates" "[" "R" "]emove all installed eXo packages" "[" "A" "]bort installation"
         while true
         do
-            read -p "(P/D/A)? " choice
+            read -p "(P/D/R/A)? " choice
             case $choice in
                 [Pp]* ) break;;
                 [Dd]* ) run_update=yes
                         break;;
-                [Ff]* ) move_fix_only=yes
+                [Rr]* ) remove_exo=yes
                         break;;
                 [Aa]* ) printf "\n"
                         exit 0
@@ -45,37 +49,69 @@ function beginMac
             esac
         done
     fi
-    clear
-    printf "Checking for essential system packages...\n\n"
-    command -v sha256sum &> /dev/null || sha256sum() { shasum -a 256 "$@"; }
+    if [ "$remove_exo" == "yes" ]
+    then
+        clear
+        printf "This will uninstall all eXo flatpaks from your system.\n%s" \
+            "Are you sure you want to proceed? "
+        while true
+        do
+            read -p "(Y/N)? " choice
+            case $choice in
+                [Yy]* ) break;;
+                [Nn]* ) exit 0
+                        break;;
+                *     ) printf "Invalid input.\n";;
+            esac
+        done
+        command -v flatpak &>/dev/null || abortScript "flatpak is not present. There are no eXo packages to uninstall."
+        flatpak list | grep -q "com.retro_exo" || abortScript "There are no eXo packages to uninstall."
+        for package in `flatpak list | grep com.retro_exo | sed -e 's/^.*com.retro_exo/com.retro_exo/' | sed -e 's/[[:space:]].*//'`
+        do
+            flatpak remove --delete-data -y "$package" 2>/dev/null || abortScript "Failed to uninstall $package package."
+        done
+        printf "\nAll eXo flatpaks have been successfully uninstalled.\n"
+        read -s -n 1 -p "Press any key to exit."
+        exit 0
+    fi
     
-    printf "Extracting bundled versions of unzip, wget, and gstreamer...\n\n"
-    extractEssential
-    fixGatekeeper
-    installPackages
-    for app_dir in "$PWD"/eXo/util/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/eXo/util/macOS/wget/wget.app/Contents/MacOS
+    clear
+    printf "Checking for missing system packages...\n\n"
+    for check in curl ffmpeg flatpak fold perl python3 sed sha256sum tput unzip wget zip
     do
-        [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        command -v "$check" &>/dev/null && printf "%s: \e[1;37;44mpresent\e[0m\n" "$check" || { missing_packages=yes; printf "%s: \e[1;37;41mmissing\e[0m\n" "$check"; }
     done
-    export PATH
-    hash -r
-    [ "$move_fix_only" == "yes" ] && exit 0
-    printf "\n"
-    read -s -n 1 -p "Press any key to proceed with collection specific dependencies..."
-    printf "\n"
-    [ "$run_update" == "yes" ] && getUpdate
-    extractPackages
-    extractDmg
-    fixGatekeeper
-    PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-    for app_dir in "$PWD"/eXo/util/macOS/*/*.app/Contents/MacOS "$PWD"/eXo/dmg/*/*.app/Contents/MacOS
-    do
-        [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
-    done
-    export PATH
-    mkdir -p ~/Library/Application\ Support/exogui
-    echo "export PATH=\"$PATH\"" > ~/Library/Application\ Support/exogui/path
-    hash -r
+    if [ "$missing_packages" == "yes" ]
+    then
+        printf "\nNot all system dependencies installed.\n"
+        read -s -n 1 -p "Press any key to proceed..."
+        case "$distro_id" in
+            alpine ) goApk;;
+            debian|elementary|linuxmint|pop|ubuntu|zorin ) goApt;;
+            almalinux|centos|fedora|rhel|rocky ) goDnf;;
+            solus ) goEopkg;;
+            nixos ) goNixenv;;
+            arch|endeavouros|garuda|manjaro ) goPacman;;
+            void ) goXbps;;
+            opensuse*|sles|suse ) goZypper;;
+            * ) case "$distro_like" in
+                    *alpine* ) goApk;;
+                    *debian*|*ubuntu* ) goApt;;
+                    *centos*|*fedora*|*rhel* ) goDnf;;
+                    *solus* ) goEopkg;;
+                    *arch* ) goPacman;;
+                    *void* ) goXbps;;
+                    *suse* ) goZypper;;
+                    * ) setupOther;;
+                esac;;
+        esac
+    else
+        printf "\nAll system dependencies satisfied.\n"
+        read -s -n 1 -p "Press any key to proceed..."
+        [ "$run_update" == "yes" ] && getUpdate
+        extractPackages
+        installFlatpaks
+    fi
     
     clear
     if [ "$parameterone" == "update" ]
@@ -83,77 +119,11 @@ function beginMac
         printf "\nUpdates complete.\n%s\e[1;37;44m%s\e[0m%s\n\n" \
             "You may launch exogui with the desktop icon or the " "exogui.command" " script."
     else
-        printf "\nAll required dependencies are now satisfied.\n%s\e[1;37;44m%s\e[0m%s\n\n" \
+        printf "\nAll required dependencies are now satisfied.\n%s\e[1;33;40m%s\e[0m%s\n\n" \
             "You may proceed with running the appropriate " "Setup eXo<collection>.command" " file."
     fi
     read -s -n 1 -p "Press any key to exit..."
     printf "\n\n"
-    osascript -e 'tell application "Terminal" to close front window' > /dev/null 2>&1 & exit 0
-}
-
-function extractDmg
-{
-    cd eXo
-    rm -rf ./dmg/*/ &>/dev/null
-    printf "\nExtracting dmg files...\n"
-    for file in ./dmg/*.dmg
-    do
-        [ -e "$file" ] || continue
-        mkdir -p "${file%.dmg}"
-        if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
-        then
-            cp -a "/tmp/exo_$(basename "$file" .dmg)"/* "${file%.dmg}"
-            hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
-        else
-            abortScript "failed to extract $file"
-        fi
-    done
-    cd ..
-}
-
-function extractEssential
-{
-    [ -d ./eXo/util/macOS/unzip ] && rm -rf ./eXo/util/macOS/unzip/
-    [ -d ./eXo/util/macOS/wget ] && rm -rf ./eXo/util/macOS/wget/
-    for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
-    do
-        [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" eXo/util/macOS/unzip.dmg -d ./ || abortScript "Failed to unzip unzip."
-        unzip -o "$zip_file" eXo/util/macOS/wget.dmg -d ./ || abortScript "Failed to unzip wget."
-        unzip -o "$zip_file" 'eXo/util/macOS/gstreamer.*' -d ./ || abortScript "Failed to unzip gstreamer."
-    done
-    cd eXo
-    mkdir -p Update/linux_mac
-    cd Update/linux_mac/
-    if [ -e ver_current_linuxmac.txt ] && [ -e update_universalpackages_linuxmac.zip ]
-    then
-        updateversion="$(sed -n '1p' ver_current_linuxmac.txt)" || abortScript "Missing version tracking file contents!"
-        [ "$setupversion" != "$updateversion" ] && abortScript "Version mismatch for universal package update zip!"
-        universal_package_sum="$(sed -n '7p' ver_current_linuxmac.txt)"
-        echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for downloaded file invalid."; }
-        if unzip -l update_universalpackages_linuxmac.zip "eXo/util/macOS/unzip.dmg" &>/dev/null
-        then
-            unzip -o update_universalpackages_linuxmac.zip "eXo/util/macOS/unzip.dmg" -d ../../../ || abortScript "Failed to unzip update for unzip."
-        fi
-        if unzip -l update_universalpackages_linuxmac.zip "eXo/util/macOS/wget.dmg" &>/dev/null
-        then
-            unzip -o update_universalpackages_linuxmac.zip "eXo/util/macOS/wget.dmg" -d ../../../ || abortScript "Failed to unzip update for wget."
-        fi
-    fi
-    cd ../../
-    for file in ./util/macOS/unzip.dmg ./util/macOS/wget.dmg
-    do
-        [ -e "$file" ] || continue
-        mkdir -p "${file%.dmg}"
-        if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
-        then
-            cp -a "/tmp/exo_$(basename "$file" .dmg)"/* "${file%.dmg}"
-            hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
-        else
-            abortScript "failed to extract $file"
-        fi
-    done
-    cd ..
 }
 
 # File naming convention for Linux/macOS Content containing packages:
@@ -481,24 +451,11 @@ function failedInstall
         "- A read-only filesystem" \
         "- A zip file is corrupted" \
         "- Your computer leading a rebellion against you"
-    printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the readme:\n%s\e[1;37;44m%s\e[0m%s\n\n" \
+    printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the readme:\n%s\e[1;33;40m%s\e[0m%s\n\n" \
         "\"" "./eXo<collection> Linux ReadMe.txt" "\""
     read -s -n 1 -p "Press any key to abort."
     printf "\n\n"
     exit 1
-}
-
-function fixGatekeeper
-{
-    cd eXo
-    for app in ./dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./util/macOS/*/*.app ../exogui/*.app
-    do
-        [ -d "$app" ] || continue
-        chmod -R u+w "$app"
-        xattr -cr "$app"
-        codesign --force --deep --sign - "$app"
-    done
-    cd ..
 }
 
 # File naming convention for updates:
@@ -566,7 +523,7 @@ function getUpdate
         mv install_dependencies.bnew ../install_dependencies.bnew || abortScript "Error replacing install_dependencies.bnew."
         rm ver_universal_linuxmac.txt
         clear
-        printf "\nDependency installer updated.\n\n%s\e[1;37;44m%s\e[0m%s\e[1;37;45m%s\e[0m%s\n\n" \
+        printf "\nDependency installer updated.\n\n%s\e[1;33;40m%s\e[0m%s\e[1;37;45m%s\e[0m%s\n\n" \
             "Run " "install_dependencies.command" " again and select [" "D" "]ownload updates."
         read -s -n 1 -p "Press any key to close..."
         printf "\n\n"
@@ -926,46 +883,306 @@ function getUpdate
     printf "\nUpdates downloaded successfully.\n\n"
 }
 
-function installPackages
+function goApk
 {
-    cd eXo/util/macOS
-    printf "\nNote: You will be prompted for your password if an installation is required.\n\n"
-    #Installing Rosetta if not present
-    if [[ "$(uname -m)" == "arm64" ]]
+    command -v apk &>/dev/null || { echo "Missing apk!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    if [ "$run_update" != "yes" ]
     then
-        arch -x86_64 /usr/bin/true 2>/dev/null && printf "Rosetta: \e[1;37;44mpresent\e[0m\n" || { printf "Rosetta: \e[1;37;41mmissing\e[0m\n"; sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license && printf "\n  Installed\n" || failedInstall; }
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed unzip wget zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
     fi
-    #Install GStreamer if not present
-    if [ -e gstreamer.pkg ] && [ -e gstreamer.ver ]
+    if [ ${#missing_pkgs[@]} -gt 0 ]
     then
-        pkg_version="$(sed -n '1p' gstreamer.ver | tr -d '[:space:]')"
-        pkg_major="${pkg_version%%.*}"
-        gstreamer_verinfo="$(/Library/Frameworks/GStreamer.framework/Versions/$pkg_major.0/bin/gst-launch-$pkg_major.0 --version 2>/dev/null || gst-launch-$pkg_major.0 --version 2>/dev/null)"
-        installed_gstreamer=$(echo "$gstreamer_verinfo" | awk '/GStreamer/{print $2}')
-        unset gstreamer_verinfo
-        installed_gstreamer="${installed_gstreamer:-0.0.0}"
-        pkg_version=$(echo "$pkg_version" | awk -F. '{printf "%03d%03d%03d", $1, $2, $3}')
-        installed_gstreamer=$(echo "$installed_gstreamer" | awk -F. '{printf "%03d%03d%03d", $1, $2, $3}')
-        if [[ "$pkg_version" > "$installed_gstreamer" ]]
-        then
-            [ "$installed_gstreamer" -gt 0 ] && printf "GStreamer: \e[1;37;41moutdated\e[0m\n" || printf "GStreamer: \e[1;37;41mmissing\e[0m\n"
-            echo "  Installing GStreamer..."
-            if command -v brew >/dev/null 2>&1 && brew ls --versions gstreamer >/dev/null 2>&1
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo apk update || failedInstall
+        sudo apk add "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goApt
+{
+    command -v apt &>/dev/null || { echo "Missing apt!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses-bin")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo apt update || failedInstall
+        sudo apt install -y "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goDnf
+{
+    command -v dnf &>/dev/null || { echo "Missing dnf!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo dnf install -y "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goEopkg
+{
+    command -v eopkg &>/dev/null || { echo "Missing eopkg!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo eopkg update-repo || failedInstall
+        sudo eopkg install -y "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goNixenv
+{
+    printf "\n\e[1;37;41mWARNING: NixOS IS NOT FHS COMPLIANT\e[0m\n\e[1;31;47mWe make no promises that any eXo collections will work with it.\e[0m\n\n"
+    command -v nix-env &>/dev/null || { echo "Missing nix-env!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("nixos.coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("nixos.unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("nixos.wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("nixos.ncurses")
+        for check in curl ffmpeg flatpak perl python3 zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("nixos.$check")
+        done
+        command -v sed &>/dev/null || missing_pkgs+=("nixos.gnused")
+    fi
+
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\n"
+        echo "Attempting to install missing packages via nix-env: ${missing_pkgs[*]}"
+        nix-env -iA "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goPacman
+{
+    command -v pacman &>/dev/null || { echo "Missing pacman!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo pacman --noconfirm -Syu "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goXbps
+{
+    command -v xbps-install &>/dev/null || { echo "Missing xbps-install!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo xbps-install -Sy "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function goZypper
+{
+    command -v zypper &>/dev/null || { echo "Missing zypper!"; failedInstall; }
+    local missing_pkgs=()
+    
+    { command -v fold && command -v sha256sum; } &>/dev/null || missing_pkgs+=("coreutils")
+    command -v unzip &>/dev/null || missing_pkgs+=("unzip")
+    command -v wget &>/dev/null || missing_pkgs+=("wget")
+    
+    if [ "$run_update" != "yes" ]
+    then
+        command -v tput &>/dev/null || missing_pkgs+=("ncurses-utils")
+        for check in curl ffmpeg flatpak perl python3 sed zip
+        do
+            command -v "$check" &>/dev/null || missing_pkgs+=("$check")
+        done
+    fi
+    if [ ${#missing_pkgs[@]} -gt 0 ]
+    then
+        printf "\nBeginning dependency installation...\n\nIf a system package is needed, you will be prompted for your password (sudo).\n\n"
+        echo "Attempting to install missing packages: ${missing_pkgs[*]}"
+        sudo zypper --non-interactive refresh || failedInstall
+        sudo zypper --non-interactive install "${missing_pkgs[@]}" || failedInstall
+    fi
+    [ "$run_update" == "yes" ] && getUpdate
+    extractPackages
+    installFlatpaks
+}
+
+function installFlatpaks
+{
+    if [ "$(uname -m)" == "x86_64" ]
+    then
+        flatpak_ext="x86_64.flatpak"
+    elif [ "$(uname -m)" == "aarch64" ]
+    then
+        flatpak_ext="aarch64.flatpak"
+    else
+        echo "Unsupported architecture: $(uname -m)"
+        exit 1
+    fi
+    flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || failedInstall
+    if [ "$(uname -m)" == "x86_64" ]
+    then
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.Compat.i386//25.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.codecs_extra.i386//25.08-extra
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08
+        for dev in /sys/bus/pci/devices/*
+        do
+            [ -f "$dev/class" ] || continue
+            read -r class < "$dev/class"
+            if [[ "$class" == 0x03* ]]
             then
-                brew update && brew upgrade gstreamer || abortScript "Failed to update GStreamer."
-            elif command -v port >/dev/null 2>&1 && port installed | grep -qi "gstreamer$pkg_major"
-            then
-                sudo port selfupdate && sudo port upgrade "gstreamer$pkg_major" || abortScript "Failed to update GStreamer."
-            else
-                sudo installer -pkg "$PWD/gstreamer.pkg" -target / || abortScript "Failed to install GStreamer."
+                read -r vendor < "$dev/vendor"
+                [[ "$vendor" == "0x8086" ]] && flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
+                [[ "$vendor" == "0x10de" ]] && flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
             fi
-            [ "$installed_gstreamer" -gt 0 ] && printf "\n  Upgraded\n" || printf "\n  Installed\n"
-        else
-            printf "GStreamer: \e[1;37;44mpresent\e[0m\n"
-        fi
-        unset pkg_version installed_gstreamer
+        done
     fi
-    cd ../../..
+    flatpak update --user -y || failedInstall
+
+    echo "Installing retro_exo flatpaks..."
+    shopt -s nullglob
+    for pkg in ./eXo/Flatpaks/*.$flatpak_ext
+    do
+        flatpak info "`basename "${pkg%.$flatpak_ext}"`" &>/dev/null && flatpak remove --delete-data -y "`basename "${pkg%.$flatpak_ext}"`"
+        flatpak install --user --reinstall -y "$pkg" || failedInstall
+        #https://github.com/flatpak/flatpak/pull/5546
+        #Note that --reinstall will not work until the above flatpak pull request is rolled out, work around implemented in prior line
+    done
+    shopt -u nullglob
+}
+
+function setupOther
+{
+    if [ "$run_update" == "yes" ]
+    then
+        { command -v fold && command -v sha256sum; } &>/dev/null || abortScript "Coreutils (sha256sum/fold) is not present. Please install it before proceeding."
+        command -v unzip &>/dev/null || abortScript "Unzip is not present. Please install it before proceeding."
+        command -v wget &>/dev/null || abortScript "Wget is not present. Please install it before proceeding."
+        getUpdate
+    fi
+    
+    if [ "$missing_packages" == "no" ]
+    then
+        printf "\nSystem dependencies satisfied. Proceeding to install flatpaks.\n\n"
+        extractPackages
+        installFlatpaks
+    elif [ "$missing_packages" == "yes" ]
+    then
+        printf "\nYour distribution, $distro_id, is not officially supported.\n%s\n\n%s\n%s\n\n%s\n\n" \
+            "As such, you will need to install the missing system dependencies manually." \
+            "If a problem is encountered, you may make a support request in our Discord." \
+            "If support is added, you will need to update this installer to access it." \
+            "After you have installed the required packages, rerun this setup."
+        read -s -n 1 -p "Press any key to abort."
+        printf "\n\n"
+        exit 1
+    fi
 }
 
 if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
@@ -983,9 +1200,10 @@ scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
 [ $# -gt 2 ] && parameterthree="$3"
 [ $# -gt 3 ] && parameterfour="$4"
 
-if [[ "${BASH_SOURCE[0]}" == *.command ]]
+if [[ "${BASH_SOURCE[0]}" == *.bsh ]]
 then
-    updated_uds="$scriptDir/eXo/Update/linux_mac/$(basename -- "${BASH_SOURCE%.command}.cnew")"
+    cd ../..
+    updated_uds="$PWD/eXo/Update/linux_mac/$(basename -- "${BASH_SOURCE%.bsh}.bnew")"
     if [[ -f "$updated_uds" ]]
     then
         new_version=$(grep -m 1 '^setupversion=' "$updated_uds" | cut -d'"' -f2)
@@ -997,8 +1215,8 @@ then
     fi
     macUDSext=command
     linUDSext=bsh
-    udspath="eXo/util"
-elif [[ "${BASH_SOURCE[0]}" == *.cnew ]]
+    udspath="."
+elif [[ "${BASH_SOURCE[0]}" == *.bnew ]]
 then
     cd ../../..
     macUDSext=cnew
@@ -1008,134 +1226,10 @@ else
     abortScript "Invalid script extension!"
 fi
 
-if [[ "$OSTYPE" == "linux"* ]]
+if [[ "$OSTYPE" == "darwin"* ]]
 then
-    current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
-    case "$current_term" in
-        "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"*|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
-            cd "$udspath"
-            source "$scriptDir/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")"
-            exit 0
-            break;;
-    esac
-    unset current_term
-    if command -v cool-retro-term &> /dev/null
-    then
-        cool-retro-term -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v konsole &> /dev/null
-    then
-        konsole -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v xfce4-terminal &> /dev/null
-    then
-        xfce4-terminal -x /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v gnome-terminal &> /dev/null
-    then
-        gnome-terminal -- /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v mate-terminal &> /dev/null
-    then
-        eval mate-terminal -e \"/usr/bin/env bash \\\"$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")\\\" $@\" "$@" &
-        exit 0
-    elif command -v ptyxis &> /dev/null
-    then
-        ptyxis --new-window -- /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v kgx &> /dev/null
-    then
-        kgx -e "/usr/bin/env bash \"$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")\" $@" &
-        exit 0
-    elif command -v x-terminal-emulator &> /dev/null
-    then
-        x-terminal-emulator -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v foot &> /dev/null
-    then
-        foot -- /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v qterminal &> /dev/null
-    then
-        qterminal -e "/usr/bin/env bash \"$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")\" $@" &
-        exit 0
-    elif command -v terminator &> /dev/null
-    then
-        terminator -x /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v kitty &> /dev/null
-    then
-        kitty -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v tilix &> /dev/null
-    then
-        tilix -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v alacritty &> /dev/null
-    then
-        alacritty -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v cosmic-term &> /dev/null
-    then
-        cosmic-term -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v terminology &> /dev/null
-    then
-        terminology -e "/usr/bin/env bash \"$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")\" $@" &
-        exit 0
-    elif command -v urxvt &> /dev/null
-    then
-        urxvt -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v xterm &> /dev/null
-    then
-        xterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v uxterm &> /dev/null
-    then
-        uxterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v rxvt &> /dev/null
-    then
-        rxvt -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v lxterm &> /dev/null
-    then
-        lxterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v termit &> /dev/null
-    then
-        termit -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v stterm &> /dev/null
-    then
-        stterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v mlterm &> /dev/null
-    then
-        mlterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v aterm &> /dev/null
-    then
-        aterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif command -v Eterm &> /dev/null
-    then
-        Eterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
-        exit 0
-    elif [[ "$-" == *i* ]]
-    then
-        source "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")"
-        exit 0
-    else
-        logger -s "eXo: weird system achievement unlocked - None of the 26 supported terminal emulators are installed."
-        exit 1
-    fi
+    source "$scriptDir/$udspath/$(basename -- "${BASH_SOURCE%.$linUDSext}.$macUDSext")"
     exit 0
-elif [[ "$OSTYPE" != "darwin"* ]]
-then
-    logger -s "eXo: OS not supported"
-    exit 1
 fi
 
 [ ! -d Content ] && abortScript "Cannot find ./Content subdirectory."
@@ -1145,4 +1239,4 @@ chmod +x *.command
 
 initialDir=$PWD
 
-beginMac
+beginLinux
