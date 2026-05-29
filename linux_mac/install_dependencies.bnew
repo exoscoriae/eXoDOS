@@ -175,10 +175,12 @@ function extractPackages
     then
         updateversion="$(sed -n '1p' ver_current_linuxmac.txt)" || abortScript "Missing version tracking file contents!"
         [ "$setupversion" != "$updateversion" ] && abortScript "Version mismatch for universal package update zip!"
-        universal_package_sum="$(sed -n '7p' ver_current_linuxmac.txt)"
-        echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for downloaded file invalid."; }
-        unzip -o update_universalpackages_linuxmac.zip -d ../../../ || abortScript "Failed to unzip universal update."
-        
+        if [ -e update_universalpackages_linuxmac.zip ]
+        then
+            universal_package_sum="$(sed -n '7p' ver_current_linuxmac.txt)"
+            echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for downloaded file invalid."; }
+            unzip -o update_universalpackages_linuxmac.zip -d ../../../ || abortScript "Failed to unzip universal update."
+        fi
         for file in ../../../Content/XO!(*zz)_linux*_Metadata.zip ../../../Content/eXo!(*zz)_linux*_Metadata.zip
         do
             [ -e "$file" ] || continue
@@ -1113,29 +1115,33 @@ function goZypper
 
 function installFlatpaks
 {
-    if [ "$arch" == "x86_64" ]
+    if [ "$(uname -m)" == "x86_64" ]
     then
         flatpak_ext="x86_64.flatpak"
-    elif [ "$arch" == "aarch64" ]
+    elif [ "$(uname -m)" == "aarch64" ]
     then
         flatpak_ext="aarch64.flatpak"
     else
-        echo "Unsupported architecture: $arch"
+        echo "Unsupported architecture: $(uname -m)"
         exit 1
     fi
     flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || failedInstall
-    if [ "$arch" == "x86_64" ]
+    if [ "$(uname -m)" == "x86_64" ]
     then
         flatpak install --user --reinstall -y flathub org.freedesktop.Platform.Compat.i386//25.08
         flatpak install --user --reinstall -y flathub org.freedesktop.Platform.codecs_extra.i386//25.08-extra
         flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08
-        if lspci | grep -iE 'vga|3d' | grep -iq 'intel'
-        then
-            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
-        elif lspci | grep -iE 'vga|3d' | grep -iq 'nvidia'
-        then
-            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
-        fi
+        for dev in /sys/bus/pci/devices/*
+        do
+            [ -f "$dev/class" ] || continue
+            read -r class < "$dev/class"
+            if [[ "$class" == 0x03* ]]
+            then
+                read -r vendor < "$dev/vendor"
+                [[ "$vendor" == "0x8086" ]] && flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
+                [[ "$vendor" == "0x10de" ]] && flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
+            fi
+        done
     fi
     flatpak update --user -y || failedInstall
 
