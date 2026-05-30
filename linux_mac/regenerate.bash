@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-29
+# Revised: 2026-05-30
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1022,7 +1022,7 @@ echo "Applying Linux-only game fixes."
 [ `ls -1 Magazines/Interactive\ Entertainment\ CD/run_lin.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/mount/ s|\\\|/|Ig" Magazines/Interactive\ Entertainment\ CD/run_lin.bat 2>/dev/null
 [ `ls -1 Magazines/Interactive\ Entertainment\ CD/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" Magazines/Interactive\ Entertainment\ CD/dosbox_linux.conf 2>/dev/null
 [ `ls -1 Magazines/Interactive\ Entertainment\ CD.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/run\.bak/run_lin.bak/I" Magazines/Interactive\ Entertainment\ CD.bsh 2>/dev/null
-[ `ls -1 Magazines/Interactive\ Entertainment\ CD.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/run_lin\.bak/ s/run\.bat/run_lin.bat/I" Magazines/Interactive\ Entertainment\ CD.bsh 2>/dev/null
+[ `ls -1 Magazines/Interactive\ Entertainment\ CD.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/run\.bat/run_lin.bat/I" Magazines/Interactive\ Entertainment\ CD.bsh 2>/dev/null
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_10/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|cd/PCGAMER\.cue|cd/PCGAMER_linux.cue|" Magazines/PCGamerUS/PCGamer_1997_10/dosbox_linux.conf 2>/dev/null
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_10/cd/PCGAMER.cue 2>/dev/null | wc -w` -gt 0 ] && cp Magazines/PCGamerUS/PCGamer_1997_10/cd/PCGAMER.cue Magazines/PCGamerUS/PCGamer_1997_10/cd/PCGAMER_linux.cue 2>/dev/null
 #[ `ls -1 Magazines/PCGamerUS/PCGamer_1997_10/cd/PCGAMER_linux.cue 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/PCGAMER\.BIN/PCGAMER.bin/" Magazines/PCGamerUS/PCGamer_1997_10/cd/PCGAMER_linux.cue 2>/dev/null
