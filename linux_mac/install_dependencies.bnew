@@ -499,9 +499,12 @@ function getUpdate
         if [ "$setupversion" == "$updateversion" ]
         then
             cd ..
-            if [ "$local_update" != "$setupversion" ] || ! echo "$universal_depmac_sum" | sha256sum --check || ! echo "$universal_deplin_sum" | sha256sum --check
+            if [ -e install_dependencies.cnew ] || [ -e install_dependencies.bnew ]
             then
-                setupversion="$setupversion (bad state)"
+                if [ "$local_update" != "$setupversion" ] || ! echo "$universal_depmac_sum" | sha256sum --check || ! echo "$universal_deplin_sum" | sha256sum --check
+                then
+                    setupversion="$setupversion (bad state)"
+                fi
             fi
             cd tmp
         fi
@@ -1191,7 +1194,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta"
+setupversion="Version 6.04b.universal1_beta2"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
