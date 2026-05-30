@@ -1,4 +1,4 @@
-Version 6.04b.universal1_beta
+Version 6.04b.universal1_beta2
 https://exampleurlsitethingy.com/install_dependencies.cnew
 60f9e3d43668b57a0f119dcfd8873b2f9bc38d41705bcea52e8d23a970c76c4e  install_dependencies.cnew
 https://exampleurlsitethingy.com/install_dependencies.bnew
