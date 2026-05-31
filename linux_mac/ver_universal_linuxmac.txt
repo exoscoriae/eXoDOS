@@ -1,9 +1,9 @@
 Version 6.04b.universal1_beta2
-https://exampleurlsitethingy.com/install_dependencies.cnew
+https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/install_dependencies.cnew
 60f9e3d43668b57a0f119dcfd8873b2f9bc38d41705bcea52e8d23a970c76c4e  install_dependencies.cnew
-https://exampleurlsitethingy.com/install_dependencies.bnew
+https://github.com/exoscoriae/eXoDOS/raw/master/linux_mac/install_dependencies.bnew
 1d3705dbc1c692a26f66c43e3f3952ecdb060f9c5870a60b4299f4540aeb35fd  install_dependencies.bnew
-https://exampleurlsitethingy.com/update_universalpackages_linuxmac.zip
+https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b/update_universalpackages_linuxmac.zip
 0000000000000000000000000000000000000000000000000000000000000000  update_universalpackages_linuxmac.zip
 
 
