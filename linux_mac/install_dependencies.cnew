@@ -977,7 +977,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta2"
+setupversion="Version 6.04b.universal1_beta3"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
@@ -1003,7 +1003,8 @@ then
     udspath="eXo/util"
 elif [[ "${BASH_SOURCE[0]}" == *.cnew ]]
 then
-    cd ../../..
+    cd "$scriptDir/../../.."
+    scriptDir="$PWD"
     macUDSext=cnew
     linUDSext=bnew
     udspath="eXo/Update/linux_mac"
