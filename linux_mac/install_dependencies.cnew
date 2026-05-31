@@ -538,20 +538,18 @@ function getUpdate
     
     if [ -e ../ver_current_linuxmac.txt ]
     then
-        local_update=$(grep "Version " ../ver_current_linuxmac.txt | head -n 1)
         if [ "$setupversion" == "$updateversion" ]
         then
             cd ..
             if [ -e install_dependencies.cnew ] || [ -e install_dependencies.bnew ]
             then
-                if [ "$local_update" != "$setupversion" ] || ! echo "$universal_depmac_sum" | sha256sum --check || ! echo "$universal_deplin_sum" | sha256sum --check
+                if ! echo "$universal_depmac_sum" | sha256sum --check || ! echo "$universal_deplin_sum" | sha256sum --check
                 then
                     setupversion="$setupversion (bad state)"
                 fi
             fi
             cd tmp
         fi
-        unset local_update
     fi
     if [ "$setupversion" == "$updateversion" ]
     then
