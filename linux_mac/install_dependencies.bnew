@@ -1153,6 +1153,7 @@ function installFlatpaks
         if flatpak ps --columns=application | grep -q "^$(basename "${pkg%.$flatpak_ext}")$"
         then
             if [ "$(basename "${pkg%.$flatpak_ext}")" == "com.retro_exo.konsole" ]
+            then
                 echo "An instance of com.retro_exo.konsole is currently running. Skipping..."
                 continue
             else
@@ -1202,7 +1203,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta5"
+setupversion="Version 6.04b.universal1_beta6"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"

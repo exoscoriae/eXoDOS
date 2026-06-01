@@ -975,7 +975,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta5"
+setupversion="Version 6.04b.universal1_beta6"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
