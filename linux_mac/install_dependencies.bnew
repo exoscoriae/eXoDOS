@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-05-29
+# Revised: 2026-05-31
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -1150,6 +1150,16 @@ function installFlatpaks
     shopt -s nullglob
     for pkg in ./eXo/Flatpaks/*.$flatpak_ext
     do
+        if flatpak ps --columns=application | grep -q "^$(basename "${pkg%.$flatpak_ext}")$"
+        then
+            if [ "$(basename "${pkg%.$flatpak_ext}")" == "com.retro_exo.konsole" ]
+                echo "An instance of com.retro_exo.konsole is currently running. Skipping..."
+                continue
+            else
+                echo "Killing running instance of $(basename "${pkg%.$flatpak_ext}")..."
+                flatpak kill "$(basename "${pkg%.$flatpak_ext}")"
+            fi
+        fi
         flatpak info "`basename "${pkg%.$flatpak_ext}"`" &>/dev/null && flatpak remove --delete-data -y "`basename "${pkg%.$flatpak_ext}"`"
         flatpak install --user --reinstall -y "$pkg" || failedInstall
         #https://github.com/flatpak/flatpak/pull/5546
@@ -1192,7 +1202,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta4"
+setupversion="Version 6.04b.universal1_beta5"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
