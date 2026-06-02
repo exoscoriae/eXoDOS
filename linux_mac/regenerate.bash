@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-01
+# Revised: 2026-06-02
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -218,6 +218,7 @@ function convertMacShell
            -e 's/\(Setup_.[^\.]*\)\.bsh/\1.msh/Ig' \
            -e '/find .*\.msh/! s/\.bsh/.msh/g' \
            -e 's/PENDINGbs/bsh/g' \
+           -e 's@^ipaddress=`ip -4 -o addr show up primary scope global.*@ipaddress=$(ipconfig getifaddr $(route -n get default | awk '\''/interface: / {print $2}'\''))@' \
            -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' \
            -e '/86Box-Linux-b6130\.AppImage / s| -R \.| -R "$PWD"/.|I' \
            -e '/86Box-Linux-b6130\.AppImage / s| -C \.| -C "$PWD"/.|I' \
