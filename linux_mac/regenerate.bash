@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-30
+# Revised: 2026-06-01
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -219,7 +219,9 @@ function convertMacShell
            -e '/find .*\.msh/! s/\.bsh/.msh/g' \
            -e 's/PENDINGbs/bsh/g' \
            -e 's/flatpak run com\.retro_exo\.wine .*foobar2000\.exe/foobar2000/I' \
-           -e 's|^[\./]*emulators/86Box/86Box-Linux-x86_64-b6130.AppImage |86Box-4-2-1-b6130 |' \
+           -e '/86Box-Linux-b6130\.AppImage / s| -R \.| -R "$PWD"/.|I' \
+           -e '/86Box-Linux-b6130\.AppImage / s| -C \.| -C "$PWD"/.|I' \
+           -e 's/86Box-Linux-b6130\.AppImage /86Box-4-2-1-b6130 /' \
            -e '/flatpak run com\.retro_exo\.aria2c/I s/flatpak run com\.retro_exo\.aria2c /aria2c /I' \
            -e 's/flatpak run com\.retro_exo\.dosbox-074r3-1 /dosbox-074r3-3 /I' \
            -e 's/flatpak run com\.retro_exo\.dosbox-ece-r4301 /dosbox-ece-r4301 /I' \

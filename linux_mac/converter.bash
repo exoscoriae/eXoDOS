@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-05-20
+# Revised: 2026-06-01
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -1308,7 +1308,7 @@ EOF
     #Note that the gzdoom directory is lowercase for Sigil and Sigil II!
     
     #fix 86Box references
-    sed -i -e 's|^"\([\./]*emulators/86Box/\)86Box\.exe" -C|\186Box-Linux-x86_64-b6130.AppImage -R \1Roms -C|I' "$currentScript"
+    sed -i -e 's|^"\([\./]*emulators/86Box/\)86Box\.exe" -C|86Box-Linux-b6130.AppImage -R \1Roms -C|I' "$currentScript"
     
 #    #fix RW1_EDIT.EXE execution line
 #    sed -i -e 's|^"eXoDOS/\$gamedir/RW1_EDIT.EXE"|wine "eXoDOS/$gamedir/RW1_EDIT.EXE"|I' "$currentScript"
