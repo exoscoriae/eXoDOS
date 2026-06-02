@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-01
+# Revised: 2026-06-02
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3052,9 +3052,10 @@ TEMPDONECHOICE' "$currentScript"
     sed -i -e 's/gamename=\$gamename2.*/gamename=\$\{gamename2%.bsh\}/' "$currentScript"
     
     #fix variable expansion instances
-    
+
     #convert ~0,-[##] declarations
     sed -i -e 's/\(.[^[:space:]\"~=]*\)=\${\(.[^[:space:]\"~=]*\):~0,-\([[:digit:]]\+\)}/\1=\$\{\2::-\3\}/g' \
+           -e 's/\(.[^[:space:]\"~=]*\)=\(.\)\${\(.[^[:space:]\"~=]*\):~0,-\([[:digit:]]\+\)}/\1=\2\$\{\3::-\4\}/g' \
            -e 's/"\(.[^[:space:]\"~=]*\)=\(\${.[^[:space:]\"~=]*::-[[:digit:]]\+}\)"/\1=\2/g' "$currentScript"
     
     #convert ~0,-[##] declarations that use delayed expansion
