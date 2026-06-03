@@ -595,7 +595,7 @@ do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.wine"` ]] \&\& missingDependencies=yes^' "$currentScript"
 done
-for currentScript in eXoWin9x/\!*/*/*/*.bsh eXoWin9x/\!*/*/*/*/*.bsh util/*_drm.bsh ../Setup\ eXoWin9x.bsh
+for currentScript in eXoWin9x/\!*/*/*/*.bsh eXoWin9x/\!*/*/*/*/*.bsh ../Setup\ eXoWin9x.bsh
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
