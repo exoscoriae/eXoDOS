@@ -572,12 +572,13 @@ do
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-074r3-1"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-ece-r4482"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-081-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-082-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-08220"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20240701"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20241001"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20250503"` ]] \&\& missingDependencies=yes^' "$currentScript"
 
 done
-for currentScript in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh util/*_drm.bsh ../Setup\ eXoDREAMM.bsh
+for currentScript in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh util/*_drm*.bsh ../Setup\ eXoDREAMM.bsh
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/drmini="\/${drm::-11}"/a drm="${drm: -10}"' "$currentScript"
 done
 for currentScript in eXoScummVM/\!*/*/*.bsh eXoScummVM/\!*/*/*/*.bsh util/*_svm.bsh ../Setup\ eXoScummVM.bsh
 do
@@ -1256,16 +1257,15 @@ do
 done 2>/dev/null
 
 cp util/dreamm.txt util/dreamm_linux.txt  2>/dev/null
-sed -i -e 's|:2\.1\.2\\dreamm\.exe|:2.1.2/dreamm-2.1.2-linux-x64/dreamm|I' util/dreamm_linux.txt  2>/dev/null
-sed -i -e 's|:3\.01\\dreamm\.exe|:3.01/dreamm-3.01-linux-x64/dreamm|I' util/dreamm_linux.txt  2>/dev/null
+sed -i -e 's|:2\.1\.2\\dreamm\.exe|:2.1.2/dreamm_212|I' util/dreamm_linux.txt  2>/dev/null
+sed -i -e 's|:3\.0\.1\\dreamm\.exe|:3.0.1/dreamm_301|I' util/dreamm_linux.txt  2>/dev/null
+sed -i -e 's|:3\.0\.2\\dreamm\.exe|:3.0.2/dreamm_302|I' util/dreamm_linux.txt  2>/dev/null
+sed -i -e 's|:4\.0\\dreamm\.exe|:4.0/dreamm_400|I' util/dreamm_linux.txt  2>/dev/null
 dos2unix util/dreamm_linux.txt 2>/dev/null
 #Note: If a macOS binary is not universal, there will need to be separate text files for m1 and x64.
 #      In such cases, use the endings _mac-m1.txt and _mac-x64.txt. The binaries that are referenced
 #      inside of such text files should follow the location patterns of macOS/x64/ and macOS/m1/.
-cp util/dreamm.txt util/dreamm_mac.txt  2>/dev/null
-sed -i -e 's|:2\.1\.2\\dreamm\.exe|:2.1.2/macOS/dreamm.app/Contents/MacOS/dreamm|I' util/dreamm_mac.txt  2>/dev/null
-sed -i -e 's|:3\.01\\dreamm\.exe|:3.01/macOS/dreamm.app/Contents/MacOS/dreamm|I' util/dreamm_mac.txt  2>/dev/null
-dos2unix util/dreamm_mac.txt  2>/dev/null
+cp util/dreamm_linux.txt util/dreamm_mac.txt  2>/dev/null
 
 echo "Preparing macOS shell files... (ETA 1.5 minutes)"
 #skipping eXoDOS and eXoScummVM files for now. They will need some additional changes in the converting macOS shell files section.

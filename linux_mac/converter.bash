@@ -1284,6 +1284,12 @@ EOF
            -e 's|\&\& [\./]*util/ssr |\&\& ssr |I' \
            -e 's|\&\& [\./]*ssr |\&\& ssr |I' "$currentScript"
     
+    #fix dreamm references
+    sed -i -e "s|^\"[\./]*emulators/DREAMM/\(\${drm}\"\)|\"\1|I" \
+           -e "s|^\"[\./]*emulators/DREAMM/DELAYEDVARBEGdrmDELAYEDVAREND\"|\"\${drm}\"|I" \
+           -e "s|\&\& \"[\./]*emulators/DREAMM/\(\${drm}\"\)|\&\& \"\1|I" \
+           -e "s|\&\& \"[\./]*emulators/DREAMM/DELAYEDVARBEGdrmDELAYEDVAREND\"|\&\& \"\${drm}\"|I" "$currentScript"
+
     #fix scummvm references
     sed -i -e 's|^"[\./]*scummvm/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-8-0|I' \
            -e 's|^"[\./]*emulators/scummvm/scummvm\.exe"|flatpak run com.retro_exo.scummvm-2-8-0|I' \
