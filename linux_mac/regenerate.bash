@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-02
+# Revised: 2026-06-04
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -962,6 +962,14 @@ do\
     [ -e "$file" ] && sed -i -e "s/\\\\\\Once Upon a Time - Baba Yaga (Multi-Platform)/\\\\\\Once Upon A Time - Baba Yaga (Multi-Platform)/g" "$file"\
     [ -e "$file" ] && sed -i -e "s/\\\\\\TeTRIks (Windows)/\\\\\\TeTriks (Windows)/g" "$file"\
 done' ../Setup\ eXoScummVM.bsh
+
+[ `ls -1 ../Setup\ eXoDREAMM.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/^: xml$/a\
+for file in Data/Platforms/DREAMM.xml xml/all/DREAMM.xml xml/family/DREAMM.xml\
+do\
+    [ -e "$file" ] && sed -i -e "/RootFolder/ s/\\\\\\Star Wars - Anakin\\’s Speedway (2000)/\\\\\\Star Wars - Anakins Speedway (2000)/g" "$file"\
+    [ -e "$file" ] && sed -i -e "/RootFolder/ s/\\\\\\Star Wars - Jar Jar\\’s Journey (2000)/\\\\\\Star Wars - Jar Jars Journey (2000)/g" "$file"\
+    [ -e "$file" ] && sed -i -e "/RootFolder/ s/\\\\\\Star Wars - Math Jabba\\’s Game Galaxy (2000)/\\\\\\Star Wars - Math Jabbas Game Galaxy (2000)/g" "$file"\
+done' ../Setup\ eXoDREAMM.bsh
 
 #sync case workaround to match update zips
 for file in util/install*.bsh
