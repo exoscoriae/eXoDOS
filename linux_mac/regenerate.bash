@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-04
+# Revised: 2026-06-10
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -646,7 +646,7 @@ then
         exit 0
     elif [[ `flatpak list 2>/dev/null | grep "retro_exo\.konsole"` ]]
     then
-        flatpak run com.retro_exo.konsole -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
+        flatpak run --filesystem=host --env=HOST_PATH="$PATH" com.retro_exo.konsole -e /bin/bash -c 'export PATH="$HOST_PATH:$PATH"; exec bash "$0" "$@"' -- "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")" "$@" &
         exit 0
     elif [[ "$-" == *i* ]]
     then
