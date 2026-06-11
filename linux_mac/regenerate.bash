@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-10
+# Revised: 2026-06-11
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -563,6 +563,11 @@ for currentScript in Videos/*/*.bsh
 do
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.vlc"` ]] \&\& missingDependencies=yes^' "$currentScript"
 done
+for currentScript in ../Setup\ eXo*.bsh
+do
+    [ -e "$currentScript" ] && sed -i -e '/unzip -o/ s|XODOSMetadata Plugins/eXoPlugin\.dll|XODOSzz_linuxmac_Metadata.zip Plugins/eXoPlugin.dll|' "$currentScript"
+done
+
 for currentScript in eXoDemoScn/\!*/*/*.bsh eXoDemoScn/\!*/*/*/*.bsh eXoDemoScn/\!*/*/*/*/*.bsh util/ds_*.bsh ../Setup\ eXoDemoScene.bsh
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
