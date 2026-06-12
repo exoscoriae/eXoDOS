@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-05-31
+# Revised: 2026-06-12
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -53,10 +53,20 @@ function beginMac
     extractEssential
     fixGatekeeper
     installPackages
-    for app_dir in "$PWD"/eXo/util/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/eXo/util/macOS/wget/wget.app/Contents/MacOS
-    do
-        [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
-    done
+    cd eXo
+    if checkSymlinks
+    then
+        for app_dir in "$PWD"/util/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/util/macOS/wget/wget.app/Contents/MacOS
+        do
+            [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        done
+    else
+        for app_dir in ~/Library/Application\ Support/exogui/external_core/unzip/unzip.app/Contents/MacOS ~/Library/Application\ Support/exogui/external_core/wget/wget.app/Contents/MacOS
+        do
+            [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        done
+    fi
+    cd ..
     export PATH
     hash -r
     [ "$move_fix_only" == "yes" ] && exit 0
@@ -68,10 +78,20 @@ function beginMac
     extractDmg
     fixGatekeeper
     PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-    for app_dir in "$PWD"/eXo/util/macOS/*/*.app/Contents/MacOS "$PWD"/eXo/dmg/*/*.app/Contents/MacOS
-    do
-        [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
-    done
+    cd eXo
+    if checkSymlinks
+    then
+        for app_dir in "$PWD"/util/macOS/*/*.app/Contents/MacOS "$PWD"/dmg/*/*.app/Contents/MacOS
+        do
+            [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        done
+    else
+        for app_dir in ~/Library/Application\ Support/exogui/external_core/*/*.app/Contents/MacOS ~/Library/Application\ Support/exogui/external_apps/*/*.app/Contents/MacOS
+        do
+            [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        done
+    fi
+    cd ..
     export PATH
     mkdir -p ~/Library/Application\ Support/exogui
     echo "export PATH=\"$PATH\"" > ~/Library/Application\ Support/exogui/path
@@ -91,21 +111,49 @@ function beginMac
     osascript -e 'tell application "Terminal" to close front window' > /dev/null 2>&1 & exit 0
 }
 
+function checkSymlinks
+{
+    local test_file=".symlink_test_src_$RANDOM"
+    local test_link=".symlink_test_dst_$RANDOM"
+    touch "$test_file" 2>/dev/null || abortScript "Failed to write to directory."
+    if ln -s "$test_file" "$test_link" 2>/dev/null
+    then
+        rm -f "$test_file" "$test_link"
+        return 0
+    else
+        rm -f "$test_file" 2>/dev/null
+        return 1
+    fi
+}
+
 function extractDmg
 {
     cd eXo
     rm -rf ./dmg/*/ &>/dev/null
+    rm -rf ~/Library/Application\ Support/exogui/external_apps/*/ &>/dev/null
     printf "\nExtracting dmg files...\n"
     for file in ./dmg/*.dmg
     do
         [ -e "$file" ] || continue
-        mkdir -p "${file%.dmg}"
-        if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
+        if checkSymlinks
         then
-            cp -a "/tmp/exo_$(basename "$file" .dmg)"/* "${file%.dmg}"
-            hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
+            mkdir -p "${file%.dmg}"
+            if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
+            then
+                cp -a "/tmp/exo_$(basename "$file" .dmg)"/* "${file%.dmg}"
+                hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
+            else
+                abortScript "failed to extract $file"
+            fi
         else
-            abortScript "failed to extract $file"
+            mkdir -p ~/Library/Application\ Support/exogui/external_apps/"${file%.dmg}"
+            if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
+            then
+                cp -a "/tmp/exo_$(basename "$file" .dmg)"/* ~/Library/Application\ Support/exogui/external_apps/"${file%.dmg}"
+                hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
+            else
+                abortScript "failed to extract $file"
+            fi
         fi
     done
     cd ..
@@ -115,6 +163,8 @@ function extractEssential
 {
     [ -d ./eXo/util/macOS/unzip ] && rm -rf ./eXo/util/macOS/unzip/
     [ -d ./eXo/util/macOS/wget ] && rm -rf ./eXo/util/macOS/wget/
+    [ -d ~/Library/Application\ Support/exogui/external_core/unzip ] && rm -rf ~/Library/Application\ Support/exogui/external_core/unzip/
+    [ -d ~/Library/Application\ Support/exogui/external_core/wget ] && rm -rf ~/Library/Application\ Support/exogui/external_core/wget/
     for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
     do
         [ -e "$zip_file" ] || continue
@@ -144,13 +194,25 @@ function extractEssential
     for file in ./util/macOS/unzip.dmg ./util/macOS/wget.dmg
     do
         [ -e "$file" ] || continue
-        mkdir -p "${file%.dmg}"
-        if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
+        if checkSymlinks
         then
-            cp -a "/tmp/exo_$(basename "$file" .dmg)"/* "${file%.dmg}"
-            hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
+            mkdir -p "${file%.dmg}"
+            if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
+            then
+                cp -a "/tmp/exo_$(basename "$file" .dmg)"/* "${file%.dmg}"
+                hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
+            else
+                abortScript "failed to extract $file"
+            fi
         else
-            abortScript "failed to extract $file"
+            mkdir -p ~/Library/Application\ Support/exogui/external_core/"${file%.dmg}"
+            if hdiutil attach -nobrowse -noverify -mountpoint "/tmp/exo_$(basename "$file" .dmg)" "$file" &>/dev/null
+            then
+                cp -a "/tmp/exo_$(basename "$file" .dmg)"/* ~/Library/Application\ Support/exogui/external_core/"${file%.dmg}"
+                hdiutil detach "/tmp/exo_$(basename "$file" .dmg)" -quiet -force &>/dev/null
+            else
+                abortScript "failed to extract $file"
+            fi
         fi
     done
     cd ..
@@ -491,13 +553,24 @@ function failedInstall
 function fixGatekeeper
 {
     cd eXo
-    for app in ./dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./util/macOS/*/*.app ../exogui/*.app
-    do
-        [ -d "$app" ] || continue
-        chmod -R u+w "$app"
-        xattr -cr "$app"
-        codesign --force --deep --sign - "$app"
-    done
+    if checkSymlinks
+    then
+        for app in ./dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./util/macOS/*/*.app ../exogui/*.app
+        do
+            [ -d "$app" ] || continue
+            chmod -R u+w "$app"
+            xattr -cr "$app"
+            codesign --force --deep --sign - "$app"
+        done
+    else
+        for app in ~/Library/Application\ Support/exogui/external_core/*/*.app ~/Library/Application\ Support/exogui/external_apps/*/*.app
+        do
+            [ -d "$app" ] || continue
+            chmod -R u+w "$app"
+            xattr -cr "$app"
+            codesign --force --deep --sign - "$app"
+        done
+    fi
     cd ..
 }
 
@@ -934,7 +1007,14 @@ function installPackages
     #Installing Rosetta if not present
     if [[ "$(uname -m)" == "arm64" ]]
     then
-        arch -x86_64 /usr/bin/true 2>/dev/null && printf "Rosetta: \e[1;37;44mpresent\e[0m\n" || { printf "Rosetta: \e[1;37;41mmissing\e[0m\n"; sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license && printf "\n  Installed\n" || failedInstall; }
+        if (( $(sw_vers -productVersion | cut -d. -f1) < 28 ))
+        then
+            arch -x86_64 /usr/bin/true 2>/dev/null && printf "Rosetta: \e[1;37;44mpresent\e[0m\n" || { printf "Rosetta: \e[1;37;41mmissing\e[0m\n"; sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license && printf "\n  Installed\n" || failedInstall; }
+        else
+            echo "As of MacOS 28, Rosetta is no longer supported."
+            echo "Applications requiring an x86_64 translation layer will not function."
+            echo "This primarily affects features that use Wine."
+        fi
     fi
     #Install GStreamer if not present
     if [ -e gstreamer.pkg ] && [ -e gstreamer.ver ]
@@ -975,7 +1055,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta6"
+setupversion="Version 6.04b.universal1_beta7"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
