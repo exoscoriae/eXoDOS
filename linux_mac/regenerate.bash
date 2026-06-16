@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-11
+# Revised: 2026-06-15
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1414,7 +1414,17 @@ rm eXo*/\!*/*/*_mac.conf eXo*/\!*/*/*/*_mac.conf dosbox/*_mac.conf dosbox/*/*_ma
 for file in eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf
 do
     [ -e "$file" ] && cp "$file" "${file%_linux.conf}_mac.conf"
+    [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e '/midiconfig=128/d' "${file%_linux.conf}_mac.conf"
 done 2>/dev/null
+
+echo "Applying MacOS-only game fixes."
+[ `ls -1 eXoDOS/\!dos/DOOM/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/DOOM/dosbox_mac.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/DOOMII/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/DOOMII/dosbox_mac.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/eXoWAD/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/eXoWAD/dosbox_mac.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/HelltoPa/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/HelltoPa/dosbox_mac.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/MasterLe/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/MasterLe/dosbox_mac.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/Perditio/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/Perditio/dosbox_mac.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/UltDoom/dosbox_mac.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/cycles=auto/cycles=50000/" eXoDOS/\!dos/UltDoom/dosbox_mac.conf 2>/dev/null
 
 echo "Correcting xml inconsistencies..."
 for file in ../Data/Platforms/ScummVM.xml ../Data/Platforms/ScummVM\ SVN.xml ../xml/all/ScummVM.xml ../xml/all/ScummVM\ SVN.xml ../xml/family/ScummVM.xml ../xml/family/ScummVM\ SVN.xml

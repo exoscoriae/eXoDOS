@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-06-12
+# Revised: 2026-06-15
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -56,7 +56,7 @@ function beginMac
     cd eXo
     if checkSymlinks
     then
-        for app_dir in "$PWD"/util/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/util/macOS/wget/wget.app/Contents/MacOS
+        for app_dir in "$PWD"/macutil/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/macutil/macOS/wget/wget.app/Contents/MacOS
         do
             [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
         done
@@ -81,7 +81,7 @@ function beginMac
     cd eXo
     if checkSymlinks
     then
-        for app_dir in "$PWD"/util/macOS/*/*.app/Contents/MacOS "$PWD"/dmg/*/*.app/Contents/MacOS
+        for app_dir in "$PWD"/macutil/macOS/*/*.app/Contents/MacOS "$PWD"/dmg/*/*.app/Contents/MacOS
         do
             [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
         done
@@ -161,16 +161,16 @@ function extractDmg
 
 function extractEssential
 {
-    [ -d ./eXo/util/macOS/unzip ] && rm -rf ./eXo/util/macOS/unzip/
-    [ -d ./eXo/util/macOS/wget ] && rm -rf ./eXo/util/macOS/wget/
+    [ -d ./eXo/macutil/macOS/unzip ] && rm -rf ./eXo/macutil/macOS/unzip/
+    [ -d ./eXo/macutil/macOS/wget ] && rm -rf ./eXo/macutil/macOS/wget/
     [ -d ~/Library/Application\ Support/exogui/external_core/unzip ] && rm -rf ~/Library/Application\ Support/exogui/external_core/unzip/
     [ -d ~/Library/Application\ Support/exogui/external_core/wget ] && rm -rf ~/Library/Application\ Support/exogui/external_core/wget/
     for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
     do
         [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" eXo/util/macOS/unzip.dmg -d ./ || abortScript "Failed to unzip unzip."
-        unzip -o "$zip_file" eXo/util/macOS/wget.dmg -d ./ || abortScript "Failed to unzip wget."
-        unzip -o "$zip_file" 'eXo/util/macOS/gstreamer.*' -d ./ || abortScript "Failed to unzip gstreamer."
+        unzip -o "$zip_file" eXo/macutil/macOS/unzip.dmg -d ./ || abortScript "Failed to unzip unzip."
+        unzip -o "$zip_file" eXo/macutil/macOS/wget.dmg -d ./ || abortScript "Failed to unzip wget."
+        unzip -o "$zip_file" 'eXo/macutil/macOS/gstreamer.*' -d ./ || abortScript "Failed to unzip gstreamer."
     done
     cd eXo
     mkdir -p Update/linux_mac
@@ -181,17 +181,17 @@ function extractEssential
         [ "$setupversion" != "$updateversion" ] && abortScript "Version mismatch for universal package update zip!"
         universal_package_sum="$(sed -n '7p' ver_current_linuxmac.txt)"
         echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for downloaded file invalid."; }
-        if unzip -l update_universalpackages_linuxmac.zip "eXo/util/macOS/unzip.dmg" &>/dev/null
+        if unzip -l update_universalpackages_linuxmac.zip "eXo/macutil/macOS/unzip.dmg" &>/dev/null
         then
-            unzip -o update_universalpackages_linuxmac.zip "eXo/util/macOS/unzip.dmg" -d ../../../ || abortScript "Failed to unzip update for unzip."
+            unzip -o update_universalpackages_linuxmac.zip "eXo/macutil/macOS/unzip.dmg" -d ../../../ || abortScript "Failed to unzip update for unzip."
         fi
-        if unzip -l update_universalpackages_linuxmac.zip "eXo/util/macOS/wget.dmg" &>/dev/null
+        if unzip -l update_universalpackages_linuxmac.zip "eXo/macutil/macOS/wget.dmg" &>/dev/null
         then
-            unzip -o update_universalpackages_linuxmac.zip "eXo/util/macOS/wget.dmg" -d ../../../ || abortScript "Failed to unzip update for wget."
+            unzip -o update_universalpackages_linuxmac.zip "eXo/macutil/macOS/wget.dmg" -d ../../../ || abortScript "Failed to unzip update for wget."
         fi
     fi
     cd ../../
-    for file in ./util/macOS/unzip.dmg ./util/macOS/wget.dmg
+    for file in ./macutil/macOS/unzip.dmg ./macutil/macOS/wget.dmg
     do
         [ -e "$file" ] || continue
         if checkSymlinks
@@ -555,7 +555,7 @@ function fixGatekeeper
     cd eXo
     if checkSymlinks
     then
-        for app in ./dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./util/macOS/*/*.app ../exogui/*.app
+        for app in ./dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./macutil/macOS/*/*.app ../exogui/*.app
         do
             [ -d "$app" ] || continue
             chmod -R u+w "$app"
@@ -1002,7 +1002,7 @@ function getUpdate
 
 function installPackages
 {
-    cd eXo/util/macOS
+    cd eXo/macutil/macOS
     printf "\nNote: You will be prompted for your password if an installation is required.\n\n"
     #Installing Rosetta if not present
     if [[ "$(uname -m)" == "arm64" ]]
@@ -1055,7 +1055,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta7"
+setupversion="Version 6.04b.universal1_beta8"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
