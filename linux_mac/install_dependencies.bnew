@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-06-15
+# Revised: 2026-07-26
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -1132,17 +1132,22 @@ function installFlatpaks
         flatpak install --user --reinstall -y flathub org.freedesktop.Platform.Compat.i386//25.08
         flatpak install --user --reinstall -y flathub org.freedesktop.Platform.codecs_extra.i386//25.08-extra
         flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08-extra
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL.default//25.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL.default//25.08-extra
+        if [ -f /sys/module/nvidia/version ]
+        then
+            read -r nvidia_version < /sys/module/nvidia/version
+            flatpak install --user --reinstall -y flathub "org.freedesktop.Platform.GL32.nvidia-${nvidia_version//./-}//1.4"
+            flatpak install --user --reinstall -y flathub "org.freedesktop.Platform.GL.nvidia-${nvidia_version//./-}//1.4"
+            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
+        fi
         for dev in /sys/bus/pci/devices/*
         do
-            [ -f "$dev/class" ] || continue
-            read -r class < "$dev/class"
-            if [[ "$class" == 0x03* ]]
-            then
-                read -r vendor < "$dev/vendor"
-                [[ "$vendor" == "0x8086" ]] && flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
-                [[ "$vendor" == "0x10de" ]] && flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
-            fi
-        done
+            [[ "$(< "$dev/class")" == 0x03* && "$(< "$dev/vendor")" == "0x8086" ]] || continue
+            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
+            break
+        done 2>/dev/null
     fi
     flatpak update --user -y || failedInstall
 
@@ -1203,7 +1208,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta8"
+setupversion="Version 6.04b.universal1_beta9"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
