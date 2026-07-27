@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-15
+# Revised: 2026-07-27
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -10,6 +10,7 @@
 #  - curl 8.14.1 (Release-Date: 2025-06-04)
 #  - dos2unix 7.5.2 (2024-01-22)
 #  - DOSBox version 0.74-3, copyright 2002-2019 DOSBox Team.
+#  - DOSBox Daum altered macOS version (Jul 26 2026)
 #  - DOSBox ECE r4301 (Dec 11 2019)
 #  - DOSBox ECE r4358 (Sep 02 2020)
 #  - DOSBox ECE r4482 (Mar 17 2023)
@@ -239,6 +240,7 @@ function convertMacShell
            -e 's/flatpak run com\.retro_exo\.dosbox-x-20250201 /dosbox-x-20250201 /I' \
            -e 's/flatpak run com\.retro_exo\.dosbox-x-20250503 /dosbox-x-20250503 /I' \
            -e 's|flatpak run --env=DOOMWADDIR=\./GZDOOM com\.retro_exo\.gzdoom-4-11-3 |DOOMWADDIR=./GZDOOM gzdoom-4-11-3 |I' \
+           -e 's/flatpak run com\.retro_exo\.martypc-0-4-0 /martypc-0-4-0 /I' \
            -e 's/flatpak run com\.retro_exo\.openuhs /bash OpenUHS.command /I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2-2-0 |scummvm-2-2-0 |I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0 |scummvm-2-8-0 |I' \
@@ -1185,8 +1187,10 @@ do
     [ -e "$file" ] && sed -i -e 's/:staging0\.83\.0\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-staging-083-0/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:x\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-x-08220/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:x2\\dosbox\.exe/:flatpak run com.retro_exo.dosbox-x-20240701/I' "$file" 2>/dev/null
-    [ -e "$file" ] && sed -i -e 's/:X_2024\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20241001/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:X_2024\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20240701/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:X_2025\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20250503/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:X_Nov\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20241001/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's/:X_Nov\\dosbox-x/:flatpak run com.retro_exo.dosbox-x-20241001/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:mingw\\dosbox-x.exe/:flatpak run com.retro_exo.dosbox-x-20241001/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:dosbox0.63\\dosbox\.exe|:flatpak run com.retro_exo.wine emulators/dosbox/dosbox0.63/dosbox.exe|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:DWDdosbox\\dosbox\.exe|:flatpak run com.retro_exo.dosbox-gridc-4-3-1|I' "$file" 2>/dev/null
@@ -1225,6 +1229,7 @@ do
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20241001/:dosbox-x-20241001/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20250201/:dosbox-x-20250201/I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's/:flatpak run com.retro_exo.dosbox-x-20250503/:dosbox-x-20250503/I' "$file" 2>/dev/null
+    [ -e "$file" ] && sed -i -e 's|:flatpak run com.retro_exo.wine emulators/dosbox/daum/dosbox.exe|dosbox-daum|I' "$file" 2>/dev/null
     [ -e "$file" ] && sed -i -e 's|:flatpak run com.retro_exo.wine |:wine |I' "$file" 2>/dev/null
 done
 
@@ -1260,13 +1265,19 @@ sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;scu
 rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
 
 #remove MacOS conf files for games running DOSBox through Wine
-rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/desund/*_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/dune2/*_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TermFS/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf eXoDOS/\!dos/WarCraft/*_mac.conf 2>/dev/null
+rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/dune2/*_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TermFS/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf eXoDOS/\!dos/WarCraft/*_mac.conf 2>/dev/null
 
 #recopy Windows conf files to Linux and macOS naming convention for games running DOSBox through Wine
-for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/desund/*.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/dune2/*.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TermFS/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf eXoDOS/\!dos/WarCraft/*.conf
+for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/dune2/*.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TermFS/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf eXoDOS/\!dos/WarCraft/*.conf
 do
     [ -e "$file" ] && cp "$file" "${file%.conf}_linux.conf"
     [ -e "$file" ] && cp "$file" "${file%.conf}_mac.conf"
+done 2>/dev/null
+
+#recopy Windows conf files to Linux naming convention only (for games running DOSBox through Wine ONLY on Linux)
+for file in eXoDOS/\!dos/desund/*.conf
+do
+    [ -e "$file" ] && cp "$file" "${file%.conf}_linux.conf"
 done 2>/dev/null
 
 cp util/dreamm.txt util/dreamm_linux.txt  2>/dev/null
@@ -1298,9 +1309,7 @@ do
     [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
 ! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
-! [[ `which dosbox-ece-r4358` ]] && missingDependencies=yes\
 ! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
-! [[ `which dosbox-gridc-4-3-1` ]] && missingDependencies=yes\
 ! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
 ! [[ `which dosbox-staging-082-2` ]] && missingDependencies=yes\
 ! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
@@ -1320,6 +1329,7 @@ do
 ! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
 ! [[ `which dosbox-x-20241001` ]] && missingDependencies=yes\
 ! [[ `which dosbox-x-20250503` ]] && missingDependencies=yes\
+! [[ `which martypc-0-4-0` ]] && missingDependencies=yes\
 ! [[ `which wine` ]] && missingDependencies=yes' "$currentScript"
 done
 

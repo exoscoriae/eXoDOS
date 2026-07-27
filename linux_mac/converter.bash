@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-06-02
+# Revised: 2026-07-27
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3238,6 +3238,12 @@ TEMPDONECHOICE' "$currentScript"
            -e 's|^\([[:space:]]\+\)[\./]*openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.openuhs "\$PWD/|I' \
            -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS "|flatpak run com.retro_exo.openuhs "\$PWD/|I' \
            -e 's|^\([[:space:]]\+\)[\./]*util/openuhs/OpenUHS\.exe "|flatpak run com.retro_exo.openuhs "\$PWD/|I' "$currentScript"
+
+    #have MartyPC run through flatpak
+    sed -i -e 's|^[\./]*martypc |flatpak run martypc-0-4-0 |I' \
+           -e 's|^[\./]*martypc\.exe |flatpak run martypc-0-4-0 |I' \
+           -e 's|^\([[:space:]]\+\)[\./]*martypc |flatpak run martypc-0-4-0 |I' \
+           -e 's|^\([[:space:]]\+\)[\./]*martypc\.exe |flatpak run martypc-0-4-0 |I' "$currentScript"
     
     #have foobar2000.exe run through Wine
     sed -i -e 's|^\([^[:space:]]\+foobar2000.exe \)|flatpak run com.retro_exo.wine \1|' "$currentScript"
