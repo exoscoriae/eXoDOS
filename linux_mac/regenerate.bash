@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-07-27
+# Revised: 2026-07-31
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
-#  - Abiword 3.0.7 (Jul 30 2025)
+#  - Abiword 3.0.8 (Feb 18 2026)
 #  - aria2 version 1.37.0 (Nov 15 2023)
 #  - curl 8.14.1 (Release-Date: 2025-06-04)
 #  - dos2unix 7.5.2 (2024-01-22)
 #  - DOSBox version 0.74-3, copyright 2002-2019 DOSBox Team.
 #  - DOSBox Daum altered macOS version (Jul 26 2026)
-#  - DOSBox ECE r4301 (Dec 11 2019)
-#  - DOSBox ECE r4358 (Sep 02 2020)
-#  - DOSBox ECE r4482 (Mar 17 2023)
-#  - DOSBox GRIDC 4.3.1 (Mar 04 2019)
+#  - DOSBox ECE r4301 (Dec 11 2019) (MacOS version adds dynamic core fix)
+#  - DOSBox ECE r4358 (Sep 02 2020) (MacOS version adds dynamic core fix)
+#  - DOSBox ECE r4482 (Mar 17 2023) (MacOS version adds dynamic core fix)
 #  - DOSBox GunStick (altered with 0.74-3 as a base)
 #  - DOSBox Staging 0.81.2 (Jul 21 2024)
 #  - DOSBox Staging 0.82.0 (Oct 26 2024)
@@ -53,7 +52,7 @@
 #  - sed (GNU sed) 4.9
 #  - UnZip 6.00 of 20 April 2009, by Debian. Original by Info-ZIP.
 #  - VLC 3.0.23 (Dec 19 2025)
-#  - Wine 11.0 (Jan 13 2026)
+#  - Wine 11.0 (Jan 13 2026) with added console input fix
 #  - Zenity 4.2.1 (Nov 07 2025)
 #
 # Purpose: The purpose of this script is to assist in the development of future
@@ -1065,8 +1064,7 @@ eval flatpak run com.retro_exo.scummvm-2-9-0 $(echo "${screen}" | sed -e "s/\\\\
 [ `ls -1 eXoDOS/\!dos/curse/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/curse/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/dkkrynn/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/dkkrynn/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/drkqueen/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/drkqueen/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/dune2/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|"${dosbox}"|ece4230/DOSBox.exe|gI' eXoDOS/\!dos/dune2/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/dune2/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|^\./eXoDOS/dune2/Dune2MouseHelper\.exe|flatpak run com.retro_exo.wine ./eXoDOS/dune2/Dune2MouseHelper.exe|gI' eXoDOS/\!dos/dune2/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/dune2/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && rm eXoDOS/\!dos/dune2/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/eob1/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|ASE 1|ASE.exe 1|I" eXoDOS/\!dos/eob1/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/eob1/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/eob1/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/eob1/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/flatpak run com.retro_exo.wine/ s|_linux||gI" eXoDOS/\!dos/eob1/exception.bsh 2>/dev/null
@@ -1114,8 +1112,9 @@ eval flatpak run com.retro_exo.scummvm-2-8-0 $(echo "${screen}" | sed -e "s/\\\\
 [ `ls -1 eXoDOS/\!dos/Sigil/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|^gzrun\.bat|eval source gzrun.bsh|gI" eXoDOS/\!dos/Sigil/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/Sigil2/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|^gzrun\.bat|eval source gzrun.bsh|gI" eXoDOS/\!dos/Sigil2/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/SystemSh/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/^SSP\.EXE/flatpak run com.retro_exo.wine SSP.exe/I" eXoDOS/\!dos/SystemSh/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/SystemSh/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/\"Press 2 for SSP Configurator\"/\"Press 2 for SSP Configurator (do not launch SSP from Configurator)\"/I" eXoDOS/\!dos/SystemSh/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/SkyNET/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|"${dosbox}"|ece4481/DOSBox.exe|gI' eXoDOS/\!dos/SkyNET/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/TermFS/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|"${dosbox}"|ece4481/DOSBox.exe|gI' eXoDOS/\!dos/TermFS/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/TermFS/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && rm eXoDOS/\!dos/TermFS/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|tnmdbwrp |tnmdbwrp.exe |gI' eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/*\.tnm/{p;s/*\.tnm/*.TNM/}' eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e '/\*\.EXE/! s/\(for i in \*\.exe\)/\1 *.EXE/I' eXoDOS/\!dos/TNM7SE/exception.bsh 2>/dev/null
@@ -1125,7 +1124,7 @@ eval flatpak run com.retro_exo.scummvm-2-8-0 $(echo "${screen}" | sed -e "s/\\\\
 [ `ls -1 eXoDOS/\!dos/ultima5/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/Ultimapper_5 /Ultimapper_5.exe /gI" eXoDOS/\!dos/ultima5/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/ultima5/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/Ultimapper_5\`/Ultimapper_5.exe\`/gI" eXoDOS/\!dos/ultima5/exception.bsh 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/unlimadv/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s|flatpak run com.retro_exo.dosbox-ece-r4301|flatpak run com.retro_exo.wine emulators/dosbox/ece4230/DOSBox.exe|gI" eXoDOS/\!dos/unlimadv/exception.bsh 2>/dev/null
-[ `ls -1 eXoDOS/\!dos/WarCraft/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's|"${dosbox}"|ece4481/DOSBox.exe|gI' eXoDOS/\!dos/WarCraft/exception.bsh 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/WarCraft/exception.bsh 2>/dev/null | wc -w` -gt 0 ] && rm eXoDOS/\!dos/WarCraft/exception.bsh 2>/dev/null
 echo ""
 
 echo "Converting shell script reference files."
@@ -1262,13 +1261,13 @@ sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;scum
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3|;scummvm-3-0-0-git20192-g3ca9da6a1c3|I' util/scummvm_mac.txt  2>/dev/null
 
 #remove Linux conf files for games running DOSBox through Wine
-rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/dune2/*_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TermFS/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf eXoDOS/\!dos/WarCraft/*_linux.conf 2>/dev/null
+rm eXoDOS/\!dos/BRcdoom/*_GBC_linux.conf eXoDOS/\!dos/BRmatrix/*_GBC_linux.conf eXoDOS/\!dos/ckrynn/*_GBC_linux.conf eXoDOS/\!dos/curse/*_GBC_linux.conf eXoDOS/\!dos/desund/*_linux.conf eXoDOS/\!dos/dkkrynn/*_GBC_linux.conf eXoDOS/\!dos/drkqueen/*_GBC_linux.conf eXoDOS/\!dos/gatesf/*_GBC_linux.conf eXoDOS/\!dos/pooldark/*_GBC_linux.conf eXoDOS/\!dos/poolrad/*_GBC_linux.conf eXoDOS/\!dos/secsilbl/*_GBC_linux.conf eXoDOS/\!dos/SkyNET/*_linux.conf eXoDOS/\!dos/TNM7SE/*_linux.conf eXoDOS/\!dos/TreasSav/*_GBC_linux.conf eXoDOS/\!dos/ultima5/*_GBC_linux.conf eXoDOS/\!dos/unlimadv/*_GBC_linux.conf 2>/dev/null
 
 #remove MacOS conf files for games running DOSBox through Wine
-rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/dune2/*_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TermFS/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf eXoDOS/\!dos/WarCraft/*_mac.conf 2>/dev/null
+rm eXoDOS/\!dos/BRcdoom/*_GBC_mac.conf eXoDOS/\!dos/BRmatrix/*_GBC_mac.conf eXoDOS/\!dos/ckrynn/*_GBC_mac.conf eXoDOS/\!dos/curse/*_GBC_mac.conf eXoDOS/\!dos/dkkrynn/*_GBC_mac.conf eXoDOS/\!dos/drkqueen/*_GBC_mac.conf eXoDOS/\!dos/gatesf/*_GBC_mac.conf eXoDOS/\!dos/pooldark/*_GBC_mac.conf eXoDOS/\!dos/poolrad/*_GBC_mac.conf eXoDOS/\!dos/secsilbl/*_GBC_mac.conf eXoDOS/\!dos/SkyNET/*_mac.conf eXoDOS/\!dos/TNM7SE/*_mac.conf eXoDOS/\!dos/TreasSav/*_GBC_mac.conf eXoDOS/\!dos/ultima5/*_GBC_mac.conf eXoDOS/\!dos/unlimadv/*_GBC_mac.conf 2>/dev/null
 
 #recopy Windows conf files to Linux and macOS naming convention for games running DOSBox through Wine
-for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/dune2/*.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TermFS/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf eXoDOS/\!dos/WarCraft/*.conf
+for file in eXoDOS/\!dos/BRcdoom/*_GBC.conf eXoDOS/\!dos/BRmatrix/*_GBC.conf eXoDOS/\!dos/ckrynn/*_GBC.conf eXoDOS/\!dos/curse/*_GBC.conf eXoDOS/\!dos/dkkrynn/*_GBC.conf eXoDOS/\!dos/drkqueen/*_GBC.conf eXoDOS/\!dos/gatesf/*_GBC.conf eXoDOS/\!dos/pooldark/*_GBC.conf eXoDOS/\!dos/poolrad/*_GBC.conf eXoDOS/\!dos/secsilbl/*_GBC.conf eXoDOS/\!dos/SkyNET/*.conf eXoDOS/\!dos/TNM7SE/*.conf eXoDOS/\!dos/TreasSav/*_GBC.conf eXoDOS/\!dos/ultima5/*_GBC.conf eXoDOS/\!dos/unlimadv/*_GBC.conf
 do
     [ -e "$file" ] && cp "$file" "${file%.conf}_linux.conf"
     [ -e "$file" ] && cp "$file" "${file%.conf}_mac.conf"
