@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-07-31
+# Revised: 2026-08-05
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -330,6 +330,49 @@ missingDependencies=no\
 }
 export -f convertMacShell
 
+function smartMerge
+{
+    local src="$1"
+    local dst="$2"
+    [ -e "$src" ] || return 0
+
+    #capitalization fix for case insensitive filesystems
+    if [ "$src" -ef "$dst" ]
+    then
+        mv -n -- "$src" "${dst}_tmp"
+        mv -n -- "${dst}_tmp" "$dst"
+        return 0
+    fi
+
+    #correct capitalization if no target is present
+    if [ ! -e "$dst" ]
+    then
+        mv -n -- "$src" "$dst"
+        return 0
+    fi
+
+    #merge if target directory is already present
+    if [ -d "$src" ] && [ -d "$dst" ]
+    then
+        local shopt_state=$(shopt -p dotglob)
+        shopt -s dotglob
+        for item in "$src"/*
+        do
+            [ -e "$item" ] || [ -L "$item" ] || continue
+            local base_item="${item##*/}"
+            smartMerge "$item" "$dst/$base_item"
+        done
+        eval "$shopt_state"
+
+        rmdir "$src"
+        return 0
+    fi
+
+    #replace if target file already exists
+    rm -rf "$dst"
+    mv -n -- "$src" "$dst"
+}
+
 #determine available threads for parallel script conversion
 totalThreads=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 
@@ -404,11 +447,54 @@ cd eXo
 #[ -e "emulators/scummvm/scummvm.ini" ] && wine cmd /c "md %USERPROFILE%\AppData\Roaming\ScummVM" 2>/dev/null
 #[ -e "emulators/scummvm/scummvm.ini" ] && wine cmd /c "copy .\util\scummvm.ini %USERPROFILE%\AppData\Roaming\ScummVM\scummvm.ini" 2>/dev/null
 
+echo "Fixing file and directory names."
+smartMerge eXoDemoScn/\!demoscn/bits5038/bits5038\ \(2016\).bat eXoDemoScn/\!demoscn/bits5038/BITS5038\ \(2016\).bat
+smartMerge eXoDemoScn/\!demoscn/bits5038 eXoDemoScn/\!demoscn/BITS5038
+smartMerge eXoDemoScn/\!demoscn/bits5039/bits5039\ \(2017\).bat eXoDemoScn/\!demoscn/bits5039/BITS5039\ \(2017\).bat
+smartMerge eXoDemoScn/\!demoscn/bits5039 eXoDemoScn/\!demoscn/BITS5039
+smartMerge eXoDemoScn/\!demoscn/corrupt/corrupt\ \(1992\).bat eXoDemoScn/\!demoscn/corrupt/CORRUPT\ \(1992\).bat
+smartMerge eXoDemoScn/\!demoscn/corrupt eXoDemoScn/\!demoscn/CORRUPT
+smartMerge eXoDemoScn/\!demoscn/daybreak/daybreak\ \(2016\).bat eXoDemoScn/\!demoscn/daybreak/DAYBREAK\ \(2016\).bat
+smartMerge eXoDemoScn/\!demoscn/daybreak eXoDemoScn/\!demoscn/DAYBREAK
+smartMerge eXoDemoScn/\!demoscn/demo3D/demo3d\ \(1993\).bat eXoDemoScn/\!demoscn/demo3D/demo3D\ \(1993\).bat
+smartMerge eXoDemoScn/\!demoscn/demulamu/demulamu\ \(1996\).bat eXoDemoScn/\!demoscn/demulamu/DEMULAMU\ \(1996\).bat
+smartMerge eXoDemoScn/\!demoscn/demulamu eXoDemoScn/\!demoscn/DEMULAMU
+smartMerge eXoDemoScn/\!demoscn/e-motion/e-motion\ \(1994\).bat eXoDemoScn/\!demoscn/e-motion/E-MOTION\ \(1994\).bat
+smartMerge eXoDemoScn/\!demoscn/e-motion eXoDemoScn/\!demoscn/E-MOTION
+smartMerge eXoDemoScn/\!demoscn/gobit/gobit\ \(2017\).bat eXoDemoScn/\!demoscn/gobit/GoBIT\ \(2017\).bat
+smartMerge eXoDemoScn/\!demoscn/gobit eXoDemoScn/\!demoscn/GoBIT
+smartMerge eXoDemoScn/\!demoscn/hyp_year/hyp_year\ \(1993\).bat eXoDemoScn/\!demoscn/hyp_year/HYP_YEAR\ \(1993\).bat
+smartMerge eXoDemoScn/\!demoscn/hyp_year eXoDemoScn/\!demoscn/HYP_YEAR
+smartMerge eXoDemoScn/\!demoscn/inthe90s/inthe90s\ \(2019\).bat eXoDemoScn/\!demoscn/inthe90s/INTHE90S\ \(2019\).bat
+smartMerge eXoDemoScn/\!demoscn/inthe90s eXoDemoScn/\!demoscn/INTHE90S
+smartMerge eXoDemoScn/\!demoscn/j3preinv/j3preinv\ \(1995\).bat eXoDemoScn/\!demoscn/j3preinv/J3PREINV\ \(1995\).bat
+smartMerge eXoDemoScn/\!demoscn/j3preinv eXoDemoScn/\!demoscn/J3PREINV
+smartMerge eXoDemoScn/\!demoscn/lostdes/lostdes\ \(1994\).bat eXoDemoScn/\!demoscn/lostdes/LOSTDES\ \(1994\).bat
+smartMerge eXoDemoScn/\!demoscn/lostdes eXoDemoScn/\!demoscn/LOSTDES
+smartMerge eXoDemoScn/\!demoscn/pyopyo/pyopyo\ \(2019\).bat eXoDemoScn/\!demoscn/pyopyo/PYOPYO\ \(2019\).bat
+smartMerge eXoDemoScn/\!demoscn/pyopyo eXoDemoScn/\!demoscn/PYOPYO
+smartMerge eXoDemoScn/\!demoscn/reactive eXoDemoScn/\!demoscn/REACTIVE
+smartMerge eXoDemoScn/\!demoscn/Sanim eXoDemoScn/\!demoscn/sanim
+smartMerge eXoDemoScn/\!demoscn/scx-taoc/scx-taoc\ \(1994\).bat eXoDemoScn/\!demoscn/scx-taoc/SCX-TAOC\ \(1994\).bat
+smartMerge eXoDemoScn/\!demoscn/scx-taoc eXoDemoScn/\!demoscn/SCX-TAOC
+smartMerge eXoDemoScn/\!demoscn/Time eXoDemoScn/\!demoscn/time
+smartMerge eXoDemoScn/\!demoscn/tinydemo/tinydemo\ \(2022\).bat eXoDemoScn/\!demoscn/tinydemo/TINYDEMO\ \(2022\).bat
+smartMerge eXoDemoScn/\!demoscn/tinydemo eXoDemoScn/\!demoscn/TINYDEMO
+smartMerge eXoDemoScn/\!demoscn/vittu/vittu\ \(2025\).bat eXoDemoScn/\!demoscn/vittu/VITTU\ \(2025\).bat
+smartMerge eXoDemoScn/\!demoscn/vittu eXoDemoScn/\!demoscn/VITTU
+smartMerge eXoDemoScn/\!demoscn/XMAS1992/xmas1992\ \(1992\).bat eXoDemoScn/\!demoscn/XMAS1992/XMAS1992\ \(1992\).bat
+#the zips for the below 4 commented out lines should say 1997, not 1996 - include zips with corrected filenames in the patch
+#smartMerge eXoDemoScn/\!demoscn/comahomo/comahomo\ \(1997\).bat eXoDemoScn/\!demoscn/comahomo/comahomo\ \(1996\).bat
+#smartMerge eXoDemoScn/\!demoscn/creat1on/creat1on\ \(1997\).bat eXoDemoScn/\!demoscn/creat1on/creat1on\ \(1996\).bat
+#smartMerge eXoDemoScn/\!demoscn/fizzygay/fizzygay\ \(1997\).bat eXoDemoScn/\!demoscn/fizzygay/fizzygay\ \(1996\).bat
+#smartMerge eXoDemoScn/\!demoscn/zebra/zebra\ \(1997\).bat eXoDemoScn/\!demoscn/zebra/zebra\ \(1996\).bat
+[ -e eXoDemoScn/\!demoscn/da-ass/da-ass\ \(2019\).bat ] && rm eXoDemoScn/\!demoscn/da-ass/da-ass\ \(2019\).bat
+
 echo "Fixing zip archive references."
 
 echo "Fixing batch file reference inconsistencies. (ETA 2 minutes)"
 [ `ls -1 Update/*.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "s/^goto :eof/goto :end/" Update/*.bat 2>/dev/null
-for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.bat Magazines/*.bat Magazines/*/*.bat Magazines/*/*/*.bat Videos/*.bat Videos/*/*.bat Videos/*/*/*.bat emulators/dosbox/*.bat emulators/dosbox/*/*.bat util/*.bat util/*/*.bat ../xml/*.bat ../*.bat
+for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.bat Magazines/*.bat Magazines/*/*.bat Magazines/*/*/*.bat Videos/*.bat Videos/*/*.bat Videos/*/*/*.bat emulators/dosbox/*.bat emulators/dosbox/*/*.bat emulators/martypc/*.bat util/*.bat util/*/*.bat ../xml/*.bat ../*.bat
 do
     [ -e "$file" ] && printf "%s\0" "$file"
 done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'fixBatchReferenceInconsistencies "$@"' _
@@ -515,12 +601,33 @@ echo "Fixing typos."
 [ `ls -1 ../eXoMerge.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/To few parameters/Too few parameters/Ig' ../eXoMerge.bat 2>/dev/null
 [ `ls -1 ../eXoMerge.bat 2>/dev/null | wc -w` -gt 0 ] && sed -i -e 's/To much parameters/Too many parameters/Ig' ../eXoMerge.bat 2>/dev/null
 
+echo "fixing demoscn.txt reference errors."
+for file in util/demoscn.txt
+do
+    [ -e "$file" ] && sed -i -e 's/^corrupt (1992):/CORRUPT (1992):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^xmas1992 (1992):/XMAS1992 (1992):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^hyp_year (1993):/HYP_YEAR (1993):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^e-motion (1994):/E-MOTION (1994):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^lostdes (1994):/LOSTDES (1994):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^scx-taoc (1994):/SCX-TAOC (1994):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^j3preinv (1995):/J3PREINV (1995):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^demulamu (1996):/DEMULAMU (1996):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^bits5038 (2016):/BITS5038 (2016):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^daybreak (2016):/DAYBREAK (2016):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^bits5039 (2017):/BITS5039 (2017):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^gobit (2017):/GoBIT (2017):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^inthe90s (2019):/INTHE90S (2019):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^pyopyo (2019):/PYOPYO (2019):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^tinydemo (2022):/TINYDEMO (2022):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^vittu (2025):/VITTU (2025):/' "$file"
+done
+
 echo "Fixing scummvm.txt reference errors."
 #each game must have matching entry for the game directory; subdirectories may have an entry but this is not required; defaults to game directory if subdirectory has no entry
 
 echo "Creating game shell files."
 echo "Preparing files for conversion..."
-for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.bat Magazines/*.bat Magazines/*/*.bat Magazines/*/*/*.bat Videos/*.bat Videos/*/*.bat Videos/*/*/*.bat emulators/dosbox/*.bat emulators/dosbox/*/*.bat util/*.bat util/*/*.bat ../xml/*.bat ../*.bat
+for file in eXo*/\!*/*/*.bat eXo*/\!*/*/*/*.bat eXo*/\!*/*/*/*/*.bat Update/*.bat Magazines/*.bat Magazines/*/*.bat Magazines/*/*/*.bat Videos/*.bat Videos/*/*.bat Videos/*/*/*.bat emulators/dosbox/*.bat emulators/dosbox/*/*.bat emulators/martypc/*.bat util/*.bat util/*/*.bat ../xml/*.bat ../*.bat
 do
     [ -e "$file" ] && cp "$file" "${file%.bat}.bsh"
 done
@@ -549,7 +656,7 @@ done
 echo "Converting file syntax from Windows batch to bash. (ETA 1.25 hours)"
 echo ""
 
-for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
+for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh emulators/martypc/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$currentScript" ] && printf "%s\0" "$currentScript"
 done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'spawnConversion "$@"' _
@@ -569,6 +676,11 @@ do
     [ -e "$currentScript" ] && sed -i -e '/unzip -o/ s|XODOSMetadata Plugins/eXoPlugin\.dll|XODOSzz_linuxmac_Metadata.zip Plugins/eXoPlugin.dll|' "$currentScript"
 done
 
+for currentScript in emulators/martypc/*.bsh
+do
+    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
+    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.martypc"` ]] \&\& missingDependencies=yes^' "$currentScript"
+done
 for currentScript in eXoDemoScn/\!*/*/*.bsh eXoDemoScn/\!*/*/*/*.bsh eXoDemoScn/\!*/*/*/*/*.bsh util/ds_*.bsh ../Setup\ eXoDemoScene.bsh
 do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
@@ -576,7 +688,6 @@ do
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-074r3-1"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-ece-r4482"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-081-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-082-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-08220"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20240701"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20241001"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20250503"` ]] \&\& missingDependencies=yes^' "$currentScript"
-
 done
 for currentScript in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh util/*_drm*.bsh ../Setup\ eXoDREAMM.bsh
 do
@@ -620,7 +731,7 @@ echo "Removing unnecessary files..."
 
 echo ""
 echo "Creating universal launch files. (ETA 4 minutes)"
-for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
+for currentScript in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh emulators/martypc/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$currentScript" ] && cat << 'EOF' > "${currentScript%.bsh}.command"
 #!/usr/bin/env bash
@@ -701,6 +812,28 @@ do
     [ -e "$file" ] && sed -i -e "s/PPMode/PPmode/I" "$file"
 done 2>/dev/null
 
+[ -e eXoDemoScn/\!demoscn/4k____/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\4K____|\\eXoDemoScn\\4k____|g' eXoDemoScn/\!demoscn/4k____/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/ai-melon/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\AI-MELON|\\eXoDemoScn\\ai-melon|g' eXoDemoScn/\!demoscn/ai-melon/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/amb_dupl/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\AMB_DUPL|\\eXoDemoScn\\amb_dupl|g' eXoDemoScn/\!demoscn/amb_dupl/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/BITS5038/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\bits5038|\\eXoDemoScn\\BITS5038|g' eXoDemoScn/\!demoscn/BITS5038/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/BITS5039/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\bits5039|\\eXoDemoScn\\BITS5039|g' eXoDemoScn/\!demoscn/BITS5039/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/cc_2lite/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\CC_2LITE|\\eXoDemoScn\\cc_2lite|g' eXoDemoScn/\!demoscn/cc_2lite/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/cc_ureah/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\CC_UREAH|\\eXoDemoScn\\cc_ureah|g' eXoDemoScn/\!demoscn/cc_ureah/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/CORRUPT/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\corrupt|\\eXoDemoScn\\CORRUPT|g' eXoDemoScn/\!demoscn/CORRUPT/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/cytopyge/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\CYTOPYGE|\\eXoDemoScn\\cytopyge|g' eXoDemoScn/\!demoscn/cytopyge/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/DAYBREAK/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\daybreak|\\eXoDemoScn\\DAYBREAK|g' eXoDemoScn/\!demoscn/DAYBREAK/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/DEMULAMU/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\demulamu|\\eXoDemoScn\\DEMULAMU|g' eXoDemoScn/\!demoscn/DEMULAMU/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/E-MOTION/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\e-motion|\\eXoDemoScn\\E-MOTION|g' eXoDemoScn/\!demoscn/E-MOTION/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/GoBIT/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\gobit|\\eXoDemoScn\\GoBIT|g' eXoDemoScn/\!demoscn/GoBIT/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/INTHE90S/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\inthe90s|\\eXoDemoScn\\INTHE90S|g' eXoDemoScn/\!demoscn/INTHE90S/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/J3PREINV/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\j3preinv|\\eXoDemoScn\\J3PREINV|g' eXoDemoScn/\!demoscn/J3PREINV/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/LOSTDES/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\lostdes|\\eXoDemoScn\\LOSTDES|g' eXoDemoScn/\!demoscn/LOSTDES/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/PYOPYO/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\pyopyo|\\eXoDemoScn\\PYOPYO|g' eXoDemoScn/\!demoscn/PYOPYO/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/REACTIVE/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\reactive|\\eXoDemoScn\\REACTIVE|g' eXoDemoScn/\!demoscn/REACTIVE/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/SCX-TAOC/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\scx-taoc|\\eXoDemoScn\\SCX-TAOC|g' eXoDemoScn/\!demoscn/SCX-TAOC/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/TINYDEMO/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\tinydemo|\\eXoDemoScn\\TINYDEMO|g' eXoDemoScn/\!demoscn/TINYDEMO/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/VITTU/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\vittu|\\eXoDemoScn\\VITTU|g' eXoDemoScn/\!demoscn/VITTU/dosbox.conf
+[ -e eXoDemoScn/\!demoscn/XMAS1992/dosbox.conf ] && sed -i -e 's|\\eXoDemoScn\\xmas1992|\\eXoDemoScn\\XMAS1992|g' eXoDemoScn/\!demoscn/XMAS1992/dosbox.conf
 #[ -e eXoDOS/\!dos/11thHour/dosbox.conf ] && sed -i -e "s/\\\eXoDOS\\\11thhour/\\\eXoDOS\\\11thHour/Ig" eXoDOS/\!dos/11thHour/dosbox.conf
 #[ -e eXoDOS/\!dos/1942PAW/dosbox.conf ] && sed -i -e "s/1942PAW\\\CD\\\/1942PAW\\\cd\\\/" eXoDOS/\!dos/1942PAW/dosbox.conf
 #[ -e eXoDOS/\!dos/442/dosbox.conf ] && sed -i -e "s/442\\\cd\\\/442\\\CD\\\/" eXoDOS/\!dos/442/dosbox.conf
@@ -1292,18 +1425,18 @@ cp util/dreamm_linux.txt util/dreamm_mac.txt  2>/dev/null
 
 echo "Preparing macOS shell files... (ETA 1.5 minutes)"
 #skipping eXoDOS and eXoScummVM files for now. They will need some additional changes in the converting macOS shell files section.
-for file in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
+for file in eXo*/\!*/*/*.bsh eXo*/\!*/*/*/*.bsh eXo*/\!*/*/*/*/*.bsh Magazines/*.bsh Magazines/*/*.bsh Magazines/*/*/*.bsh Videos/*.bsh Videos/*/*.bsh Videos/*/*/*.bsh Update/*.bsh emulators/dosbox/*.bsh emulators/dosbox/*/*.bsh emulators/martypc/*.bsh util/*.bsh util/*/*.bsh ../xml/*.bsh ../*.bsh
 do
     [ -e "$file" ] && cp "$file" "${file%.bsh}.msh"
 done
 
 echo "Converting macOS shell files... (ETA 3 minutes)"
-for currentScript in eXo*/\!*/*/*.msh eXo*/\!*/*/*/*.msh eXo*/\!*/*/*/*/*.msh Magazines/*.msh Magazines/*/*.msh Magazines/*/*/*.msh Videos/*.msh Videos/*/*.msh Videos/*/*/*.msh Update/*.msh emulators/dosbox/*.msh emulators/dosbox/*/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
+for currentScript in eXo*/\!*/*/*.msh eXo*/\!*/*/*/*.msh eXo*/\!*/*/*/*/*.msh Magazines/*.msh Magazines/*/*.msh Magazines/*/*/*.msh Videos/*.msh Videos/*/*.msh Videos/*/*/*.msh Update/*.msh emulators/dosbox/*.msh emulators/dosbox/*/*.msh emulators/martypc/*.msh util/*.msh util/*/*.msh ../xml/*.msh ../*.msh
 do
     [ -e "$currentScript" ] && printf "%s\0" "$currentScript"
 done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'convertMacShell "$@"' _
 
-for currentScript in currentScript in eXoDOS/\!*/*/*.msh eXoDOS/\!*/*/*/*.msh eXoPCjr/\!*/*/*.msh eXoPCjr/\!*/*/*/*.msh ../Setup\ eXoDOS.msh
+for currentScript in eXoDOS/\!*/*/*.msh eXoDOS/\!*/*/*/*.msh eXoPCjr/\!*/*/*.msh eXoPCjr/\!*/*/*/*.msh ../Setup\ eXoDOS.msh
 do
     [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
@@ -1317,7 +1450,7 @@ do
 ! [[ `which gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
 done
 
-for currentScript in currentScript in eXoDemoScn/\!*/*/*.msh eXoDemoScn/\!*/*/*/*.msh util/\ds_*.msh ../Setup\ eXoDemoScene.msh
+for currentScript in eXoDemoScn/\!*/*/*.msh eXoDemoScn/\!*/*/*/*.msh util/\ds_*.msh ../Setup\ eXoDemoScene.msh
 do
     [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
@@ -1332,7 +1465,7 @@ do
 ! [[ `which wine` ]] && missingDependencies=yes' "$currentScript"
 done
 
-for currentScript in currentScript in eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*_svm.msh ../Setup\ eXoScummVM.msh
+for currentScript in eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*_svm.msh ../Setup\ eXoScummVM.msh
 do
     [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which scummvm-2-5-0` ]] && missingDependencies=yes\
@@ -1344,10 +1477,17 @@ do
 ! [[ `which scummvm-3-0-0-git20192-g3ca9da6a1c3` ]] && missingDependencies=yes' "$currentScript"
 done
 
-for currentScript in currentScript in eXoWin9x/\!*/*/*/*.msh eXoWin9x/\!*/*/*/*/*.msh util/9x*.msh ../Setup\ eXoWin9x.msh
+for currentScript in eXoWin9x/\!*/*/*/*.msh eXoWin9x/\!*/*/*/*/*.msh util/9x*.msh ../Setup\ eXoWin9x.msh
 do
     [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
 ! [[ `which dosbox-x-20250201` ]] && missingDependencies=yes' "$currentScript"
+done
+
+for currentScript in emulators/martypc/*.msh
+do
+    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
+! [[ `which martypc-0-4-0` ]] && missingDependencies=yes\
+! [[ `which wine` ]] && missingDependencies=yes' "$currentScript"
 done
 
 for file in ../Setup*.msh ../eXoMerge.msh
