@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-07-26
+# Revised: 2026-08-05
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -49,7 +49,7 @@ function beginMac
     printf "Checking for essential system packages...\n\n"
     command -v sha256sum &> /dev/null || sha256sum() { shasum -a 256 "$@"; }
     
-    printf "Extracting bundled versions of unzip, wget, and gstreamer...\n\n"
+    printf "Extracting bundled versions of unzip and wget...\n\n"
     extractEssential
     fixGatekeeper
     installPackages
@@ -170,7 +170,6 @@ function extractEssential
         [ -e "$zip_file" ] || continue
         unzip -o "$zip_file" eXo/macutil/macOS/unzip.dmg -d ./ || abortScript "Failed to unzip unzip."
         unzip -o "$zip_file" eXo/macutil/macOS/wget.dmg -d ./ || abortScript "Failed to unzip wget."
-        unzip -o "$zip_file" 'eXo/macutil/macOS/gstreamer.*' -d ./ || abortScript "Failed to unzip gstreamer."
     done
     cd eXo
     mkdir -p Update/linux_mac
@@ -1016,36 +1015,36 @@ function installPackages
             echo "This primarily affects features that use Wine."
         fi
     fi
-    #Install GStreamer if not present
-    if [ -e gstreamer.pkg ] && [ -e gstreamer.ver ]
-    then
-        pkg_version="$(sed -n '1p' gstreamer.ver | tr -d '[:space:]')"
-        pkg_major="${pkg_version%%.*}"
-        gstreamer_verinfo="$(/Library/Frameworks/GStreamer.framework/Versions/$pkg_major.0/bin/gst-launch-$pkg_major.0 --version 2>/dev/null || gst-launch-$pkg_major.0 --version 2>/dev/null)"
-        installed_gstreamer=$(echo "$gstreamer_verinfo" | awk '/GStreamer/{print $2}')
-        unset gstreamer_verinfo
-        installed_gstreamer="${installed_gstreamer:-0.0.0}"
-        pkg_version=$(echo "$pkg_version" | awk -F. '{printf "%03d%03d%03d", $1, $2, $3}')
-        installed_gstreamer=$(echo "$installed_gstreamer" | awk -F. '{printf "%03d%03d%03d", $1, $2, $3}')
-        if [[ "$pkg_version" > "$installed_gstreamer" ]]
-        then
-            [ "$installed_gstreamer" -gt 0 ] && printf "GStreamer: \e[1;37;41moutdated\e[0m\n" || printf "GStreamer: \e[1;37;41mmissing\e[0m\n"
-            echo "  Installing GStreamer..."
-            if command -v brew >/dev/null 2>&1 && brew ls --versions gstreamer >/dev/null 2>&1
-            then
-                brew update && brew upgrade gstreamer || abortScript "Failed to update GStreamer."
-            elif command -v port >/dev/null 2>&1 && port installed | grep -qi "gstreamer$pkg_major"
-            then
-                sudo port selfupdate && sudo port upgrade "gstreamer$pkg_major" || abortScript "Failed to update GStreamer."
-            else
-                sudo installer -pkg "$PWD/gstreamer.pkg" -target / || abortScript "Failed to install GStreamer."
-            fi
-            [ "$installed_gstreamer" -gt 0 ] && printf "\n  Upgraded\n" || printf "\n  Installed\n"
-        else
-            printf "GStreamer: \e[1;37;44mpresent\e[0m\n"
-        fi
-        unset pkg_version installed_gstreamer
-    fi
+#    #Install GStreamer if not present
+#    if [ -e gstreamer.pkg ] && [ -e gstreamer.ver ]
+#    then
+#        pkg_version="$(sed -n '1p' gstreamer.ver | tr -d '[:space:]')"
+#        pkg_major="${pkg_version%%.*}"
+#        gstreamer_verinfo="$(/Library/Frameworks/GStreamer.framework/Versions/$pkg_major.0/bin/gst-launch-$pkg_major.0 --version 2>/dev/null || gst-launch-$pkg_major.0 --version 2>/dev/null)"
+#        installed_gstreamer=$(echo "$gstreamer_verinfo" | awk '/GStreamer/{print $2}')
+#        unset gstreamer_verinfo
+#        installed_gstreamer="${installed_gstreamer:-0.0.0}"
+#        pkg_version=$(echo "$pkg_version" | awk -F. '{printf "%03d%03d%03d", $1, $2, $3}')
+#        installed_gstreamer=$(echo "$installed_gstreamer" | awk -F. '{printf "%03d%03d%03d", $1, $2, $3}')
+#        if [[ "$pkg_version" > "$installed_gstreamer" ]]
+#        then
+#            [ "$installed_gstreamer" -gt 0 ] && printf "GStreamer: \e[1;37;41moutdated\e[0m\n" || printf "GStreamer: \e[1;37;41mmissing\e[0m\n"
+#            echo "  Installing GStreamer..."
+#            if command -v brew >/dev/null 2>&1 && brew ls --versions gstreamer >/dev/null 2>&1
+#            then
+#                brew update && brew upgrade gstreamer || abortScript "Failed to update GStreamer."
+#            elif command -v port >/dev/null 2>&1 && port installed | grep -qi "gstreamer$pkg_major"
+#            then
+#                sudo port selfupdate && sudo port upgrade "gstreamer$pkg_major" || abortScript "Failed to update GStreamer."
+#            else
+#                sudo installer -pkg "$PWD/gstreamer.pkg" -target / || abortScript "Failed to install GStreamer."
+#            fi
+#            [ "$installed_gstreamer" -gt 0 ] && printf "\n  Upgraded\n" || printf "\n  Installed\n"
+#        else
+#            printf "GStreamer: \e[1;37;44mpresent\e[0m\n"
+#        fi
+#        unset pkg_version installed_gstreamer
+#    fi
     cd ../../..
 }
 
@@ -1055,7 +1054,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta9"
+setupversion="Version 6.04b.universal1_beta10"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
