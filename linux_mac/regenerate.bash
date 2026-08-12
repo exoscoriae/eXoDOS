@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-08-05
+# Revised: 2026-08-12
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -604,7 +604,9 @@ echo "Fixing typos."
 echo "fixing demoscn.txt reference errors."
 for file in util/demoscn.txt
 do
+    [ -e "$file" ] && sed -i -e 's/^comahomo (1996):/comahomo (1997):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^corrupt (1992):/CORRUPT (1992):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^creat1on (1996):/creat1on (1997):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^xmas1992 (1992):/XMAS1992 (1992):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^hyp_year (1993):/HYP_YEAR (1993):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^e-motion (1994):/E-MOTION (1994):/' "$file"
@@ -615,11 +617,13 @@ do
     [ -e "$file" ] && sed -i -e 's/^bits5038 (2016):/BITS5038 (2016):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^daybreak (2016):/DAYBREAK (2016):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^bits5039 (2017):/BITS5039 (2017):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^fizzygay (1996):/fizzygay (1997):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^gobit (2017):/GoBIT (2017):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^inthe90s (2019):/INTHE90S (2019):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^pyopyo (2019):/PYOPYO (2019):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^tinydemo (2022):/TINYDEMO (2022):/' "$file"
     [ -e "$file" ] && sed -i -e 's/^vittu (2025):/VITTU (2025):/' "$file"
+    [ -e "$file" ] && sed -i -e 's/^zebra (1996):/zebra (1997):/' "$file"
 done
 
 echo "Fixing scummvm.txt reference errors."
