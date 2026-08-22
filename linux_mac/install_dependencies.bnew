@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-08-05
+# Revised: 2026-08-22
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -451,8 +451,8 @@ function failedInstall
         "- A read-only filesystem" \
         "- A zip file is corrupted" \
         "- Your computer leading a rebellion against you"
-    printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the readme:\n%s\e[1;33;40m%s\e[0m%s\n\n" \
-        "\"" "./eXo<collection> Linux ReadMe.txt" "\""
+    printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the manual:\n%s\e[1;33;40m%s\e[0m%s\n\n" \
+        "\"" "eXo<collection> Patch Manual.pdf" "\""
     read -s -n 1 -p "Press any key to abort."
     printf "\n\n"
     exit 1
@@ -1208,7 +1208,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta10"
+setupversion="Version 6.04b.universal1_beta11"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"

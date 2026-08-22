@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-08-05
+# Revised: 2026-08-22
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -27,8 +27,8 @@ function beginMac
             "This setup will install the software required by the collection." \
             "If system packages are needed, you may be asked for your password (for sudo)." \
             "If your account lacks sudo access, this script cannot install system packages."
-        printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
-            "[" "P" "]roceed with installation" "[" "D" "]ownload updates" "[" "F" "]ix gatekeeper permissions" "[" "A" "]bort installation"
+        printf "Please choose one of the following:\n\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n%s\e[1;37;45m%s\e[0m%s\n\n" \
+            "[" "P" "]roceed with installation" "[" "D" "]ownload updates" "[" "F" "]ix gatekeeper permissions" "[" "R" "]emove all installed eXo packages" "[" "A" "]bort installation"
         while true
         do
             read -p "(P/D/A)? " choice
@@ -38,6 +38,8 @@ function beginMac
                         break;;
                 [Ff]* ) move_fix_only=yes
                         break;;
+                [Rr]* ) remove_exo=yes
+                        break;;
                 [Aa]* ) printf "\n"
                         exit 0
                         break;;
@@ -45,6 +47,28 @@ function beginMac
             esac
         done
     fi
+    if [ "$remove_exo" == "yes" ]
+    then
+        clear
+        printf "This will remove all eXo applications from your ~/Library directory.\n%s" \
+            "Are you sure you want to proceed? "
+        while true
+        do
+            read -p "(Y/N)? " choice
+            case $choice in
+                [Yy]* ) break;;
+                [Nn]* ) exit 0
+                        break;;
+                *     ) printf "Invalid input.\n";;
+            esac
+        done
+        rm -rf ~/Library/Application\ Support/exogui/external_apps || abortScript "Failed to remove external_apps."
+	rm -rf ~/Library/Application\ Support/exogui/external_core || abortScript "Failed to remove external_core."
+        printf "\nAll eXo applications have been successfully uninstalled from ~/Library.\n"
+        read -s -n 1 -p "Press any key to exit."
+        exit 0
+    fi
+
     clear
     printf "Checking for essential system packages...\n\n"
     command -v sha256sum &> /dev/null || sha256sum() { shasum -a 256 "$@"; }
@@ -542,8 +566,8 @@ function failedInstall
         "- A read-only filesystem" \
         "- A zip file is corrupted" \
         "- Your computer leading a rebellion against you"
-    printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the readme:\n%s\e[1;37;44m%s\e[0m%s\n\n" \
-        "\"" "./eXo<collection> Linux ReadMe.txt" "\""
+    printf "Sometimes the problem may resolve itself by rerunning this setup.\nFirst try that. If there is still a problem, consult the manual:\n%s\e[1;37;44m%s\e[0m%s\n\n" \
+        "\"" "eXo<collection> Patch Manual.pdf" "\""
     read -s -n 1 -p "Press any key to abort."
     printf "\n\n"
     exit 1
@@ -1054,7 +1078,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta10"
+setupversion="Version 6.04b.universal1_beta11"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
@@ -1093,7 +1117,7 @@ if [[ "$OSTYPE" == "linux"* ]]
 then
     current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
     case "$current_term" in
-        "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"*|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
+        "alacritty"|"aterm"|"blackbox-termin"|"cool-retro-term"|"cosmic-term"|"deepin-terminal"|"Eterm"|"foot"|"ghostty"|"gnome-terminal-"*|"io.elementary.terminal"|"kgx"|"konsole"|"kitty"|"lxterminal"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rio"|"rio-terminal"|"rxvt"|"sakura"|"st"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"wezterm"|"xdg-terminal-exec"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
             cd "$udspath"
             source "$scriptDir/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")"
             exit 0
@@ -1204,12 +1228,52 @@ then
     then
         Eterm -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
         exit 0
+    elif command -v wezterm &> /dev/null
+    then
+        wezterm start -- /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v ghostty &> /dev/null
+    then
+        ghostty -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v blackbox-terminal &> /dev/null
+    then
+        blackbox-terminal -c "/usr/bin/env bash \"$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")\" $@" &
+        exit 0
+    elif command -v lxterminal &> /dev/null
+    then
+        lxterminal -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v io.elementary.terminal &> /dev/null
+    then
+        io.elementary.terminal -e "/usr/bin/env bash \"$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")\" $@" &
+        exit 0
+    elif command -v deepin-terminal &> /dev/null
+    then
+        deepin-terminal -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v sakura &> /dev/null
+    then
+        sakura -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v rio-terminal &> /dev/null
+    then
+        rio-terminal -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v st &> /dev/null
+    then
+        st -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v xdg-terminal-exec &> /dev/null
+    then
+        xdg-terminal-exec /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
     elif [[ "$-" == *i* ]]
     then
         source "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")"
         exit 0
     else
-        logger -s "eXo: weird system achievement unlocked - None of the 26 supported terminal emulators are installed."
+        logger -s "eXo: weird system achievement unlocked - None of the 35 supported terminal emulators are installed."
         exit 1
     fi
     exit 0
