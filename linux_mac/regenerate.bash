@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-08-12
+# Revised: 2026-08-23
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -783,7 +783,7 @@ then
     hash -r
     if command -v cool-retro-term &> /dev/null
     then
-        cool-retro-term --profile "IBM VGA 8x16" --scaling "80%" -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
+        cool-retro-term --profile "IBM VGA 8x16" --scaling "76%" -e /usr/bin/env bash "$PWD/$(basename -- "${BASH_SOURCE%.command}.msh")" "$@" &
         osascript -e 'tell application "Terminal" to close front window' > /dev/null 2>&1 & exit 0
     elif [[ "$-" == *i* ]]
     then

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-08-22
+# Revised: 2026-08-23
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -1208,7 +1208,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta11"
+setupversion="Version 6.04b.universal1_beta12"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
