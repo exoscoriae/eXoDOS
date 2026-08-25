@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-08-05
+# Revised: 2026-08-24
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3519,7 +3519,14 @@ EOF
     sed -i -e "s/freespace=DETERMINEBYTESFREE/freespace=\$(df -P -k . | awk 'NR==2 {print \$4 * 1024}')/" "$currentScript"
     
 #    #fix desktop icon creation process
-    sed -i -e 's#^echo.* > .*{userprofile}/Desktop/eXoDOS.*#echo "\[Desktop Entry\]" > ~/Desktop/eXoDOS.desktop\
+    sed -i -e 's#^echo.* > .*{userprofile}/Desktop/eXoDOS.*#if [[ "$scriptDir" == */eXo/util ]]\
+then\
+    iconDir="$scriptDir"\
+elif [[ "$scriptDir" == */eXo/Update/linux_mac ]]\
+then\
+    iconDir="${scriptDir%/Update/linux_mac}/util"\
+fi\
+echo "\[Desktop Entry\]" > ~/Desktop/eXoDOS.desktop\
 echo "Encoding=UTF-8" >> ~/Desktop/eXoDOS.desktop\
 echo "Version=1.0" >> ~/Desktop/eXoDOS.desktop\
 echo "Type=Application" >> ~/Desktop/eXoDOS.desktop\
@@ -3528,16 +3535,30 @@ echo "Exec=\\"\${scriptDir%/eXo/util}/exogui.command\\"" >> ~/Desktop/eXoDOS.des
 echo "Name=eXoDOS" >> ~/Desktop/eXoDOS.desktop\
 echo "Icon=\${scriptDir}/exodos.png" >> ~/Desktop/eXoDOS.desktop#I' \
            -e '/echo.* >> .*{userprofile}\/Desktop\/eXoDOS.*/Id' \
-           -e 's#^echo.* > .*{userprofile}/Desktop/eXoDREAMM.*#echo "\[Desktop Entry\]" > ~/Desktop/eXoDREAMM.desktop\
+           -e 's#^echo.* > .*{userprofile}/Desktop/eXoDREAMM.*#if [[ "$scriptDir" == */eXo/util ]]\
+then\
+    iconDir="$scriptDir"\
+elif [[ "$scriptDir" == */eXo/Update/linux_mac ]]\
+then\
+    iconDir="${scriptDir%/Update/linux_mac}/util"\
+fi\
+echo "\[Desktop Entry\]" > ~/Desktop/eXoDREAMM.desktop\
 echo "Encoding=UTF-8" >> ~/Desktop/eXoDREAMM.desktop\
 echo "Version=1.0" >> ~/Desktop/eXoDREAMM.desktop\
 echo "Type=Application" >> ~/Desktop/eXoDREAMM.desktop\
 echo "Terminal=false" >> ~/Desktop/eXoDREAMM.desktop\
-echo "Exec=\\"\${scriptDir%/eXo/util}/exogui.command\\"" >> ~/Desktop/eXoDREAMM.desktop\
+echo "Exec=\\"\${iconDir%/eXo/util}/exogui.command\\"" >> ~/Desktop/eXoDREAMM.desktop\
 echo "Name=eXoDREAMM" >> ~/Desktop/eXoDREAMM.desktop\
-echo "Icon=\${scriptDir}/exodreamm.png" >> ~/Desktop/eXoDREAMM.desktop#I' \
+echo "Icon=\${iconDir}/exodreamm.png" >> ~/Desktop/eXoDREAMM.desktop#I' \
            -e '/echo.* >> .*{userprofile}\/Desktop\/eXoDREAM.*/Id' \
-           -e 's#^echo.* > .*{userprofile}/Desktop/eXo\${name}.*#echo "\[Desktop Entry\]" > ~/Desktop/eXo\${name}.desktop\
+           -e 's#^echo.* > .*{userprofile}/Desktop/eXo\${name}.*#if [[ "$scriptDir" == */eXo/util ]]\
+then\
+    iconDir="$scriptDir"\
+elif [[ "$scriptDir" == */eXo/Update/linux_mac ]]\
+then\
+    iconDir="${scriptDir%/Update/linux_mac}/util"\
+fi\
+echo "\[Desktop Entry\]" > ~/Desktop/eXo\${name}.desktop\
 echo "Encoding=UTF-8" >> ~/Desktop/eXo\${name}.desktop\
 echo "Version=1.0" >> ~/Desktop/eXo\${name}.desktop\
 echo "Type=Application" >> ~/Desktop/eXo\${name}.desktop\

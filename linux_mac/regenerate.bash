@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-08-23
+# Revised: 2026-08-24
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -751,7 +751,7 @@ then
     hash -r
     current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
     case "$current_term" in
-        "alacritty"|"aterm"|"cool-retro-term"|"cosmic-term"|"Eterm"|"foot"|"gnome-terminal-"|"kgx"|"konsole"|"kitty"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rxvt"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
+        "alacritty"|"aterm"|"blackbox-termin"|"cool-retro-term"|"cosmic-term"|"deepin-terminal"|"Eterm"|"foot"|"ghostty"|"gnome-terminal-"*|"io.elementary.terminal"|"kgx"|"konsole"|"kitty"|"lxterminal"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rio"|"rio-terminal"|"rxvt"|"sakura"|"st"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"wezterm"|"xdg-terminal-exec"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
             source "$PWD/$(basename -- "${BASH_SOURCE%.command}.bsh")"
             exit 0
             break;;
@@ -1496,18 +1496,18 @@ done
 
 for file in ../Setup*.msh ../eXoMerge.msh
 do
-    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/eXoDOS\.desktop#ICON_PATH="${scriptDir}/exodos.png"\
+    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/eXoDOS\.desktop#ICON_PATH="${iconDir}/exodos.png"\
 osascript <<EOF\
 use framework "Foundation"\
 use framework "AppKit"\
 use scripting additions\
 \
 tell application "Finder"\
-   set myapp to POSIX file "${scriptDir%/eXo/util}/exogui.command" as alias\
+   set myapp to POSIX file "${iconDir%/eXo/util}/exogui.command" as alias\
    set newAlias to make new alias to myapp at desktop with properties {name:"eXoDOS"}\
    set aliasPath to POSIX path of (newAlias as text)\
 end tell\
-delay 0.5\
+delay 5\
 set theWorkspace to current application'\''s NSWorkspace'\''s sharedWorkspace()\
 set theImage to current application'\''s NSImage'\''s alloc()'\''s initWithContentsOfFile:"$ICON_PATH"\
 if theImage is missing value then\
@@ -1520,18 +1520,18 @@ if success is false then\
     error "NSWorkspace failed to apply the icon to the file."\
 end if\
 EOF#' "$file"
-    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/\(.*\)\.desktop#ICON_PATH="${scriptDir}/exo${name,,}.png"\
+    [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/\(.*\)\.desktop#ICON_PATH="${iconDir}/exo${name,,}.png"\
 osascript <<EOF\
 use framework "Foundation"\
 use framework "AppKit"\
 use scripting additions\
 \
 tell application "Finder"\
-   set myapp to POSIX file "${scriptDir%/eXo/util}/exogui.command" as alias\
+   set myapp to POSIX file "${iconDir%/eXo/util}/exogui.command" as alias\
    set newAlias to make new alias to myapp at desktop with properties {name:"eXo${name}"}\
    set aliasPath to POSIX path of (newAlias as text)\
 end tell\
-delay 0.5\
+delay 5\
 set theWorkspace to current application'\''s NSWorkspace'\''s sharedWorkspace()\
 set theImage to current application'\''s NSImage'\''s alloc()'\''s initWithContentsOfFile:"$ICON_PATH"\
 if theImage is missing value then\
@@ -1552,10 +1552,41 @@ do\
     xattr -cr "$app"\
     codesign --force --deep --sign - "$app"\
 done' "$file"
-    [ -e "${file%.msh}.command" ] && sed -i '/cd "\$( dirname "\$BASH_SOURCE")"/a cd eXo/util || { logger -s "ERROR: Unable to change to eXo/util directory. Aborting."; exit 1; }' "${file%.msh}.command"
+    [ -e "${file%.msh}.command" ] && sed -i '/cd "\$( dirname "\$BASH_SOURCE")"/a if [[ -f "$PWD/eXo/Update/linux_mac/$(basename -- "${BASH_SOURCE%.command}.bsh")" && -f "$PWD/eXo/Update/linux_mac/$(basename -- "${BASH_SOURCE%.command}.msh")" ]] \
+then\
+    cd eXo/Update/linux_mac || { logger -s "ERROR: Unable to change to eXo/Update/linux_mac directory. Aborting."; exit 1; }\
+else\
+    cd eXo/util || { logger -s "ERROR: Unable to change to eXo/util directory. Aborting."; exit 1; }\
+fi' "${file%.msh}.command"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"
-    [ -e "$file" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "$file"
-    [ -e "${file%.msh}.bsh" ] && sed -i -e "s|^missingDependencies=no|cd ../../\nmissingDependencies=no|" "${file%.msh}.bsh"
+    [ -e "$file" ] && sed -i -e '/^missingDependencies=no/i \
+if [[ "$scriptDir" == */eXo/util ]]\
+then\
+    cd ../../\
+elif [[ "$scriptDir" == */eXo/Update/linux_mac ]]\
+then\
+    cd ../../../\
+else\
+    printf "\\n\\e[1;31;47mUnexpected setup location.\\e[0m\\n\\n"\
+    printf "Please check your file locations and report this to the team.\\n"\
+    read -s -n 1 -p "Press any key to abort."\
+    printf "\\n\\n"\
+    exit 1\
+fi' "$file"
+    [ -e "${file%.msh}.bsh" ] && sed -i -e '/^missingDependencies=no/i \
+if [[ "$scriptDir" == */eXo/util ]]\
+then\
+    cd ../../\
+elif [[ "$scriptDir" == */eXo/Update/linux_mac ]]\
+then\
+    cd ../../../\
+else\
+    printf "\\n\\e[1;31;47mUnexpected setup location.\\e[0m\\n\\n"\
+    printf "Please check your file locations and report this to the team.\\n"\
+    read -s -n 1 -p "Press any key to abort."\
+    printf "\\n\\n"\
+    exit 1\
+fi' "${file%.msh}.bsh"
     [ -e "$file" ] && mv "$file" ./util/
     [ -e "${file%.msh}.bsh" ] && mv "${file%.msh}.bsh" ./util/
 done

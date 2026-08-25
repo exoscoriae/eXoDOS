@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-08-23
+# Revised: 2026-08-25
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -670,6 +670,8 @@ function getUpdate
         exit 0
     fi
     
+    anyUpdates=no
+
     #universal package updates
     needsDownload=yes
     [[ "$universal_package_sum" =~ ^0{64} ]] && needsDownload=no
@@ -684,6 +686,7 @@ function getUpdate
         wget "$universal_package_url" -O update_universalpackages_linuxmac.zip || abortScript "Failed to download packages."
         echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for update_universalpackages_linuxmac.zip invalid."; }
         mv update_universalpackages_linuxmac.zip ../ || abortScript "Error moving universal packages update zip."
+        anyUpdates=yes
     fi
     unset needsDownload
     cd ..
@@ -740,6 +743,7 @@ function getUpdate
                 wget "$custom_package_url" -O "$custom_package_file" || abortScript "Failed to download $custom_package_file."
                 echo "$custom_package_sum" | sha256sum --check || abortScript "Checksum for $custom_package_file invalid."
                 mv "$custom_package_file" ../ || abortScript "Error moving $custom_package_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -778,6 +782,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -829,6 +834,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -903,6 +909,7 @@ function getUpdate
                 wget "$custom_package_url" -O "$custom_package_file" || abortScript "Failed to download $custom_package_file."
                 echo "$custom_package_sum" | sha256sum --check || abortScript "Checksum for $custom_package_file invalid."
                 mv "$custom_package_file" ../ || abortScript "Error moving $custom_package_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -941,6 +948,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -992,6 +1000,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -1020,6 +1029,12 @@ function getUpdate
     rm tmp/ver_universal_linuxmac.txt
     cd ../../..
     clear
+    if [ "$anyUpdates" == "no" ]
+    then
+        printf "\nNo new updates available.\n\n"
+        read -s -n 1 -p "Press any key to exit."
+        exit 0
+    fi
     printf "\nUpdates downloaded successfully.\n\n"
 }
 
@@ -1078,7 +1093,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta12"
+setupversion="Version 6.04b.universal1_beta13"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"

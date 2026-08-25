@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-08-23
+# Revised: 2026-08-25
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -531,6 +531,8 @@ function getUpdate
         exit 0
     fi
     
+    anyUpdates=no
+
     #universal package updates
     needsDownload=yes
     [[ "$universal_package_sum" =~ ^0{64} ]] && needsDownload=no
@@ -545,6 +547,7 @@ function getUpdate
         wget "$universal_package_url" -O update_universalpackages_linuxmac.zip || abortScript "Failed to download packages."
         echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for update_universalpackages_linuxmac.zip invalid."; }
         mv update_universalpackages_linuxmac.zip ../ || abortScript "Error moving universal packages update zip."
+        anyUpdates=yes
     fi
     unset needsDownload
     cd ..
@@ -601,6 +604,7 @@ function getUpdate
                 wget "$custom_package_url" -O "$custom_package_file" || abortScript "Failed to download $custom_package_file."
                 echo "$custom_package_sum" | sha256sum --check || abortScript "Checksum for $custom_package_file invalid."
                 mv "$custom_package_file" ../ || abortScript "Error moving $custom_package_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -639,6 +643,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -690,6 +695,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -764,6 +770,7 @@ function getUpdate
                 wget "$custom_package_url" -O "$custom_package_file" || abortScript "Failed to download $custom_package_file."
                 echo "$custom_package_sum" | sha256sum --check || abortScript "Checksum for $custom_package_file invalid."
                 mv "$custom_package_file" ../ || abortScript "Error moving $custom_package_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -802,6 +809,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -853,6 +861,7 @@ function getUpdate
                 wget "$custom_addon_url" -O "$custom_addon_file" || abortScript "Failed to download $custom_addon_file."
                 echo "$custom_addon_sum" | sha256sum --check || abortScript "Checksum for $custom_addon_file invalid."
                 mv "$custom_addon_file" ../ || abortScript "Error moving $custom_addon_file."
+                anyUpdates=yes
                 cd ..
             fi
             unset needsDownload
@@ -881,6 +890,12 @@ function getUpdate
     rm tmp/ver_universal_linuxmac.txt
     cd ../../..
     clear
+    if [ "$anyUpdates" == "no" ]
+    then
+        printf "\nNo new updates available.\n\n"
+        read -s -n 1 -p "Press any key to exit."
+        exit 0
+    fi
     printf "\nUpdates downloaded successfully.\n\n"
 }
 
@@ -1000,7 +1015,25 @@ function goEopkg
 
 function goNixenv
 {
-    printf "\n\e[1;37;41mWARNING: NixOS IS NOT FHS COMPLIANT\e[0m\n\e[1;31;47mWe make no promises that any eXo collections will work with it.\e[0m\n\n"
+    clear
+    printf "\n\e[1;37;41m\u26a0\ufe0f WARNING \u26a0\ufe0f\e[0m\n\n\e[1;37;41mNixOS IS NOT FHS COMPLIANT\e[0m\n\n\e[1;31;47m%s\e[0m\n\n\e[1;31;47m%s\e[0m\n\e[1;31;47m%s\e[1;35;47m%s\e[1;31;47m%s\e[0m\n\n%s\n\e[1;36;40m%s\n%s\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\e[0m\n\n" \
+           "We make no promises that any eXo collections will work with it." \
+           "NixOS is also an immutable distro that requires you to define any packages" \
+           "and programs that you would like to use in your " "configuration.nix" " file." \
+           "Ensure the following is in your configuration file:" \
+           "  programs.appimage = {" \
+           "    enable = true;" \
+           "    binfmt = true;" \
+           "  };" \
+           "  environment.systemPackages = with pkgs; [" \
+           "    wget" \
+           "    ffmpeg" \
+           "    zip" \
+           "    python3" \
+           "  ];"
+    read -s -n 1 -p "Then, after you are ready, press any key to continue."
+    clear
+
     command -v nix-env &>/dev/null || { echo "Missing nix-env!"; failedInstall; }
     local missing_pkgs=()
     
@@ -1208,7 +1241,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta12"
+setupversion="Version 6.04b.universal1_beta13"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
