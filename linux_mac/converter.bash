@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-08-24
+# Revised: 2026-10-21
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -962,6 +962,7 @@ EOF
            -e "s/^PENDINGTLIBF not \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\)/PENDINGTLIBF 2RMV [ \"\1\" != \2 ] \&\& PENDINGTRAILTLIBF/" \
            -e "s/^if \"\(.[^[:space:]\"]*\)\"==\"\(.[^[:space:]\"]*\)\" \(.*\)/[ \"\1\" == \"\2\" ] \&\& \3/" \
            -e "s/^if \"\(.[^[:space:]\"]*\)\"==\"\" \(.*\)/[ \"\1\" == \"\" ] \&\& \2/" \
+           -e "s/^if \"\(.[^[:space:]\"]*\)\" == \"\([^\"]*\)\" \(.*\)/[ \"\1\" == \"\2\" ] \&\& \3/" \
            -e "s/^if \"\(.[^[:space:]\"]*\)\" == \(.[^[:space:]]*\) \(.*\)/[ \"\1\" == \2 ] \&\& \3/" \
            -e "s/^if \(.[^[:space:]\"]*\) == \(.[^[:space:]]*\) \(.*\)/[ \"\1\" == \2 ] \&\& \3/" \
            -e "s/^if \(.[^[:space:]\"]*\)==\(.[^[:space:]]*\) \(.*\)/[ \"\1\" == \2 ] \&\& \3/" \
