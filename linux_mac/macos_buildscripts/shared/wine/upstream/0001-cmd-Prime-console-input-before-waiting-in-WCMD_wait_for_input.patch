@@ -1,0 +1,58 @@
+From: Christopher Parris <parricc@gmail.com>
+Subject: [PATCH] cmd: Prime the console input path before waiting in WCMD_wait_for_input().
+
+WCMD_wait_for_input() waits on the console input handle before it has issued
+any read, which deadlocks on a Unix console. "wine cmd /c pause" therefore
+hangs forever in a terminal and no keypress will release it.
+
+On a Unix console the console input object cannot become signaled until
+conhost's tty_input() thread is reading the terminal. That thread is started
+only by ensure_tty_input_thread(), which is reached only from the six
+read/peek ioctls in console_input_ioctl() -- IOCTL_CONDRV_READ_CONSOLE,
+READ_CONSOLE_CONTROL, READ_FILE, READ_INPUT, PEEK and GET_INPUT_INFO. The
+main() call site is guarded by !console->is_unix, so it does not apply here.
+
+In this function the only call that issues one of those ioctls is
+has_pending_char_events(), via GetNumberOfConsoleInputEvents(), and it sits
+inside the loop body after the wait. So the wait needs input records, the
+records need the reader thread, and the reader thread needs a read that only
+happens once the wait has already returned. Nothing starts, and because
+ensure_tty_input_thread() returns TRUE when console->tty_input is NULL and
+its return value is discarded at all six call sites, nothing is logged
+either.
+
+Calling has_pending_char_events() once before the loop starts the reader and
+lets the subsequent wait behave normally. The result is assigned to
+return_code rather than returned directly so that the SetConsoleMode() restore
+at the end of the function still runs.
+
+Reproduced identically on macOS 26.5.1 (arm64, x86_64 Wine under Rosetta) and
+on Linux with a Flatpak build reporting wine-11.0, so this is not
+platform-specific. WCMD_wait_for_input() is unchanged between wine-11.0 and
+current master.
+
+Distinguishing observation: typing "pause" at an interactive "wine cmd" prompt
+works correctly, because reading the command line has already started the
+reader thread. Only the non-interactive "cmd /c pause" hangs. "dir /p" hangs
+the same way once the listing is long enough to page.
+---
+ programs/cmd/wcmdmain.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+--- a/programs/cmd/wcmdmain.c
++++ b/programs/cmd/wcmdmain.c
+@@ -617,6 +617,14 @@ RETURN_CODE WCMD_wait_for_input(HANDLE hIn)
+     {
+         SetConsoleMode(hIn, oldmode & ~ENABLE_LINE_INPUT);
+         FlushConsoleInputBuffer(hIn);
++        /* On a Unix console the input object cannot become signaled until
++         * conhost's tty reader thread is running, and that thread is only
++         * started by a read or peek ioctl.  Prime the input path here so the
++         * wait below can be satisfied: has_pending_char_events() issues
++         * GetNumberOfConsoleInputEvents(), which is enough to start it.
++         * Assigned rather than returned so the mode restore still runs. */
++        if (has_pending_char_events(hIn))
++            return_code = NO_ERROR;
+         while (return_code == ERROR_SIGNAL_PENDING)
+         {
+             switch (WaitForMultipleObjects(2, h, FALSE, INFINITE))
