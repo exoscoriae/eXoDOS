@@ -1,0 +1,84 @@
+# Source tarballs: name  version  file  checksum  url [url ...]
+#
+# checksum is sha256:<hex> or sha512:<hex>.  Provenance of the pinned values:
+#   FreeBSD ports distinfo (FB), MacPorts Portfile (MP), Gentoo Manifest (GE).
+# "tofu" = no independently published checksum was found; the hash of the
+# first download is recorded in checksums.tofu and enforced afterwards.
+#
+# gnu:<path>   -> https://ftpmirror.gnu.org/<path>, https://ftp.gnu.org/gnu/<path>, ...
+# gnupg:<path> -> https://gnupg.org/ftp/gcrypt/<path> and mirrors
+
+# build tool (runs on the build Mac only, never shipped)
+pkgconf     2.5.1   pkgconf-2.5.1.tar.xz            sha512:e654c3a460e5f0f801e8ac43ad9086f397d1da0553186ff05f5f0e18ffdac99fb652fd9b6c0379db4bc8307699699d69bc66d13cc85a4a6b0cd36462f5948a1d  https://distfiles.ariadne.space/pkgconf/pkgconf-2.5.1.tar.xz
+#   (GE)
+
+# compression
+zlib        1.3.2   zlib-1.3.2.tar.xz               sha256:d7a0654783a4da529d1bb793b7ad9c3318020af77667bcae35f95d0e42a792f3  https://zlib.net/zlib-1.3.2.tar.xz https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.xz
+#   (MP)
+bzip2       1.0.8   bzip2-1.0.8.tar.gz              sha256:ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269  https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+#   (FB)
+xz          5.8.4   xz-5.8.4.tar.bz2                sha256:3340ae48f88665abc78d71dc43446fb3f7e70b48fd59844ac0e14958cef6e00b  https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.bz2
+#   (MP)
+zstd        1.5.7   zstd-1.5.7.tar.gz               sha256:37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3  https://github.com/facebook/zstd/archive/v1.5.7.tar.gz
+#   (MP; GitHub tag archive)
+brotli      1.2.1   brotli-1.2.1.tar.gz             sha256:98d35d11a78dc453aebb7d10c3748f3f73ff78c8267c0dc697b8631f67bf7e8f  https://github.com/google/brotli/archive/v1.2.1.tar.gz
+#   (MP; GitHub tag archive)
+lzlib       1.16    lzlib-1.16.tar.gz               sha256:203228de911780309dad6813e51541d7ea89469784f01cb661edba080ff1b038  https://download.savannah.gnu.org/releases/lzip/lzlib/lzlib-1.16.tar.gz https://download-mirror.savannah.gnu.org/releases/lzip/lzlib/lzlib-1.16.tar.gz
+#   (FB)
+
+# text / i18n
+libiconv    1.18    libiconv-1.18.tar.gz            sha256:3b08f5f4f9b4eb82f151a7040bfd6fe6c6fb922efe4b1659c66ea933276965e8  gnu:libiconv/libiconv-1.18.tar.gz
+#   (FB)
+libunistring 1.4.2  libunistring-1.4.2.tar.xz       sha256:5b46e74377ed7409c5b75e7a96f95377b095623b689d8522620927964a41499c  gnu:libunistring/libunistring-1.4.2.tar.xz
+#   (FB)
+gettext     1.0     gettext-1.0.tar.xz              sha256:71132a3fb71e68245b8f2ac4e9e97137d3e5c02f415636eb508ae607bc01add7  gnu:gettext/gettext-1.0.tar.xz
+#   (MP)
+libidn2     2.3.8   libidn2-2.3.8.tar.gz            sha256:f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a  gnu:libidn/libidn2-2.3.8.tar.gz
+#   (FB)
+pcre2       10.49   pcre2-10.49.tar.bz2             sha256:53c156e1ba416a20da8e65395daa132da0d80e76910424caca3fcdae7831d384  https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.49/pcre2-10.49.tar.bz2
+#   (FB)
+
+# TLS stack
+libtasn1    4.21.0  libtasn1-4.21.0.tar.gz          sha256:1d8a444a223cc5464240777346e125de51d8e6abf0b8bac742ac84609167dc87  gnu:libtasn1/libtasn1-4.21.0.tar.gz
+#   (FB)
+gmp         6.3.0   gmp-6.3.0.tar.xz                sha256:a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898  https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz gnu:gmp/gmp-6.3.0.tar.xz
+#   (FB)
+nettle      3.10.2  nettle-3.10.2.tar.gz            sha256:fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5  gnu:nettle/nettle-3.10.2.tar.gz
+#   (FB)
+leancrypto  1.9.1   leancrypto-1.9.1.tar.xz         tofu  https://leancrypto.org/leancrypto/releases/leancrypto-1.9.1/leancrypto-1.9.1.tar.xz
+expat       2.9.0   expat-2.9.0.tar.xz              sha256:1e6371862cc31999b368c3b89b49994f0677e1bab5f1b2b85ae3741f5d803051  https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.xz
+#   (FB)
+unbound     1.26.2  unbound-1.26.2.tar.gz           sha256:d8ee7aa6bbb3ff1be7d9e57637d0d0ec2f18273a8efff1a0afe2c665858b96f7  https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz
+#   (FB)
+gnutls      3.8.13  gnutls-3.8.13.tar.xz            sha256:ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e  gnupg:gnutls/v3.8/gnutls-3.8.13.tar.xz
+#   (FB)
+
+# HTTP / web data
+nghttp2     1.70.0  nghttp2-1.70.0.tar.xz           sha256:e05cb1388eaca3830aded4ccf20044b6e1ac1a61411dcca11b0437c4285c8bc2  https://github.com/nghttp2/nghttp2/releases/download/v1.70.0/nghttp2-1.70.0.tar.xz
+#   (FB)
+libpsl      0.23.3  libpsl-0.23.3.tar.gz            sha256:93941f85a1e7bd593fa94f299233cb5dfc91cd144fd9a78a6ceb75001c5b03be  https://github.com/rockdaboot/libpsl/releases/download/0.23.3/libpsl-0.23.3.tar.gz
+#   (MP)
+libhsts     0.1.0   libhsts-0.1.0.tar.gz            sha256:e1125e0395b4777361eafafd61fff2b516d3f2fb57d56e40cb554a6cd8c024e0  https://gitlab.com/rockdaboot/libhsts/uploads/4753f61b5a3c6253acf4934217816e3f/libhsts-0.1.0.tar.gz
+#   (FB)
+
+# GnuPG (signature verification)
+sqlite      3.54.1  sqlite-autoconf-3540100.tar.gz  sha256:926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e  https://www.sqlite.org/2026/sqlite-autoconf-3540100.tar.gz
+#   (MP)
+libgpg-error 1.61   libgpg-error-1.61.tar.bz2       sha256:7a85413f2bc354f4f8aa832b718af122e48965e9e0eb9012ee659c13c6385c93  gnupg:libgpg-error/libgpg-error-1.61.tar.bz2
+#   (FB)
+libgcrypt   1.12.4  libgcrypt-1.12.4.tar.bz2        sha256:d77f68f48879510e79a2f65977ccc68981781ea0923e5bdffac2a193ea3d660e  gnupg:libgcrypt/libgcrypt-1.12.4.tar.bz2
+#   (FB)
+libassuan   3.0.2   libassuan-3.0.2.tar.bz2         sha256:d2931cdad266e633510f9970e1a2f346055e351bb19f9b78912475b8074c36f6  gnupg:libassuan/libassuan-3.0.2.tar.bz2
+#   (FB)
+libksba     1.8.1   libksba-1.8.1.tar.bz2           sha256:c2f84393011827219ae117131dba8e7684c2bed0961eed11b0642c2acba440b5  gnupg:libksba/libksba-1.8.1.tar.bz2
+#   (FB)
+npth        1.8     npth-1.8.tar.bz2                sha256:8bd24b4f23a3065d6e5b26e98aba9ce783ea4fd781069c1b35d149694e90ca3e  gnupg:npth/npth-1.8.tar.bz2
+#   (FB)
+gpgme       2.2.0   gpgme-2.2.0.tar.bz2             sha512:76c382bdc73b1c6ed523a0803dd2ec100b95f84e768787beaeb656ce84820fc37bc74229816a527ab17944c0ef7b937713298d9b3b87e70d7613e03b6dae4840  gnupg:gpgme/gpgme-2.2.0.tar.bz2
+#   (GE)
+gnupg       2.5.24  gnupg-2.5.24.tar.bz2            sha512:c60b0c105ef710defec5b23d6c1382ae8adabc3207917fb484960b1c37ae7b542da2ece5eafaa5d53fa13485647b52c2d371fe099e5600aba4c84e7d83ceb1df  gnupg:gnupg/gnupg-2.5.24.tar.bz2
+#   (GE)
+
+# the program
+wget2       2.3.0   wget2-2.3.0.tar.gz              sha512:f2521eade2f20c5c9a9c4484f48b16039cd7bb4d8e9d75318181167c196aa60784b8a896a28b26c814f92dbfe46cf3f41b4dd49358c0c58d6f86fdc79449dd30  gnu:wget/wget2-2.3.0.tar.gz
+#   (GE)
