@@ -1,0 +1,80 @@
+52824683	movz w3, #4660
+52a24683	movz w3, #4660, lsl #16
+129fffe5	movn w5, #65535
+72b579a7	movk w7, #43981, lsl #16
+d2c24689	movz x9, #4660, lsl #32
+d2e24689	movz x9, #4660, lsl #48
+f2f579a2	movk x2, #43981, lsl #48
+1ac32041	lslv w1, w2, w3
+1ac32441	lsrv w1, w2, w3
+1ac32841	asrv w1, w2, w3
+1ac32c41	rorv w1, w2, w3
+9ac620a4	lslv x4, x5, x6
+9ac624a4	lsrv x4, x5, x6
+d351fd28	lsr x8, x9, #17
+11048c41	add w1, w2, #291
+11448c41	add w1, w2, #291, lsl #12
+0b031c41	add w1, w2, w3, lsl #7
+51048c41	sub w1, w2, #291
+4b031c41	sub w1, w2, w3, lsl #7
+71048c9f	cmp w4, #291
+71448c9f	cmp w4, #291, lsl #12
+0a031441	and w1, w2, w3, lsl #5
+2a031441	orr w1, w2, w3, lsl #5
+4a031441	eor w1, w2, w3, lsl #5
+0a231441	bic w1, w2, w3, lsl #5
+8a03a041	and x1, x2, x3, lsl #40
+2a0a0fe9	mov w9, w10, lsl #3
+a9440861	ldp x1, x2, [x3, #64]
+a97c0861	ldp x1, x2, [x3, #-64]
+f947fc41	ldr x1, [x2, #4088]
+b947fc41	ldr w1, [x2, #2044]
+7947fc41	ldrh w1, [x2, #1022]
+3947fc41	ldrb w1, [x2, #511]
+f8637841	ldr x1, [x2, x3, lsl #3]
+f8636841	ldr x1, [x2, x3]
+f85f8041	ldur x1, [x2, #-8]
+b85f8041	ldur w1, [x2, #-8]
+785f8041	ldurh w1, [x2, #-8]
+385f8041	ldurb w1, [x2, #-8]
+a93c0861	stp x1, x2, [x3, #-64]
+f907fc41	str x1, [x2, #4088]
+b907fc41	str w1, [x2, #2044]
+7907fc41	strh w1, [x2, #1022]
+3907fc41	strb w1, [x2, #511]
+f81f8041	stur x1, [x2, #-8]
+b81f8041	stur w1, [x2, #-8]
+781f8041	sturh w1, [x2, #-8]
+381f8041	sturb w1, [x2, #-8]
+d61f00a0	br x5
+d63f00a0	blr x5
+d65f03c0	ret x30
+13003c41	sxth w1, w2
+13001c41	sxtb w1, w2
+53003c41	uxth w1, w2
+53001c41	uxtb w1, w2
+331b1841	bfi w1, w2, #5, #7
+b37b1841	bfi x1, x2, #5, #7
+33001c41	bfi w1, w2, #0, #8
+b3401c41	bfi x1, x2, #0, #8
+13032441	sbfm w1, w2, #3, #9
+53032441	ubfm w1, w2, #3, #9
+33032441	bfm  w1, w2, #3, #9
+b3432441	bfm  x1, x2, #3, #9
+d3432441	ubfm x1, x2, #3, #9
+a97c0861	ldp x1, x2, [x3, #-64]
+a9600861	ldp x1, x2, [x3, #-512]
+a95f9be5	ldp x5, x6, [sp, #504]
+a93c0861	stp x1, x2, [x3, #-64]
+a9200861	stp x1, x2, [x3, #-512]
+a90153f3	stp x19, x20, [sp, #16]
+a9025bf5	stp x21, x22, [sp, #32]
+a94153f3	ldp x19, x20, [sp, #16]
+a9425bf5	ldp x21, x22, [sp, #32]
+14000002	b   . + 8
+14ffffff	b   . + 0x3fffffc
+5400004c	bgt . + 8
+547fffec	bgt . + 0xffffc
+34000045	cbz w5, . + 8
+357fffe5	cbnz w5, . + 0xffffc
+58fff801	ldr x1, .-256
