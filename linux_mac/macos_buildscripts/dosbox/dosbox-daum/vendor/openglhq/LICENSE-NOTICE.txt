@@ -1,0 +1,35 @@
+OpenGL-HQ shader assets
+=======================
+
+The four headers in this directory are extracted verbatim from openglhq.patch
+(OpenGL-HQ for SDL, version 2012-10-17):
+
+    SDL_openglhq_pass1.h    !!ARBfp1.0 fragment program, pass 1
+    SDL_openglhq_pass2.h    !!ARBfp1.0 fragment program, pass 2
+    SDL_openglhq_pass3.h    !!ARBfp1.0 fragment program, pass 3
+    SDL_openglhq_table.h    4096-byte edge-pattern classification table
+
+They are machine-generated C headers (hexdump.c / asciidump.c in the original
+tree turn the .fp and .dat sources into these), which is why they carry no
+copyright banner of their own.  The originals do:
+
+    Copyright (C) 2004 Jorg Walter <jwalt@garni.ch>
+    Licensed under the GNU General Public License, version 2.
+
+    http://www.syntax-k.de/projekte/sdl-opengl-hq/
+
+GPL-2 is compatible with DOSBox's own GPL-2 licence, so these ship inside
+dosbox-daum.app on the same terms.
+
+What was NOT taken
+------------------
+The rest of openglhq.patch implements an SDL 1.2 *video driver* -- the
+SDL_VideoDevice bootstrap, a render thread, mouse filters, and Win32/Quartz
+window glue.  None of that is used here.  This build drives the same three
+fragment programs directly from DOSBox's own OpenGL output path, because
+sdl12-compat is an API shim over SDL2 and has no SDL 1.2 driver model to plug
+into.
+
+The interpolation-table expansion (the intersect_*/setinterp geometry that
+turns the 4096-byte table above into a 256x16x256 RGBA 3D texture) was ported
+from SDL_ohqthread.h into src/gui/openglhq.cpp.
