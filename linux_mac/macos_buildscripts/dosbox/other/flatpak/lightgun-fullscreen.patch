@@ -1,0 +1,29 @@
+--- a/src/gui/sdlmain.cpp	2026-05-19 21:38:25.000000000 -0500
++++ b/src/gui/sdlmain.cpp	2026-07-17 15:43:33.765004471 -0500
+@@ -1463,7 +1463,11 @@
+ }
+ 
+ static void HandleMouseMotion(SDL_MouseMotionEvent * motion) {
+-    Mouse_CursorMoved_GunStick(motion->x, motion->y, sdl.clip.w, sdl.clip.h);
++    /* Fullscreen fix: the drawn image is letterboxed at
++	   (sdl.clip.x, sdl.clip.y) inside the surface; the gun must
++	   sample in image-relative coordinates or fullscreen shots
++	   land right/down of the aim point. */
++	Mouse_CursorMoved_GunStick(motion->x - sdl.clip.x, motion->y - sdl.clip.y, sdl.clip.w, sdl.clip.h);
+ 	if (sdl.mouse.locked || !sdl.mouse.autoenable)
+ 		Mouse_CursorMoved((float)motion->xrel*sdl.mouse.sensitivity/100.0f,
+ 						  (float)motion->yrel*sdl.mouse.sensitivity/100.0f,
+--- a/src/ints/mouse.cpp	2026-05-19 21:49:07.000000000 -0500
++++ b/src/ints/mouse.cpp	2026-07-17 15:43:33.766004471 -0500
+@@ -520,6 +520,11 @@
+     if(!sdlw || !sdlh)
+         return 0;
+ 
++    /* Fullscreen letterbox fix: coordinates outside the active
++       image (the black bars) cannot hit anything — read as dark. */
++    if(sdlx < 0 || sdly < 0 || sdlx >= sdlw || sdly >= sdlh)
++        return 0;
++
+     x = sdlx * CurMode->swidth / sdlw;
+     y = sdly * CurMode->sheight / sdlh;
+ 

@@ -1,0 +1,84 @@
+{
+    "app-id": "com.retro_exo.dosbox-gunstick",
+    "runtime": "org.freedesktop.Platform",
+    "runtime-version": "25.08",
+    "sdk": "org.freedesktop.Sdk",
+    "build-options": {
+        "cflags": "-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2",
+        "cxxflags": "-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+    },
+    "finish-args": [
+        "--device=all",
+        "--share=ipc",
+        "--share=network",
+        "--socket=x11",
+        "--socket=pulseaudio",
+        /* DOSBox does not respect XDG base directories */
+        "--persist=.dosbox",
+        "--filesystem=host"
+    ],
+    "command": "dosbox",
+    "cleanup": [
+        "/include",
+        "/lib/pkgconfig",
+        "/share/aclocal",
+        "/share/man",
+        "*.la",
+        "*.a"
+    ],
+    "modules": [
+        "../../shared-modules/glu/glu-9.json",
+        "../../shared-modules/SDL/SDL-1.2.15.json",
+        "../../shared-modules/SDL/SDL_net-1.2.8.json",
+        {
+            "name": "SDL_sound",
+            "rm-configure": true,
+            "config-opts": [
+                "--disable-static"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz",
+                    "sha256": "3999fd0bbb485289a52be14b2f68b571cb84e380cc43387eadf778f64c79e6df"
+                },
+                {
+                    "type": "script",
+                    "commands": [
+                        "AUTOMAKE=\"automake --foreign\" autoreconf -fiv"
+                    ],
+                    "dest-filename": "autogen.sh"
+                }
+            ]
+        },
+        {
+            "name": "dosbox",
+            "rm-configure": true,
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/dosbox-gunstick.tar.gz",
+                    "sha256": "21504391b7c4374ac0cee90fa8c2fe019e0c007f1ce30b9375a68f46236ebd2f"
+                },
+                {
+                    /* Fullscreen lightgun fix: the gun samples absolute SDL
+                       mouse coordinates, but in fullscreen the image is
+                       letterboxed at (sdl.clip.x, sdl.clip.y) — without
+                       subtracting those offsets, clicks sample the wrong
+                       pixel and the gun misses. Windowed mode has zero
+                       offsets, which is why it worked there. Shots into the
+                       black bars now read as dark pixels (a miss). */
+                    "type": "patch",
+                    "path": "lightgun-fullscreen.patch"
+                },
+                {
+                    "type": "script",
+                    "commands": [
+                        "autoreconf -fiv"
+                    ],
+                    "dest-filename": "autogen.sh"
+                }
+            ]
+        }
+    ]
+}
