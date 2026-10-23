@@ -1,0 +1,74 @@
+#!/bin/bash
+# Gnumeric.app portable launcher.
+# Same script serves gnumeric, ssconvert, ssdiff, ssgrep, ssindex:
+# it dispatches on its own basename ("Gnumeric" -> gnumeric-bin, else <name>-bin).
+set -u
+
+NAME="$(basename "$0")"
+CONTENTS="$(cd "$(dirname "$0")/.." && pwd)"
+RES="$CONTENTS/Resources"
+
+case "$NAME" in
+  gnumeric|Gnumeric) BIN="$CONTENTS/MacOS/gnumeric-bin" ;;
+  *)                 BIN="$CONTENTS/MacOS/$NAME-bin" ;;
+esac
+[ -x "$BIN" ] || { echo "launcher: $BIN not found" >&2; exit 127; }
+
+# ---- Gnumeric & GOffice relocation (via source patches in this build) -------
+export GNUMERIC_LIBDIR="$RES/lib/gnumeric/@GNM_VERSION@"
+export GNUMERIC_DATADIR="$RES/share/gnumeric/@GNM_VERSION@"
+export GNUMERIC_LOCALEDIR="$RES/share/locale"
+export GNUMERIC_EXTERNPLUGINDIR="$RES/lib/gnumeric/@GNM_API@/plugins"
+export GOFFICE_DATADIR="$RES/share/goffice/@GO_VERSION@"
+export GOFFICE_ICONDIR="$RES/share/pixmaps/goffice/@GO_VERSION@"
+export GOFFICE_LOCALEDIR="$RES/share/locale"
+export GOFFICE_LIBDIR="$RES/lib/goffice/@GO_VERSION@"
+export GOFFICE_EXTERNPLUGINDIR="$RES/lib/goffice/@GO_API@/plugins"
+
+# ---- GLib / GTK / fontconfig -------------------------------------------------
+export XDG_DATA_DIRS="$RES/share"
+export XDG_CONFIG_DIRS="$RES/etc/xdg"
+export GSETTINGS_SCHEMA_DIR="$RES/share/glib-2.0/schemas"
+export GTK_DATA_PREFIX="$RES"
+export GTK_EXE_PREFIX="$RES"
+export GTK_PATH="$RES"
+export FONTCONFIG_FILE="$RES/etc/fonts/fonts.conf"
+export FONTCONFIG_PATH="$RES/etc/fonts"
+
+CACHE="$HOME/Library/Caches/@BUNDLE_ID@"
+mkdir -p "$CACHE" 2>/dev/null || CACHE="${TMPDIR:-/tmp}"
+
+# ---- gdk-pixbuf dynamic loaders (SVG); core formats are compiled in ---------
+LOADERS="$RES/lib/gdk-pixbuf-2.0/2.10.0/loaders"
+if [ -d "$LOADERS" ] && [ -x "$CONTENTS/MacOS/gdk-pixbuf-query-loaders" ]; then
+  export GDK_PIXBUF_MODULEDIR="$LOADERS"
+  if GDK_PIXBUF_MODULEDIR="$LOADERS" \
+     "$CONTENTS/MacOS/gdk-pixbuf-query-loaders" > "$CACHE/loaders.cache.tmp" 2>/dev/null; then
+    mv -f "$CACHE/loaders.cache.tmp" "$CACHE/loaders.cache"
+    export GDK_PIXBUF_MODULE_FILE="$CACHE/loaders.cache"
+  else
+    rm -f "$CACHE/loaders.cache.tmp"
+  fi
+fi
+
+# ---- GTK input-method modules (only if not compiled in) -----------------------
+IMDIR="$RES/lib/gtk-3.0/3.0.0/immodules"
+if [ -d "$IMDIR" ] && [ -x "$CONTENTS/MacOS/gtk-query-immodules-3.0" ]; then
+  if "$CONTENTS/MacOS/gtk-query-immodules-3.0" "$IMDIR"/*.so \
+       > "$CACHE/immodules.cache.tmp" 2>/dev/null; then
+    mv -f "$CACHE/immodules.cache.tmp" "$CACHE/immodules.cache"
+    export GTK_IM_MODULE_FILE="$CACHE/immodules.cache"
+  else
+    rm -f "$CACHE/immodules.cache.tmp"
+  fi
+fi
+
+# ---- locale -------------------------------------------------------------------
+if [ -z "${LANG:-}" ]; then
+  loc="$(defaults read -g AppleLocale 2>/dev/null | sed 's/@.*//')"
+  if [ -n "$loc" ]; then
+    export LANG="${loc}.UTF-8"
+  fi
+fi
+
+exec "$BIN" "$@"

@@ -1,0 +1,21 @@
+# Qt 6 modules used by Okular 26.04 + KF 6.21, pinned to $QT_VERSION (6.7.3).
+# Blueprint paths relative to craft-blueprints-kde.
+# 02-pin-versions.sh pins each; missing ones are logged and skipped.
+# Verify available module blueprints with:  craft --search qt6
+#
+libs/qt6/qtbase
+libs/qt6/qtlanguageserver
+libs/qt6/qttools
+libs/qt6/qttranslations
+libs/qt6/qtdeclarative
+libs/qt6/qtsvg
+libs/qt6/qtimageformats
+libs/qt6/qt5compat
+libs/qt6/qtmultimedia
+libs/qt6/qtspeech
+libs/qt6/qtshadertools
+libs/qt6/qtquick3d
+libs/qt6/qtnetworkauth
+libs/qt6/qtwebsockets
+libs/qt6/qtsensors
+libs/qt6/qtpositioning

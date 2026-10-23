@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Gnumeric</string>
+	<key>CFBundleDisplayName</key>
+	<string>Gnumeric</string>
+	<key>CFBundleIdentifier</key>
+	<string>@BUNDLE_ID@</string>
+	<key>CFBundleVersion</key>
+	<string>@GNM_VERSION@</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@GNM_VERSION@</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleExecutable</key>
+	<string>gnumeric</string>
+	<key>CFBundleIconFile</key>
+	<string>gnumeric.icns</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>@MACOS_MIN@</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Gnumeric is free software (GPL v2/v3); this bundle was built from unmodified upstream sources plus two small path-relocation patches.</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Gnumeric Spreadsheet</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeExtensions</key>
+			<array><string>gnumeric</string></array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>OpenDocument Spreadsheet</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeExtensions</key>
+			<array><string>ods</string><string>ots</string></array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Excel Spreadsheet</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeExtensions</key>
+			<array><string>xls</string><string>xlsx</string><string>xlsm</string></array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Comma/Tab Separated Values</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeExtensions</key>
+			<array><string>csv</string><string>tsv</string></array>
+		</dict>
+	</array>
+</dict>
+</plist>

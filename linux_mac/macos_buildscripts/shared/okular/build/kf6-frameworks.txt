@@ -1,0 +1,49 @@
+# KDE Frameworks 6 modules that Okular 26.04 pulls in, pinned to $KF_VERSION (6.21.0).
+# Paths are TIERED (kde/frameworks/tier1|tier2|tier3/<name>) — this is how the
+# craft-blueprints-kde tree actually lays them out. Taken from Okular's real
+# dependency resolution. Lines starting with # and blank lines are ignored.
+#
+kde/frameworks/extra-cmake-modules
+kde/frameworks/tier1/karchive
+kde/frameworks/tier1/kcodecs
+kde/frameworks/tier1/kcoreaddons
+kde/frameworks/tier1/kconfig
+kde/frameworks/tier1/kguiaddons
+kde/frameworks/tier1/ki18n
+kde/frameworks/tier1/kwidgetsaddons
+kde/frameworks/tier1/kitemviews
+kde/frameworks/tier1/kitemmodels
+# breeze-icons: do NOT pin. Forcing version=6.21.0 makes its blueprint throw at
+# load ("Failed to load package breeze-icons.py"), which aborts Okular's whole
+# dependency resolution. It is icon data with no hard Qt-6.8 requirement, so the
+# default version builds fine against Qt 6.7. (Re-add a pin only if a future
+# breeze-icons turns out to require Qt 6.8.)
+# kde/frameworks/tier1/breeze-icons
+kde/frameworks/tier1/kdbusaddons
+kde/frameworks/tier1/kwindowsystem
+kde/frameworks/tier1/solid
+kde/frameworks/tier1/sonnet
+kde/frameworks/tier1/threadweaver
+kde/frameworks/tier1/kimageformats
+kde/frameworks/tier1/kirigami
+kde/frameworks/tier1/prison
+kde/frameworks/tier2/kcolorscheme
+kde/frameworks/tier2/kdoctools
+kde/frameworks/tier2/kauth
+kde/frameworks/tier2/kcompletion
+kde/frameworks/tier2/kjobwidgets
+kde/frameworks/tier2/kcrash
+kde/frameworks/tier2/kpackage
+kde/frameworks/tier2/kpty
+kde/frameworks/tier3/kconfigwidgets
+kde/frameworks/tier3/kiconthemes
+kde/frameworks/tier3/kxmlgui
+kde/frameworks/tier3/kbookmarks
+kde/frameworks/tier3/knotifications
+kde/frameworks/tier3/kservice
+kde/frameworks/tier3/ktextwidgets
+kde/frameworks/tier3/kio
+kde/frameworks/tier3/kcmutils
+kde/frameworks/tier3/purpose
+kde/frameworks/tier3/kparts
+kde/frameworks/tier3/kwallet

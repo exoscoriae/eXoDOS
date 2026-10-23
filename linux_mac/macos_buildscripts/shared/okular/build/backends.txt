@@ -1,0 +1,27 @@
+# Optional backend dependency libraries, built from source BEFORE Okular so its
+# CMake detects them and enables the maximum set of document backends.
+# These are the REAL craft-blueprints-kde paths (corrected after first run).
+# Okular pulls most of these itself; listing them guarantees the optional ones
+# (e.g. discount/Markdown) are present. Missing/renamed entries are logged & skipped.
+#
+# backend                     blueprint
+# --------------------------- ------------------------------------------
+# PDF                         qt-libs/poppler  (+ poppler-data, freetype, etc.)
+# PostScript (.ps/.eps)       libs/ghostscript (libspectre is unsupported on macOS)
+# DjVu                        libs/djvu
+# CHM (compiled HTML help)    libs/chm
+# Markdown                    libs/discount
+# EPUB / e-books              libs/ebook-tools
+# Mobipocket                  kde/kdegraphics/kdegraphics-mobipocket
+# ComicBook archives          libs/libzip, libs/libarchive
+#
+libs/expat
+qt-libs/poppler
+libs/ghostscript
+libs/djvu
+libs/chm
+libs/discount
+libs/ebook-tools
+kde/kdegraphics/kdegraphics-mobipocket
+libs/libzip
+libs/libarchive
