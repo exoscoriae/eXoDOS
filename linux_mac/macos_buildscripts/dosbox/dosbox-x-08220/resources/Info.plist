@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>dosbox-x-08220</string>
+	<key>CFBundleDisplayName</key>
+	<string>DOSBox-X 0.82.20</string>
+	<key>CFBundleExecutable</key>
+	<string>dosbox-x-08220</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.dosbox-x.dosbox-x-08220</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.82.20</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.82.20</string>
+	<key>CFBundleIconFile</key>
+	<string>dosbox-x</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>11.0</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.games</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>GNU GPL v2. DOSBox-X (C) 2011-2019 The DOSBox-X Team / jonathan campbell. DOSBox (C) 2002-2019 The DOSBox Team.</string>
+	<!-- SDL 1.x renders at 1x; letting AppKit scale it looks better than a
+	     quarter-size window. Set to true only if you know you want raw pixels. -->
+	<key>NSHighResolutionCapable</key>
+	<false/>
+	<!-- Intel slice exists; never launch translated when native is available -->
+	<key>LSArchitecturePriority</key>
+	<array>
+		<string>arm64</string>
+		<string>x86_64</string>
+	</array>
+</dict>
+</plist>
