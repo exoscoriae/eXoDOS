@@ -1,0 +1,38 @@
+# Overlay on a stock dockerized-bb macOS toolchain image:
+#  - force MACOSX_DEPLOYMENT_TARGET=11.0 (osxcross clang wrappers honor this)
+#  - wipe the library prefix (removes all MacPorts prebuilt binaries and any
+#    helper libs built with the stock deployment target)
+#  - rebuild every library from source using dockerized-bb's own lib-helpers
+ARG BASE_ARCH=x86_64
+
+FROM toolchains/common AS common-helpers
+FROM toolchains/apple-common AS apple-helpers
+
+FROM toolchains/macosx-${BASE_ARCH}
+
+# All compiles from here on target macOS 11.0
+ENV MACOSX_DEPLOYMENT_TARGET=11.0
+
+# nasm: needed by libjpeg-turbo x86_64 SIMD (emits Mach-O objects fine)
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nasm && \
+    rm -rf /var/lib/apt/lists/*
+
+# Full recipe collections (the stock image only kept the recipes it used)
+COPY --from=common-helpers /lib-helpers /lib-helpers
+COPY --from=apple-helpers /lib-helpers/packages /lib-helpers/packages
+# Our additions/overrides (SDL2 from source instead of the MacPorts shim)
+COPY packages /lib-helpers/packages/
+COPY rebuild-libs.sh /lib-helpers/
+
+RUN sh /lib-helpers/rebuild-libs.sh
+
+# ScummVM's ports.mk links libsonivox-static.a while the recipe may install
+# libsonivox.a (naming changed across sonivox versions) -- provide both names.
+# Kept as a separate layer so the (expensive) library rebuild layer stays cached.
+RUN set -e; LIBD="${DESTDIR}${PREFIX}/lib"; \
+    if [ -f "$LIBD/libsonivox.a" ] && [ ! -f "$LIBD/libsonivox-static.a" ]; then \
+        cp "$LIBD/libsonivox.a" "$LIBD/libsonivox-static.a"; fi; \
+    if [ -f "$LIBD/libsonivox-static.a" ] && [ ! -f "$LIBD/libsonivox.a" ]; then \
+        cp "$LIBD/libsonivox-static.a" "$LIBD/libsonivox.a"; fi; \
+    ls -la "$LIBD"/libsonivox*
