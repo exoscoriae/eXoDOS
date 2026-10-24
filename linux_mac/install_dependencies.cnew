@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-08-25
+# Revised: 2026-10-24
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -71,7 +71,7 @@ function beginMac
 
     clear
     printf "Checking for essential system packages...\n\n"
-    command -v sha256sum &> /dev/null || sha256sum() { shasum -a 256 "$@"; }
+    sha256sum() { shasum -a 256 "$@"; }
     
     printf "Extracting bundled versions of unzip and wget...\n\n"
     extractEssential
@@ -1093,7 +1093,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta13"
+setupversion="Version 6.04b.universal1_beta14"
 
 [[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
