@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-24
+# Revised: 2026-10-25
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -12,6 +12,7 @@ DELAYEDVARECHEND - denotes the end of a delayed expansion variable used in an ec
 DETERMINEBYTESFREE - placeholder that is later substituted with Linux command to determine bytes free
 PENDINGAST - pending asterisk (*)
 PENDINGBACKSLASH - pending \
+pendingIFQBS - pending if quoted backslash (backslashes in quoted operands of if [not] "..." == "...")
 PENDINGBACKTICK - pending `
 PENDINGBASENOEXT - pending current script basename without extension
 PENDINGCAT - pending cat to set variable
@@ -706,11 +707,16 @@ EOF
            -e 's|\.\\zip2 |zip |I' \
            -e 's|\.\.\\util\\zip2 |zip |I' \
            -e 's|\.\.\\zip2 |zip |I' "$currentScript"
-               
-    #change \ to / excluding echo and comment lines
-    sed -i -e '/^if .* echo /Is|\( echo .*\)\\|\1####|Ig' \
+
+    #change \ to / excluding echo and comment lines and both quoted operands of: if [not] "..." == "..."
+    sed -i -e ':ifqbs' \
+           -e 's/\(\<if[[:space:]]\+\(not[[:space:]]\+\)\?"[^"\\]*\)\\\([^"]*"[[:space:]]*==[[:space:]]*"[^"]*"\)/\1pendingIFQBS\3/I' \
+           -e 's/\(\<if[[:space:]]\+\(not[[:space:]]\+\)\?"[^"]*"[[:space:]]*==[[:space:]]*"[^"\\]*\)\\\([^"]*"\)/\1pendingIFQBS\3/I' \
+           -e 't ifqbs'\
+           -e '/^if .* echo /Is|\( echo .*\)\\|\1####|Ig' \
            -e '/^echo\|^#\|^[[:space:]]\+echo/I!s|\\|/|Ig' \
-           -e 's/####/\\/' "$currentScript"
+           -e 's/####/\\/' \
+           -e 's/pendingIFQBS/\\\\/g' "$currentScript"
     
     #fix ^! instances
     sed -i -e 's/\^\!/\!/g' "$currentScript"
