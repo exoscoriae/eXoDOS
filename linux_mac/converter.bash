@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-21
+# Revised: 2026-10-24
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -732,6 +732,9 @@ EOF
     
     #fix ^\ instances
     sed -i -e '/echo /s/\^\\/\\/g' "$currentScript"
+
+    #fix ^/ instances
+    sed -i -e '/echo / s|\^/|/|g' "$currentScript"
     
     #fix ^& instances
     sed -i -e '/echo /s/\^&/\&/g' "$currentScript"
