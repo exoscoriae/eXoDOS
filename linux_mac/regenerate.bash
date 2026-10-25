@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-08-24
+# Revised: 2026-10-25
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1134,6 +1134,12 @@ sync_case_and_unzip()\
     unzip -o "$1" -d "$2"\
 }' "$file"
     [ -e "$file" ] && sed -i -e '/Update/ s/unzip -o \([^ ]*\) -d \([^ ]*\)/sync_case_and_unzip \1 \2/g' "$file"
+done
+
+#exit on declining game download
+for file in util/*install*.bsh
+do
+    [ -e "$file" ] && sed -i -e '$!N; /^[[:space:]]*\[ \$errorlevel == '\''2'\'' \] && goto end && \[\[ \$0 != \$BASH_SOURCE \]\] && return\n[[:space:]]*\[ \$errorlevel == '\''1'\'' \] && goto download && \[\[ \$0 != \$BASH_SOURCE \]\] && return$/s/^\([[:space:]]*\)[^\n]*/\1[ $errorlevel == '\''2'\'' ] \&\& exit/; P; D' "$file"
 done
 
 echo "Applying Linux-only game fixes."
