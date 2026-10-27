@@ -3978,7 +3978,7 @@ alias :="goto"\
 \
 function clear\
 {\
-    printf "%s%s" "$cclear"\
+    printf "%s" "$cclear"\
     command clear\
 }\
 \
