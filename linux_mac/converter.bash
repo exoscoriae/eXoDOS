@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-25
+# Revised: 2026-10-26
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -806,10 +806,10 @@ EOF
            -e "s/^\(^[[:space:]]\+\)echo /\1echo \"/" \
            -e "/^if .* echo \|^[[:space:]]\+if .* echo /Is/ echo / echo \"/" "$currentScript"
 
-    #add a double quote to the end of echoes without redirects
-    sed -i -e "/^echo/I{ />\|echo \"set .*>/!s/[[:space:]\t\r]*$/\"/ }" \
-           -e "/^\(^[[:space:]]\+\)echo/I{ />\|echo \"set .*>/!s/[[:space:]\t\r]*$/\"/ }" \
-           -e "/^if .* echo \|^[[:space:]]\+if .* echo /I{ />/!s/[[:space:]\t\r]*$/\"/ }" "$currentScript"
+    #add a double quote to the end of echoes without redirects (keep trailing spaces: they show when a background color is set)
+    sed -i -e "/^echo/I{ />\|echo \"set .*>/!s/\r\?$/\"/ }" \
+           -e "/^\(^[[:space:]]\+\)echo/I{ />\|echo \"set .*>/!s/\r\?$/\"/ }" \
+           -e "/^if .* echo \|^[[:space:]]\+if .* echo /I{ />/!s/\r\?$/\"/ }" "$currentScript"
 
     #ensure echo redirects are preceded by spaces
     sed -i -e "/^echo\|^[[:space:]]\+echo/I {/[^[:space:]]>>/ s/>>/ >>/;}" \
@@ -3481,7 +3481,7 @@ EOF
            -e "s/PATHENDPLACEHOLDER/\"/" "$currentScript"
     
     #fix trailing backslashes at the end of echoes
-    sed -i -e 's|\(echo.*\)\\\\"$|\1/"|' "$currentScript"
+    sed -i -e 's|\(echo.*[^[:space:]\\]\)\\\\"$|\1/"|' "$currentScript"
 
     #fix ! for conditional echos
     sed -i -e "/&& \+echo.*\!/ {
@@ -3869,8 +3869,35 @@ function goto\
     #fix ANSI declaration structures
     sed -i -e 's/\([[:alnum:]_]\+\)="\(\x1b.[^] ]*\)"/\1=$'\''\2'\''/' "$currentScript"
     
+    #translate Windows console SGR semantics: conhost treats 1 as the intensity bit (bright colour), most Linux terminals treat it as bold weight
+    perl -pi -e 'next unless /=\$\x27\x1b\[/;
+                 s{\x1b\[([0-9;]*)m}{
+                     my @p = split /;/, $1;
+                     if (grep { $_ eq "1" } @p) {
+                         my $fg = 0;
+                         for (@p) { if (/^3([0-7])$/) { $_ = "9$1"; $fg = 1; } }
+                         push @p, "97" unless $fg;
+                         @p = grep { $_ ne "1" } @p;
+                     }
+                     "\x1b[" . join(";", @p) . "m";
+                 }ge' "$currentScript"
+
     #fix escape characters for text formatting
     sed -i -e 's/\x1b/\\e/g' "$currentScript"
+
+    #make cclear end on the theme background: append the value of cback from the same block of variable definitions
+    perl -0777 -pi -e 'my @l = split /^/m, $_;
+                       my $var = qr/^\s*(?:echo\s+(?:-e\s+)?")?[A-Za-z0-9_]+=/;
+                       for my $i (0 .. $#l) {
+                           next unless $l[$i] =~ /^\s*(?:echo\s+(?:-e\s+)?")?cclear=/;
+                           my ($s, $e) = ($i, $i);
+                           $s-- while $s > 0 && $l[$s - 1] =~ $var;
+                           $e++ while $e < $#l && $l[$e + 1] =~ $var;
+                           my ($back) = map { /^\s*(?:echo\s+(?:-e\s+)?")?cback=([^"\s]+)/ ? $1 : () } @l[$s .. $e];
+                           next unless defined $back;
+                           $l[$i] =~ s{^(\s*(?:echo\s+(?:-e\s+)?")?cclear=)([^"\s]*)}{ substr($2, -length $back) eq $back ? "$1$2" : "$1$2$back" }e;
+                       }
+                       $_ = join "", @l;' "$currentScript"
     
     #ensure comment lines are written in bash format
     sed -i -e 's/echo "rem /echo "# /' "$currentScript"
@@ -3948,6 +3975,12 @@ function goto\
     exit\
 }\
 alias :="goto"\
+\
+function clear\
+{\
+    printf "%s%s" "$cclear"\
+    command clear\
+}\
 \
 function dynchoice\
 {\
