@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-25
+# Revised: 2026-10-27
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1149,6 +1149,7 @@ echo "Applying Linux-only game fixes."
 [ `ls -1 eXoDOS/\!dos/Carmaged/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/Carmaged/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/comcon/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/comcon/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/comconra/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/comconra/dosbox_linux.conf 2>/dev/null
+[ `ls -1 eXoDOS/\!dos/DescentX/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/DescentX/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/gnb5dd/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/gnb5dd/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/GTA/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/GTA/dosbox_linux.conf 2>/dev/null
 [ `ls -1 eXoDOS/\!dos/hardnova/dosbox_linux.conf 2>/dev/null | wc -w` -gt 0 ] && sed -i -e "/_lin/! s/call run/call run_lin/I" eXoDOS/\!dos/hardnova/dosbox_linux.conf 2>/dev/null
