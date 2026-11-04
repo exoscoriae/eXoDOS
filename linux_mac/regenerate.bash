@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-30
+# Revised: 2026-11-04
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -309,7 +309,7 @@ function convertMacShell
     sed -i -e "#mac-m1# s#^\(.*\)/mac-m1\(.*\)#&\n\1mac-x64/\2#" "$currentScript"
     sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' \
            -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' \
-           -e 's/Linux 64/MacOS/gI' "$currentScript"
+           -e '/Linux 64/ s/Linux/MacOS/gI' "$currentScript"
     perl -i -e 'use strict;
                 use warnings;
                 use Text::ParseWords;
