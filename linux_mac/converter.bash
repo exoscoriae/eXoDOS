@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-26
+# Revised: 2026-11-03
 # This file is a dependency for regenerate.bash and cannot be executed directly.
 
 : 'Legend for temporary references:
@@ -3943,6 +3943,9 @@ function goto\
                      $_ = "${pre}for zip_file in $zip; do ${cmd}\"\$zip_file\"${post}; done\n";
                  }' "$currentScript"
 
+    #ensure clear commands ran directly before aria2c remove theme backgrounds
+    perl -0777 -i -pe 's/^([ \t]*)clear(\r?\n)(?=[ \t]*flatpak run com\.retro_exo\.aria2c)/$1printf \x27\\e[0m\x27; command clear$2/mg' "$currentScript"
+
     #add bash header line, goto function and alias
     sed -i -e '1i\
 #!/usr/bin/env bash\
@@ -3950,7 +3953,7 @@ if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]\
 then\
     LD_PRELOAD=""\
 fi\
-[[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"\
+[[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"\
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"\
 [ $# -gt 0 ] && parameterone="$1"\
 [ $# -gt 1 ] && parametertwo="$2"\
@@ -4188,44 +4191,16 @@ function dynchoice\
     return\
 }\
 \
-depcheck=flatpak\
-missingDependencies=no\
-if [ $depcheck == "flatpak" ]\
+if ! command -v checkDependencies &> /dev/null\
 then\
-    ! [[ `which flatpak` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.aria2c"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-074r3-1"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-ece-r4301"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-ece-r4358"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-ece-r4482"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-gridc-4-3-1"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-staging-082-0"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-staging-081-2"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-x-08220"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.dosbox-x-20240701"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.gzdoom-4-11-3"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-8-0"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.scummvm-2-9-0"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.vlc"` ]] && missingDependencies=yes\
-    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\\.wine"` ]] && missingDependencies=yes\
-else\
-    missingDependencies=yes\
-fi\
-! [[ `which curl` ]] && missingDependencies=yes\
-! [[ `which python3` ]] && missingDependencies=yes\
-! [[ `which sed` ]] && missingDependencies=yes\
-! [[ `which unzip` ]] && missingDependencies=yes\
-! [[ `which wget` ]] && missingDependencies=yes\
-\
-if [ $missingDependencies == "yes" ]\
-then\
-    printf "\\n\\e[1;31;47mOne or more dependencies are missing.\\e[0m\\n\\n"\
+    printf "\\n\\e[1;31;47mThe checkDependencies script could not be found.\\e[0m\\n\\n"\
     printf "Please run the \\e[1;33;40minstall_dependencies.command\\e[0m script.\\n"\
     printf "Then, follow the instructions to install the required dependencies.\\n"\
     read -s -n 1 -p "Press any key to abort."\
     printf "\\n\\n"\
     exit 0\
 fi\
+checkDependencies eXoShared || exit 0\
 if [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]\
 then\
     flatpak list --app --columns=application | grep "^com.retro_exo." | xargs -I {} flatpak override --user --env=SDL_VIDEODRIVER=x11 {}\

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-10-24
+# Revised: 2026-11-03
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -146,8 +146,13 @@ function beginLinux
 function extractPackages
 {
     printf "\nExtracting packages...\n"
+    for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
+    do
+        [ -e "$zip_file" ] || continue
+        unzip -o "$zip_file" 'eXo/dependencies/check/*' -d ./ || abortScript "Failed to unzip dependency checks."
+    done
     cd eXo
-    rm -rf ./dmg/*/ &>/dev/null
+    rm -rf ./dependencies/dmg/*/ &>/dev/null
     rm -rf ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app &>/dev/null
     for zip_file in ./util/util*_linux*.zip
     do
@@ -157,12 +162,12 @@ function extractPackages
     for zip_file in ./util/EXT*_linux*.zip
     do
         [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" 'Flatpaks/*' -d ./ || abortScript "Failed to unzip Flatpaks."
+        unzip -o "$zip_file" 'dependencies/Flatpaks/*' -d ./ || abortScript "Failed to unzip Flatpaks."
     done
     for zip_file in ./util/EXT*_linuxmac*.zip
     do
         [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" 'dmg/*' -d ./ || abortScript "Failed to unzip dmg packages."
+        unzip -o "$zip_file" 'dependencies/dmg/*' -d ./ || abortScript "Failed to unzip dmg packages."
         if unzip -l "$zip_file" 'emulators/*/macOS/*' &>/dev/null
         then
             unzip -o "$zip_file" 'emulators/*/macOS/*' -d ./ || abortScript "Failed to unzip macOS emulators."
@@ -1186,7 +1191,7 @@ function installFlatpaks
 
     echo "Installing retro_exo flatpaks..."
     shopt -s nullglob
-    for pkg in ./eXo/Flatpaks/*.$flatpak_ext
+    for pkg in ./eXo/dependencies/Flatpaks/*.$flatpak_ext
     do
         if flatpak ps --columns=application | grep -q "^$(basename "${pkg%.$flatpak_ext}")$"
         then
@@ -1241,9 +1246,9 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta14"
+setupversion="Version 6.04b.universal1_beta15"
 
-[[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
+[[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
 [ $# -gt 0 ] && parameterone="$1"
 [ $# -gt 1 ] && parametertwo="$2"

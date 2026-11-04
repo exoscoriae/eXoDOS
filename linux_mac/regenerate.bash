@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-10-27
+# Revised: 2026-10-30
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -104,6 +104,36 @@
 #  macOS Note: At this time, only the eXoDREAMM backend has had full conversion
 #  to macOS.
 
+#  Dependency Note: Converted scripts do not contain their own dependency lists.
+#  Each one calls checkDependencies, which exogui.command puts in PATH from
+#  eXo/dependencies/check/linux/<arch> or eXo/dependencies/check/macOS, with the
+#  list that the dependencyList function below picks from the script's location.
+#  To change what a collection requires, edit its <list>.txt files in those
+#  folders. Scripts only need to be regenerated when the location mapping changes.
+
+#function to choose the eXo/dependencies/check list a converted script checks
+#eXoShared is always checked as well, so shared utilities only need eXoShared
+function dependencyList
+{
+    case "$1" in
+        "../Setup eXoDOS.bsh"|eXoDOS/*|eXoPCjr/*|Magazines/*|Videos/*)
+            echo "eXoDOS";;
+        "../Setup eXoDemoScene.bsh"|eXoDemoScn/*|util/ds_*|emulators/martypc/*)
+            echo "eXoDemoScene";;
+        "../Setup eXoDREAMM.bsh"|eXoDREAMM/*|util/*_drm*)
+            echo "eXoDREAMM";;
+        "../Setup eXoScummVM.bsh"|eXoScummVM/*|util/*_svm.bsh)
+            echo "eXoScummVM";;
+        "../Setup eXoWin3x.bsh"|eXoWin3x/*)
+            echo "eXoWin3x";;
+        "../Setup eXoWin9x.bsh"|eXoWin9x/*|util/9x*)
+            echo "eXoWin9x";;
+        *)
+            echo "eXoShared";;
+    esac
+}
+export -f dependencyList
+
 #function to spawn a new script conversion
 function spawnConversion
 {
@@ -114,6 +144,7 @@ function spawnConversion
     . util/converter.bash
     
     convertScript
+    sed -i -e "s/^checkDependencies eXoShared || exit 0\$/checkDependencies $(dependencyList "$currentScript") || exit 0/" "$currentScript"
     sed -i -e '/^if \[ "\${BASH_VERSINFO:-0}" -lt 5 \]/i\
 if [[ "$OSTYPE" == "darwin"* ]]\
 then\
@@ -202,8 +233,9 @@ function createLinuxConf
            -e "/soundfont/ s|\\\|/|Ig" \
            -e "/romdir/ s|\\\|/|Ig" \
            -e "/glshader/ s|\\\|/|Ig" \
-           -e "/glshader/ s|Sharp|sharp|Ig" "${file%.conf}_linux.conf"
-    sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=alsa\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.conf}_linux.conf"
+           -e "/glshader/ s|Sharp|sharp|Ig" \
+           -e "/fluid.driver/ s|default|pulseaudio|Ig" "${file%.conf}_linux.conf"
+    sed -i -e "s|^fluid\.soundfont=\./mt32/SoundCanvas\.sf2|midiconfig=128:0\nfluid.driver=pulseaudio\nfluid.soundfont=./mt32/SoundCanvas.sf2|I" "${file%.conf}_linux.conf"
 }
 export -f createLinuxConf
 
@@ -278,9 +310,6 @@ function convertMacShell
     sed -i -e '/mac-m1\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep arm64` ] \&\& /' \
            -e '/mac-x64\.txt/ s/^\([[:space:]]*\)/\1[ `uname -m | grep x86_64` ] \&\& /' \
            -e 's/Linux 64/MacOS/gI' "$currentScript"
-    sed -i -e '/^depcheck=flatpak/,/^fi/c\
-missingDependencies=no\
-! [[ `which java` ]] && missingDependencies=yes' "$currentScript"
     perl -i -e 'use strict;
                 use warnings;
                 use Text::ParseWords;
@@ -666,64 +695,14 @@ do
 done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'spawnConversion "$@"' _
 
 echo ""
-echo "Removing unnecessary dependency checks."
-for currentScript in ../xml/*.bsh emulators/*/*.bsh emulators/*/*/*.bsh Videos/*/*.bsh ../eXoMerge.bsh util/*.bsh util/*/*.bsh Update/*.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
-done
-for currentScript in Videos/*/*.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.vlc"` ]] \&\& missingDependencies=yes^' "$currentScript"
-done
+echo "Applying Linux shell file post-conversion fixes."
 for currentScript in ../Setup\ eXo*.bsh
 do
     [ -e "$currentScript" ] && sed -i -e '/unzip -o/ s|XODOSMetadata Plugins/eXoPlugin\.dll|XODOSzz_linuxmac_Metadata.zip Plugins/eXoPlugin.dll|' "$currentScript"
 done
-
-for currentScript in emulators/martypc/*.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.martypc"` ]] \&\& missingDependencies=yes^' "$currentScript"
-done
-for currentScript in eXoDemoScn/\!*/*/*.bsh eXoDemoScn/\!*/*/*/*.bsh eXoDemoScn/\!*/*/*/*/*.bsh util/ds_*.bsh ../Setup\ eXoDemoScene.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-074r3-1"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-ece-r4482"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-081-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-staging-082-2"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-08220"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20240701"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20241001"` ]] \&\& missingDependencies=yes\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20250503"` ]] \&\& missingDependencies=yes^' "$currentScript"
-done
 for currentScript in eXoDREAMM/\!*/*/*.bsh eXoDREAMM/\!*/*/*/*.bsh util/*_drm*.bsh ../Setup\ eXoDREAMM.bsh
 do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
     [ -e "$currentScript" ] && sed -i -e '/drmini="\/${drm::-11}"/a drm="${drm: -10}"' "$currentScript"
-done
-for currentScript in eXoScummVM/\!*/*/*.bsh eXoScummVM/\!*/*/*/*.bsh util/*_svm.bsh ../Setup\ eXoScummVM.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-5-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2026-1-0"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-3-0-git18903-g313a824fb9"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-2-8-0-git9335-g00e72a17004"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.scummvm-3-0-0-git20192-g3ca9da6a1c3"` ]] \&\& missingDependencies=yes^' "$currentScript"
-done
-for currentScript in */\!*/*/Magazines/*.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\./d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.wine"` ]] \&\& missingDependencies=yes^' "$currentScript"
-done
-for currentScript in eXoWin9x/\!*/*/*/*.bsh eXoWin9x/\!*/*/*/*/*.bsh ../Setup\ eXoWin9x.bsh
-do
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.aria2c/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.dosbox/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.gzdoom/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e "/flatpak list.*retro_exo\\\.scummvm/d" "$currentScript"
-    [ -e "$currentScript" ] && sed -i -e '/which flatpak/ s^$^\n    ! [[ `flatpak list 2>/dev/null | grep "retro_exo\.dosbox-x-20250201"` ]] \&\& missingDependencies=yes^' "$currentScript"
-    #Dependencies will need to be added here
 done
 
 echo "Removing unnecessary files..."
@@ -1447,60 +1426,6 @@ do
     [ -e "$currentScript" ] && printf "%s\0" "$currentScript"
 done | xargs -0 -n 1 -P "${totalThreads}" bash -c 'convertMacShell "$@"' _
 
-for currentScript in eXoDOS/\!*/*/*.msh eXoDOS/\!*/*/*/*.msh eXoPCjr/\!*/*/*.msh eXoPCjr/\!*/*/*/*.msh ../Setup\ eXoDOS.msh
-do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
-! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
-! [[ `which dosbox-ece-r4301` ]] && missingDependencies=yes\
-! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
-! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
-! [[ `which dosbox-staging-082-2` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
-! [[ `which wine` ]] && missingDependencies=yes\
-! [[ `which gzdoom-4-11-3` ]] && missingDependencies=yes' "$currentScript"
-done
-
-for currentScript in eXoDemoScn/\!*/*/*.msh eXoDemoScn/\!*/*/*/*.msh util/\ds_*.msh ../Setup\ eXoDemoScene.msh
-do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
-! [[ `which dosbox-074r3-3` ]] && missingDependencies=yes\
-! [[ `which dosbox-ece-r4482` ]] && missingDependencies=yes\
-! [[ `which dosbox-staging-081-2` ]] && missingDependencies=yes\
-! [[ `which dosbox-staging-082-2` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-08220` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-20240701` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-20241001` ]] && missingDependencies=yes\
-! [[ `which dosbox-x-20250503` ]] && missingDependencies=yes\
-! [[ `which martypc-0-4-0` ]] && missingDependencies=yes\
-! [[ `which wine` ]] && missingDependencies=yes' "$currentScript"
-done
-
-for currentScript in eXoScummVM/\!*/*/*.msh eXoScummVM/\!*/*/*/*.msh util/*_svm.msh ../Setup\ eXoScummVM.msh
-do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
-! [[ `which scummvm-2-5-0` ]] && missingDependencies=yes\
-! [[ `which scummvm-2-8-0` ]] && missingDependencies=yes\
-! [[ `which scummvm-2-9-0` ]] && missingDependencies=yes\
-! [[ `which scummvm-2026-1-0` ]] && missingDependencies=yes\
-! [[ `which scummvm-2-3-0-git18903-g313a824fb9` ]] && missingDependencies=yes\
-! [[ `which scummvm-2-8-0-git9335-g00e72a17004` ]] && missingDependencies=yes\
-! [[ `which scummvm-3-0-0-git20192-g3ca9da6a1c3` ]] && missingDependencies=yes' "$currentScript"
-done
-
-for currentScript in eXoWin9x/\!*/*/*/*.msh eXoWin9x/\!*/*/*/*/*.msh util/9x*.msh ../Setup\ eXoWin9x.msh
-do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
-! [[ `which dosbox-x-20250201` ]] && missingDependencies=yes' "$currentScript"
-done
-
-for currentScript in emulators/martypc/*.msh
-do
-    [ -e "$currentScript" ] && sed -i -e '/\[\[ `which java` \]\] && missingDependencies=yes/a\
-! [[ `which martypc-0-4-0` ]] && missingDependencies=yes\
-! [[ `which wine` ]] && missingDependencies=yes' "$currentScript"
-done
-
 for file in ../Setup*.msh ../eXoMerge.msh
 do
     [ -e "$file" ] && sed -i -e 's#^echo -e "\[Desktop Entry\]" > ~/Desktop/eXoDOS\.desktop#ICON_PATH="${iconDir}/exodos.png"\
@@ -1566,7 +1491,7 @@ else\
     cd eXo/util || { logger -s "ERROR: Unable to change to eXo/util directory. Aborting."; exit 1; }\
 fi' "${file%.msh}.command"
     [ -e "$file" ] && sed -i -e '/ ~\/Desktop\//d' "$file"
-    [ -e "$file" ] && sed -i -e '/^missingDependencies=no/i \
+    [ -e "$file" ] && sed -i -e '/^if ! command -v checkDependencies/i \
 if [[ "$scriptDir" == */eXo/util ]]\
 then\
     cd ../../\
@@ -1580,7 +1505,7 @@ else\
     printf "\\n\\n"\
     exit 1\
 fi' "$file"
-    [ -e "${file%.msh}.bsh" ] && sed -i -e '/^missingDependencies=no/i \
+    [ -e "${file%.msh}.bsh" ] && sed -i -e '/^if ! command -v checkDependencies/i \
 if [[ "$scriptDir" == */eXo/util ]]\
 then\
     cd ../../\
@@ -1599,12 +1524,15 @@ fi' "${file%.msh}.bsh"
 done
 
 chmod +x ../*.command 2>/dev/null
+chmod +x dependencies/check/macOS/checkDependencies dependencies/check/linux/*/checkDependencies 2>/dev/null
 
 echo "Creating macOS DOSBox configuration files. This may take a few minutes."
 rm eXo*/\!*/*/*_mac.conf eXo*/\!*/*/*/*_mac.conf dosbox/*_mac.conf dosbox/*/*_mac.conf emulators/dosbox/*_mac.conf emulators/dosbox/*/*_mac.conf Magazines/*/*_mac.conf Magazines/*/*/*_mac.conf 2>/dev/null
 for file in eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf
 do
     [ -e "$file" ] && cp "$file" "${file%_linux.conf}_mac.conf"
+    [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e "/fluid.driver/ s|pulseaudio|coreaudio|Ig"
+    [ -e "${file%_linux.conf}_mac.conf" ] sed -i -e '/fluid\.driver/Ia fluid.periods=16\nfluid.periodsize=64'
     [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e '/midiconfig=128/d' "${file%_linux.conf}_mac.conf"
 done 2>/dev/null
 

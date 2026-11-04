@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-10-24
+# Revised: 2026-11-03
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -72,7 +72,7 @@ function beginMac
     clear
     printf "Checking for essential system packages...\n\n"
     sha256sum() { shasum -a 256 "$@"; }
-    
+
     printf "Extracting bundled versions of unzip and wget...\n\n"
     extractEssential
     fixGatekeeper
@@ -80,7 +80,7 @@ function beginMac
     cd eXo
     if checkSymlinks
     then
-        for app_dir in "$PWD"/macutil/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/macutil/macOS/wget/wget.app/Contents/MacOS
+        for app_dir in "$PWD"/dependencies/macOS/unzip/unzip.app/Contents/MacOS "$PWD"/dependencies/macOS/wget/wget.app/Contents/MacOS
         do
             [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
         done
@@ -105,7 +105,7 @@ function beginMac
     cd eXo
     if checkSymlinks
     then
-        for app_dir in "$PWD"/macutil/macOS/*/*.app/Contents/MacOS "$PWD"/dmg/*/*.app/Contents/MacOS
+        for app_dir in "$PWD"/dependencies/macOS/*/*.app/Contents/MacOS "$PWD"/dependencies/dmg/*/*.app/Contents/MacOS
         do
             [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
         done
@@ -118,9 +118,15 @@ function beginMac
     cd ..
     export PATH
     mkdir -p ~/Library/Application\ Support/exogui
-    echo "export PATH=\"$PATH\"" > ~/Library/Application\ Support/exogui/path
+    #Escape the characters that stay active inside double quotes so this file can be sourced safely
+    escaped_path="$PATH"
+    for char in '\' '"' '$' '`'
+    do
+        escaped_path="${escaped_path//"$char"/\\$char}"
+    done
+    echo "export PATH=\"$escaped_path\"" > ~/Library/Application\ Support/exogui/path
     hash -r
-    
+
     clear
     if [ "$parameterone" == "update" ]
     then
@@ -153,10 +159,10 @@ function checkSymlinks
 function extractDmg
 {
     cd eXo
-    rm -rf ./dmg/*/ &>/dev/null
+    rm -rf ./dependencies/dmg/*/ &>/dev/null
     rm -rf ~/Library/Application\ Support/exogui/external_apps/*/ &>/dev/null
     printf "\nExtracting dmg files...\n"
-    for file in ./dmg/*.dmg
+    for file in ./dependencies/dmg/*.dmg
     do
         [ -e "$file" ] || continue
         if checkSymlinks
@@ -185,15 +191,15 @@ function extractDmg
 
 function extractEssential
 {
-    [ -d ./eXo/macutil/macOS/unzip ] && rm -rf ./eXo/macutil/macOS/unzip/
-    [ -d ./eXo/macutil/macOS/wget ] && rm -rf ./eXo/macutil/macOS/wget/
+    [ -d ./eXo/dependencies/macOS/unzip ] && rm -rf ./eXo/dependencies/macOS/unzip/
+    [ -d ./eXo/dependencies/macOS/wget ] && rm -rf ./eXo/dependencies/macOS/wget/
     [ -d ~/Library/Application\ Support/exogui/external_core/unzip ] && rm -rf ~/Library/Application\ Support/exogui/external_core/unzip/
     [ -d ~/Library/Application\ Support/exogui/external_core/wget ] && rm -rf ~/Library/Application\ Support/exogui/external_core/wget/
     for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
     do
         [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" eXo/macutil/macOS/unzip.dmg -d ./ || abortScript "Failed to unzip unzip."
-        unzip -o "$zip_file" eXo/macutil/macOS/wget.dmg -d ./ || abortScript "Failed to unzip wget."
+        unzip -o "$zip_file" eXo/dependencies/macOS/unzip.dmg -d ./ || abortScript "Failed to unzip unzip."
+        unzip -o "$zip_file" eXo/dependencies/macOS/wget.dmg -d ./ || abortScript "Failed to unzip wget."
     done
     cd eXo
     mkdir -p Update/linux_mac
@@ -204,17 +210,17 @@ function extractEssential
         [ "$setupversion" != "$updateversion" ] && abortScript "Version mismatch for universal package update zip!"
         universal_package_sum="$(sed -n '7p' ver_current_linuxmac.txt)"
         echo "$universal_package_sum" | sha256sum --check || { rm update_universalpackages_linuxmac.zip; abortScript "Checksum for downloaded file invalid."; }
-        if unzip -l update_universalpackages_linuxmac.zip "eXo/macutil/macOS/unzip.dmg" &>/dev/null
+        if unzip -l update_universalpackages_linuxmac.zip "eXo/dependencies/macOS/unzip.dmg" &>/dev/null
         then
-            unzip -o update_universalpackages_linuxmac.zip "eXo/macutil/macOS/unzip.dmg" -d ../../../ || abortScript "Failed to unzip update for unzip."
+            unzip -o update_universalpackages_linuxmac.zip "eXo/dependencies/macOS/unzip.dmg" -d ../../../ || abortScript "Failed to unzip update for unzip."
         fi
-        if unzip -l update_universalpackages_linuxmac.zip "eXo/macutil/macOS/wget.dmg" &>/dev/null
+        if unzip -l update_universalpackages_linuxmac.zip "eXo/dependencies/macOS/wget.dmg" &>/dev/null
         then
-            unzip -o update_universalpackages_linuxmac.zip "eXo/macutil/macOS/wget.dmg" -d ../../../ || abortScript "Failed to unzip update for wget."
+            unzip -o update_universalpackages_linuxmac.zip "eXo/dependencies/macOS/wget.dmg" -d ../../../ || abortScript "Failed to unzip update for wget."
         fi
     fi
     cd ../../
-    for file in ./macutil/macOS/unzip.dmg ./macutil/macOS/wget.dmg
+    for file in ./dependencies/macOS/unzip.dmg ./dependencies/macOS/wget.dmg
     do
         [ -e "$file" ] || continue
         if checkSymlinks
@@ -261,8 +267,13 @@ function extractEssential
 function extractPackages
 {
     printf "\nExtracting packages...\n"
+    for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
+    do
+        [ -e "$zip_file" ] || continue
+        unzip -o "$zip_file" 'eXo/dependencies/check/*' -d ./ || abortScript "Failed to unzip dependency checks."
+    done
     cd eXo
-    rm -rf ./dmg/*/ &>/dev/null
+    rm -rf ./dependencies/dmg/*/ &>/dev/null
     rm -rf ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app &>/dev/null
     for zip_file in ./util/util*_linux*.zip
     do
@@ -272,18 +283,18 @@ function extractPackages
     for zip_file in ./util/EXT*_linux*.zip
     do
         [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" 'Flatpaks/*' -d ./ || abortScript "Failed to unzip Flatpaks."
+        unzip -o "$zip_file" 'dependencies/Flatpaks/*' -d ./ || abortScript "Failed to unzip Flatpaks."
     done
     for zip_file in ./util/EXT*_linuxmac*.zip
     do
         [ -e "$zip_file" ] || continue
-        unzip -o "$zip_file" 'dmg/*' -d ./ || abortScript "Failed to unzip dmg packages."
+        unzip -o "$zip_file" 'dependencies/dmg/*' -d ./ || abortScript "Failed to unzip dmg packages."
         if unzip -l "$zip_file" 'emulators/*/macOS/*' &>/dev/null
         then
             unzip -o "$zip_file" 'emulators/*/macOS/*' -d ./ || abortScript "Failed to unzip macOS emulators."
         fi
     done
-    
+
     mkdir -p Update/linux_mac
     cd Update/linux_mac/
     if [ -e ver_current_linuxmac.txt ]
@@ -578,7 +589,7 @@ function fixGatekeeper
     cd eXo
     if checkSymlinks
     then
-        for app in ./dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./macutil/macOS/*/*.app ../exogui/*.app
+        for app in ./dependencies/dmg/*/*.app ./emulators/*/macOS/*.app ./emulators/*/*/macOS/*.app ./emulators/*/*/*/macOS/*.app ./dependencies/macOS/*/*.app ../exogui/*.app
         do
             [ -d "$app" ] || continue
             chmod -R u+w "$app"
@@ -631,7 +642,7 @@ function getUpdate
     universal_package_url="$(sed -n '6p' ver_universal_linuxmac.txt)"
     universal_package_sum="$(sed -n '7p' ver_universal_linuxmac.txt)"
     clear
-    
+
     if [ -e ../ver_current_linuxmac.txt ]
     then
         if [ "$setupversion" == "$updateversion" ]
@@ -669,7 +680,7 @@ function getUpdate
         printf "\n\n"
         exit 0
     fi
-    
+
     anyUpdates=no
 
     #universal package updates
@@ -692,7 +703,7 @@ function getUpdate
     cd ..
     #unzip -o update_universalpackages_linuxmac.zip -d ../../../ || abortScript "Failed to unzip update."
     head -n 7 tmp/ver_universal_linuxmac.txt > ver_current_linuxmac.txt
-    
+
     #Pack specific updates for collections that do not require patch to extract last (no zz) - XO*_linux*_Metadata.zip for standard, eXo*_linux*_Metadata.zip for language packs
     for file in ../../../Content/XO!(*zz)_linux*_Metadata.zip ../../../Content/eXo!(*zz)_linux*_Metadata.zip
     do
@@ -1025,7 +1036,7 @@ function getUpdate
         done
         unset pack_id
     done
-    
+
     rm tmp/ver_universal_linuxmac.txt
     cd ../../..
     clear
@@ -1040,7 +1051,7 @@ function getUpdate
 
 function installPackages
 {
-    cd eXo/macutil/macOS
+    cd eXo/dependencies/macOS
     printf "\nNote: You will be prompted for your password if an installation is required.\n\n"
     #Installing Rosetta if not present
     if [[ "$(uname -m)" == "arm64" ]]
@@ -1087,15 +1098,41 @@ function installPackages
     cd ../../..
 }
 
+# Terminal cannot pass arguments to a .command file it opens, and scripting it through osascript
+# depends on an Automation permission the calling app may not have. A temporary .command file that
+# carries the arguments avoids both problems and opens the same way as a double-click in Finder.
+# Arguments are single-quoted by hand because printf %q in the bash 3.2 shipped with macOS leaves ~ exposed.
+function relaunchInTerminal
+{
+    local script_path launcher_dir launcher arg sq="'" escaped_sq="'\\''"
+    local relaunch_cmd="exec /usr/bin/env bash"
+    script_path="$PWD/$(basename -- "${BASH_SOURCE%.$macUDSext}.command")"
+    for arg in "$script_path" "$@"
+    do
+        relaunch_cmd+=" '${arg//$sq/$escaped_sq}'"
+    done
+    if launcher_dir="$(mktemp -d "${TMPDIR:-/tmp}/exo_relaunch.XXXXXX")"
+    then
+        launcher="$launcher_dir/$(basename -- "$script_path")"
+        printf '#!/usr/bin/env bash\nrm -rf "$(dirname "$0")"\n%s\n' "$relaunch_cmd" > "$launcher"
+        chmod +x "$launcher"
+        xattr -c "$launcher" 2>/dev/null
+        open -a Terminal "$launcher" && exit 0
+        rm -rf "$launcher_dir"
+    fi
+    logger -s "eXo: Failed to open a Terminal window."
+    exit 1
+}
+
 if [[ "$LD_PRELOAD" =~ "gameoverlayrenderer" ]]
 then
     LD_PRELOAD=""
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta14"
+setupversion="Version 6.04b.universal1_beta15"
 
-[[ $0 == $BASH_SOURCE ]] && cd "$( dirname "$0")"
+[[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
 [ $# -gt 0 ] && parameterone="$1"
 [ $# -gt 1 ] && parametertwo="$2"
@@ -1297,6 +1334,9 @@ then
     logger -s "eXo: OS not supported"
     exit 1
 fi
+
+#Finder runs this script in Terminal, but a caller such as an Electron app provides no visible terminal
+[[ -t 0 && -t 1 ]] || relaunchInTerminal "$@"
 
 [ ! -d Content ] && abortScript "Cannot find ./Content subdirectory."
 [ ! -d "eXo/util" ] && abortScript "Cannot find ./eXo/util subdirectory."
