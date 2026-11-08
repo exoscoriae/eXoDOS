@@ -280,6 +280,9 @@ def is_silent_pattern_ignore(section, key):
 #  GENERIC HELPERS
 # ---------------------------------------------------------
 
+def normalize_path(path):
+    return path.strip().lower().rstrip("\\")
+
 def find_key_line(lines, section, key_prefix):
     current = None
     key_prefix = key_prefix.lower()
@@ -843,11 +846,11 @@ def convert_config_unified(conf_path: Path, source_label: str):
     # ---------------------------------------------------------
     
     # The Win3x template PATH line we must always keep
-    WIN3X_TEMPLATE_PATH_LINE = "path=C:\\;z:\\;c:\\windows\\;y:\\dos;y:\\"
+    WIN3X_TEMPLATE_PATH_LINE = "path=c:\\;z:\\;c:\\windows\\;y:\\dos\\;y:\\"
     
     # Extract template path entries
     template_paths = WIN3X_TEMPLATE_PATH_LINE.split("=", 1)[1].split(";")
-    template_paths = [p for p in template_paths if p]
+    template_paths = [normalize_path(p) for p in template_paths if p.strip()]
 
     # ---------------------------------------------------------
     #  EXTRACT SOURCE AUTOEXEC LINES
@@ -874,11 +877,14 @@ def convert_config_unified(conf_path: Path, source_label: str):
     source_paths = []
     
     for line in autoexec_lines:
-        stripped = line.strip().lower()
-        if stripped.startswith("path="):
+        stripped = line.strip()
+
+        if stripped.lower().startswith("path="):
             parts = stripped.split("=", 1)[1].split(";")
+
             for p in parts:
-                p = p.strip()
+                p = normalize_path(p)
+
                 if p and p not in source_paths:
                     source_paths.append(p)
     
@@ -890,7 +896,12 @@ def convert_config_unified(conf_path: Path, source_label: str):
         if p not in merged_paths:
             merged_paths.append(p)
     
-    final_path_line = "path=" + ";".join(merged_paths) + "\n"
+    output_paths = []
+
+    for p in merged_paths:
+        output_paths.append(p + "\\")
+
+    final_path_line = "path=" + ";".join(output_paths) + "\n"
     
     # ---------------------------------------------------------
     #  BUILD CLEAN AUTOEXEC SECTION
