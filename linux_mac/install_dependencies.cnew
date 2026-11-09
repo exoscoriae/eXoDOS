@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Universal Dependency Setup For eXo Collections
-# Revised: 2026-11-03
+# Revised: 2026-11-09
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -1130,7 +1130,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta15"
+setupversion="Version 6.04b.universal1_beta16"
 
 [[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
@@ -1168,8 +1168,12 @@ fi
 if [[ "$OSTYPE" == "linux"* ]]
 then
     current_term="$(ps -o sid= -p "$$" | xargs ps -o ppid= -p | xargs ps -o comm= -p)"
+    if [[ "$current_term" == "flatpak-session" ]] && [ -t 0 ] && [ -t 1 ]
+    then
+        current_term="flatpak-terminal"
+    fi
     case "$current_term" in
-        "alacritty"|"aterm"|"blackbox-termin"|"cool-retro-term"|"cosmic-term"|"deepin-terminal"|"Eterm"|"foot"|"ghostty"|"gnome-terminal-"*|"io.elementary.terminal"|"kgx"|"konsole"|"kitty"|"lxterminal"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rio"|"rio-terminal"|"rxvt"|"sakura"|"st"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"wezterm"|"xdg-terminal-exec"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
+        "alacritty"|"aterm"|"blackbox-termin"|"cool-retro-term"|"cosmic-term"|"deepin-terminal"|"Eterm"|"foot"|"flatpak-terminal"|"ghostty"|"gnome-terminal-"*|"io.elementary.terminal"|"kgx"|"konsole"|"kitty"|"kwi"|"lxterminal"|"mate-terminal"|"mlterm"|"ptyxis-agent"|"qterminal"|"rio"|"rio-terminal"|"rxvt"|"sakura"|"st"|"stterm"|"terminator"|"terminology"|"termit"|"tilix"|"urxvt"|"wezterm"|"xdg-terminal-exec"|"xfce4-terminal"|"x-terminal-emul"|"xterm")
             cd "$udspath"
             source "$scriptDir/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")"
             exit 0
@@ -1319,6 +1323,10 @@ then
     elif command -v xdg-terminal-exec &> /dev/null
     then
         xdg-terminal-exec /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
+        exit 0
+    elif command -v kwi &> /dev/null
+    then
+        kwi --workdir "$PWD" -e /usr/bin/env bash "$PWD/$udspath/$(basename -- "${BASH_SOURCE%.$macUDSext}.$linUDSext")" "$@" &
         exit 0
     elif [[ "$-" == *i* ]]
     then

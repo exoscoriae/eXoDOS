@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux Dependency Setup For eXo Collections
-# Revised: 2026-11-03
+# Revised: 2026-11-09
 
 #--------------------------------------------------------------------------------------
 shopt -s extglob
@@ -1167,23 +1167,23 @@ function installFlatpaks
     flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || failedInstall
     if [ "$(uname -m)" == "x86_64" ]
     then
-        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.Compat.i386//25.08
-        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.codecs_extra.i386//25.08-extra
-        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08
-        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//25.08-extra
-        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL.default//25.08
-        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL.default//25.08-extra
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.Compat.i386//26.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.codecs_extra.i386//26.08-extra
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//26.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL32.default//26.08-extra
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL.default//26.08
+        flatpak install --user --reinstall -y flathub org.freedesktop.Platform.GL.default//26.08-extra
         if [ -f /sys/module/nvidia/version ]
         then
             read -r nvidia_version < /sys/module/nvidia/version
             flatpak install --user --reinstall -y flathub "org.freedesktop.Platform.GL32.nvidia-${nvidia_version//./-}//1.4"
             flatpak install --user --reinstall -y flathub "org.freedesktop.Platform.GL.nvidia-${nvidia_version//./-}//1.4"
-            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//25.08
+            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.nvidia.i386//26.08
         fi
         for dev in /sys/bus/pci/devices/*
         do
             [[ "$(< "$dev/class")" == 0x03* && "$(< "$dev/vendor")" == "0x8086" ]] || continue
-            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//25.08
+            flatpak install --user --reinstall -y flathub org.freedesktop.Platform.VAAPI.Intel.i386//26.08
             break
         done 2>/dev/null
     fi
@@ -1246,7 +1246,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta15"
+setupversion="Version 6.04b.universal1_beta16"
 
 [[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
