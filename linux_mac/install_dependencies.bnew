@@ -112,7 +112,26 @@ function beginLinux
         extractPackages
         installFlatpaks
     fi
-    
+    if [ "$(uname -m)" = "x86_64" ]
+    then
+        PATH="$PWD/eXo/util/linux/x86_64:$PATH"
+        PATH="$PWD/eXo/dependencies/check/linux/x86_64:$PATH"
+        for app_dir in "$PWD"/eXo/emulators/*/linux/x86_64 "$PWD"/eXo/emulators/*/*/linux/x86_64
+        do
+            [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        done
+    elif [ "$(uname -m)" = "aarch64" ]
+    then
+        PATH="$PWD/eXo/util/linux/aarch64:$PATH"
+        PATH="$PWD/eXo/dependencies/check/linux/aarch64:$PATH"
+        for app_dir in "$PWD"/eXo/emulators/*/linux/aarch64 "$PWD"/eXo/emulators/*/*/linux/aarch64
+        do
+            [ -d "$app_dir" ] && PATH="$app_dir:$PATH"
+        done
+    fi
+    export PATH
+    mkdir -p ~/.config/exogui
+    savePath ~/.config/exogui/path
     clear
     if [ "$parameterone" == "update" ]
     then
@@ -1212,6 +1231,17 @@ function installFlatpaks
     shopt -u nullglob
 }
 
+function savePath
+{
+    #Escape the characters that stay active inside double quotes so this file can be sourced safely
+    local escaped_path="$PATH" char
+    for char in '\' '"' '$' '`'
+    do
+        escaped_path="${escaped_path//"$char"/\\$char}"
+    done
+    echo "export PATH=\"$escaped_path\"" > "$1"
+}
+
 function setupOther
 {
     if [ "$run_update" == "yes" ]
@@ -1246,7 +1276,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta16"
+setupversion="Version 6.04b.universal1_beta17"
 
 [[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
