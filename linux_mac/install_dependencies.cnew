@@ -268,7 +268,7 @@ function extractEssential
 function extractPackages
 {
     printf "\nExtracting packages...\n"
-    for zip_file in ./Content/XO*_linuxmac*_Metadata.zip
+    for zip_file in ./Content/XO*_linux*_Metadata.zip
     do
         [ -e "$zip_file" ] || continue
         unzip -o "$zip_file" 'eXo/dependencies/check/*' -d ./ || abortScript "Failed to unzip dependency checks."
@@ -285,6 +285,14 @@ function extractPackages
     do
         [ -e "$zip_file" ] || continue
         unzip -o "$zip_file" 'dependencies/Flatpaks/*' -d ./ || abortScript "Failed to unzip Flatpaks."
+        if unzip -l "$zip_file" 'emulators/*/linux/*' &>/dev/null
+        then
+            unzip -o "$zip_file" 'emulators/*/linux/*' -d ./ || abortScript "Failed to unzip Linux emulators."
+        fi
+        if unzip -l "$zip_file" 'emulators/*/*/linux/*' &>/dev/null
+        then
+            unzip -o "$zip_file" 'emulators/*/*/linux/*' -d ./ || abortScript "Failed to unzip Linux emulators."
+        fi
     done
     for zip_file in ./util/EXT*_linuxmac*.zip
     do
@@ -1131,7 +1139,7 @@ then
 fi
 clear
 
-setupversion="Version 6.04b.universal1_beta17"
+setupversion="Version 6.04b.universal1_beta18"
 
 [[ "$0" == "$BASH_SOURCE" ]] && cd "$( dirname "$0")"
 scriptDir="$(cd "$( dirname "$BASH_SOURCE")" && pwd)"
