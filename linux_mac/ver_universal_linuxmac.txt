@@ -69,11 +69,11 @@ v1
 Addon Update Packages:
 
 This Media Pack is for eXoDOS Version 6.04
-https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b-beta/update_addon_DOS_Magazines_linuxmac.zip
-3270d39734aefe6b05f0d23d71f3321067c5f5a9ac5e9ea424de1ea69d2d23fb  update_addon_DOS_Magazines_linuxmac.zip
+https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b/update_addon_DOS_Magazines_linuxmac.zip
+35ca2d3cf065519110faa2b2818fdcb9db6a03f7c5291d2ec3de078df25caedf  update_addon_DOS_Magazines_linuxmac.zip
 
 This Media Pack is for eXoDOS Version 6.04
-https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b-beta/update_addon_DOS_Videos_linuxmac.zip
+https://github.com/exoscoriae/eXoDOS/releases/download/v6.04b/update_addon_DOS_Videos_linuxmac.zip
 06746ffd169792b7f2f740194233929aadb8afb5f6c8ed7a3e19bb14e2765398  update_addon_DOS_Videos_linuxmac.zip
 
 ####Version string returned by command in the eXo/Update/linux_mac/getVer_addon_DOS_GLP_MagazinesGLP.sh file found in the update archive itself.
