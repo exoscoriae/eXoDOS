@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-11-04
+# Revised: 2026-11-12
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -1531,8 +1531,9 @@ rm eXo*/\!*/*/*_mac.conf eXo*/\!*/*/*/*_mac.conf dosbox/*_mac.conf dosbox/*/*_ma
 for file in eXo*/\!*/*/*_linux.conf eXo*/\!*/*/*/*_linux.conf dosbox/*_linux.conf dosbox/*/*_linux.conf emulators/dosbox/*_linux.conf emulators/dosbox/*/*_linux.conf Magazines/*/*_linux.conf Magazines/*/*/*_linux.conf
 do
     [ -e "$file" ] && cp "$file" "${file%_linux.conf}_mac.conf"
-    [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e "/fluid.driver/ s|pulseaudio|coreaudio|Ig"
-    [ -e "${file%_linux.conf}_mac.conf" ] sed -i -e '/fluid\.driver/Ia fluid.periods=16\nfluid.periodsize=64'
+    [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e "/fluid.driver/ s|pulseaudio|coreaudio|Ig" "${file%_linux.conf}_mac.conf"
+    [ -e "${file%_linux.conf}_mac.conf" ] && perl -0777 -i -pe 's/^(?![ \t]*#).*fluid\.periods.*\n?//mg if /fluid\.driver/' "${file%_linux.conf}_mac.conf"
+    [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e '/fluid\.driver/Ia fluid.periods=16\nfluid.periodsize=64' "${file%_linux.conf}_mac.conf"
     [ -e "${file%_linux.conf}_mac.conf" ] && sed -i -e '/midiconfig=128/d' "${file%_linux.conf}_mac.conf"
 done 2>/dev/null
 
