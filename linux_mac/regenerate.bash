@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Linux & macOS Compatibility Patch for eXoDOS 6 / eXoDemoScene / eXoDREAMM / eXoScummVM / eXoWin3x / eXoWin9x
-# Revised: 2026-11-13
+# Revised: 2026-11-19
 #
 # This script was written for and tested with the following:
 #  - 86Box 4.2.1 (Sep 01 2024)
@@ -46,6 +46,7 @@
 #  - ScummVM 2.5.0 (Oct 01 2021)
 #  - ScummVM 2.9.0 (Dec 07 2024)
 #  - ScummVM 2026.1.0 (Jan 17 2026)
+#  - ScummVM 2026.4.0 (Oct 11 2026)
 #  - ScummVM 2.3.0 Alpha git18903-g313a824fb9 (Jun 15 2021)
 #  - ScummVM 2.8.0 Alpha git9335-g00e72a17004 (Nov 15 2023)
 #  - ScummVM 3.0.0 Alpha git20192-g3ca9da6a1c3 (Nov 04 2025)
@@ -278,6 +279,8 @@ function convertMacShell
            -e 's|flatpak run com\.retro_exo\.scummvm-2-5-0 |scummvm-2-5-0 |I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2-9-0 |scummvm-2-9-0 |I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2026-1-0 |scummvm-2026-1-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2026-4-0 |scummvm-2026-4-0 |I' \
+           -e 's|flatpak run com\.retro_exo\.scummvm-2027-1-0 |scummvm-2027-1-0 |I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git15811-gf97bfb7ce1 |scummvm-2-3-0-git15811-gf97bfb7ce1 |I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2-3-0-git18903-g313a824fb9 |scummvm-2-3-0-git18903-g313a824fb9 |I' \
            -e 's|flatpak run com\.retro_exo\.scummvm-2-8-0-git9335-g00e72a17004 |scummvm-2-8-0-git9335-g00e72a17004 |I' \
@@ -1364,6 +1367,8 @@ sed -i -e 's/;scummvm\.exe/;flatpak run com.retro_exo.scummvm-2-8-0/I' util/scum
 sed -i -e 's/;2\.5\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-5-0/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;2\.9\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-9-0/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;2026\.1\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2026-1-0/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;2026\.4\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2026-4-0/I' util/scummvm_linux.txt  2>/dev/null
+sed -i -e 's/;2027\.1\.0\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2027-1-0/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;svn2\.3_18903\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;svn2\.8_9335\\scummvm.exe/;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004/I' util/scummvm_linux.txt  2>/dev/null
 sed -i -e 's/;svn3\.0\.0git19492\\scummvm.exe/;flatpak run com.retro_exo.scummvm-3-0-0-git20192-g3ca9da6a1c3/I' util/scummvm_linux.txt  2>/dev/null
@@ -1378,6 +1383,8 @@ sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0|;scummvm-2-8-0|I' util/scu
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-5-0|;scummvm-2-5-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-9-0|;scummvm-2-9-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-1-0|;scummvm-2026-1-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2026-4-0|;scummvm-2026-4-0|I' util/scummvm_mac.txt  2>/dev/null
+sed -i -e 's|;flatpak run com.retro_exo.scummvm-2027-1-0|;scummvm-2027-1-0|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1|;scummvm-2-3-0-git15811-gf97bfb7ce1|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-3-0-git18903-g313a824fb9|;scummvm-2-3-0-git18903-g313a824fb9|I' util/scummvm_mac.txt  2>/dev/null
 sed -i -e 's|;flatpak run com.retro_exo.scummvm-2-8-0-git9335-g00e72a17004|;scummvm-2-8-0-git9335-g00e72a17004|I' util/scummvm_mac.txt  2>/dev/null
