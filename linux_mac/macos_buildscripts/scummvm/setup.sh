@@ -41,6 +41,40 @@ print("patched", p)
 EOF
 fi
 
+# ---------------------------------------------------------------- patch: skip ALL library builds in the base toolchain
+# The stock toolchain downloads prebuilt MacPorts binaries (now failing: the
+# MacPorts servers pruned old darwin_13 x86_64 packages) and source-builds
+# other libs. Our overlay wipes the prefix and rebuilds every library from
+# source at deployment target 11.0, so none of the base image's library steps
+# are needed. No-op them: faster, and zero MacPorts involvement anywhere.
+M4_APPLE="$DBB_DIR/toolchains/m4/apple/macosx.m4"
+if ! grep -q "macos11-overlay" "$M4_APPLE"; then
+    python3 - "$M4_APPLE" \
+        "$DBB_DIR/toolchains/macosx-x86_64/Dockerfile.m4" \
+        "$DBB_DIR/toolchains/macosx-arm64/Dockerfile.m4" <<'EOF'
+import re, sys
+
+# macosx.m4: no-op the two library-building macros, drop the SDL2 ports shim.
+p = sys.argv[1]
+t = open(p).read()
+t = re.sub(r"m4_define\(`helpers_package',[^\n]*\n",
+           "m4_dnl macos11-overlay: library builds skipped; overlay rebuilds from source\n"
+           "m4_define(`helpers_package',`')m4_dnl\n", t, count=1)
+t = re.sub(r"m4_define\(`ports_package',[^\n]*\n",
+           "m4_define(`ports_package',`')m4_dnl\n", t, count=1)
+t = re.sub(r"\n# This is a shim package[^\n]*\ncommon_package\(libsdl2\)\n", "\n", t)
+open(p, "w").write(t)
+print("patched", p)
+
+# Per-arch Dockerfiles: drop the Sparkle framework (unused: updates disabled).
+for p in sys.argv[2:]:
+    t = open(p).read()
+    t = re.sub(r"\ncommon_package\(sparkle\)\n", "\n", t)
+    open(p, "w").write(t)
+    print("patched", p)
+EOF
+fi
+
 # ---------------------------------------------------------------- check the Xcode xip is present
 XCODE_VERSION=$(sed -n "s/^m4_define(\`XCODE_VERSION', *\(.*\))$/\1/p" "$SDKS_M4" | tail -1)
 SDKS_DIR="$DBB_DIR/toolchains/apple-sdks"

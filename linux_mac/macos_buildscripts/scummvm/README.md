@@ -1,6 +1,6 @@
 # Portable universal macOS app bundles for eXo ScummVM builds
 
-Builds seven fully self-contained, universal (x86_64 + arm64) `.app` bundles that
+Builds eight fully self-contained, universal (x86_64 + arm64) `.app` bundles that
 run out of the box on macOS 11.0 and later, on a fresh install, with **all engines**
 and as many features as possible enabled.
 
@@ -13,6 +13,7 @@ and as many features as possible enabled.
 | scummvm-2-9-0.app | scummvm-2-9-0 | tag v2.9.0 |
 | scummvm-3-0-0-git20192-g3ca9da6a1c3.app | scummvm-3-0-0-git20192-g3ca9da6a1c3 | commit 3ca9da6a1c36ed1450ec5c5f08d48a225c7699df |
 | scummvm-2026-1-0.app | scummvm-2026-1-0 | tag v2026.1.0 |
+| scummvm-2026-4-0.app | scummvm-2026-4-0 | tag v2026.4.0 |
 
 ## How it works
 
@@ -25,12 +26,15 @@ Two customizations enforce your portability constraints:
    object gets `minos 11.0`.
 2. **No MacPorts (or Homebrew) binaries anywhere.** The stock toolchain downloads
    prebuilt *MacPorts* static libraries, which are built against whatever macOS
-   the MacPorts builders run — exactly the "binary blob needs newer macOS" trap.
-   Our overlay image (`docker/Dockerfile.rebuild`) wipes the entire library
-   prefix from the stock toolchain and rebuilds **every** third-party library
-   from source with deployment target 11.0, using dockerized-bb's own
-   `lib-helpers` recipes (plus one added recipe for SDL2). Nothing is installed
-   on your Mac; Homebrew/MacPorts are never touched.
+   the MacPorts builders run — exactly the "binary blob needs newer macOS" trap
+   (and the MacPorts servers have since pruned the old darwin_13 x86_64
+   packages, so those downloads now fail outright). setup.sh therefore patches
+   the toolchain m4 so the base image skips *all* library builds — it provides
+   only clang/osxcross/SDK — and our overlay image (`docker/Dockerfile.rebuild`)
+   builds **every** third-party library from source with deployment target 11.0,
+   using dockerized-bb's own `lib-helpers` recipes (plus added recipes for SDL2,
+   mpg123 and libopenmpt). MacPorts is never contacted; nothing is installed on
+   your Mac.
 
 All libraries are linked **statically** into the executable
 (`--enable-static`), so the bundles carry no dylibs at all. The only runtime
@@ -40,9 +44,10 @@ every Mach-O in every bundle.
 
 Features enabled (auto-detected from the rebuilt libs, varying by ScummVM
 version support): SDL2, SDL2_net, zlib, bzip2, png, jpeg, gif, ogg/vorbis,
-theora, FLAC, mad, faad2, mpeg2, a52, mpcdec, vpx, freetype, fribidi, mikmod,
-sonivox, FluidSynth, Discord RPC, retrowave, and system curl (cloud/DLC) from
-the SDK. Sparkle updates are intentionally omitted (pointless for ad-hoc-signed
+theora, FLAC, mad, faad2, mpeg2, a52, mpcdec, vpx, freetype, fribidi,
+libopenmpt + mpg123 (tracker music, used by 2.9+; older versions use mikmod,
+which is also included), sonivox, FluidSynth, Discord RPC, retrowave, native
+macOS text-to-speech, and system curl (cloud/DLC) from the SDK. Sparkle updates are intentionally omitted (pointless for ad-hoc-signed
 side-loaded bundles). `--disable-system-dialogs` matches your Linux flatpaks;
 remove it in `build-one.sh` if you want native file dialogs.
 

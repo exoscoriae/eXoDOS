@@ -17,6 +17,7 @@ scummvm-2-8-0-git9335-g00e72a17004 00e72a17004d393d8f44e4c54aa51c0a7efe75cc
 scummvm-2-9-0 v2.9.0
 scummvm-3-0-0-git20192-g3ca9da6a1c3 3ca9da6a1c36ed1450ec5c5f08d48a225c7699df
 scummvm-2026-1-0 v2026.1.0
+scummvm-2026-4-0 v2026.4.0
 EOF
 
 echo

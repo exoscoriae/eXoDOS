@@ -15,16 +15,25 @@ OUT=$PWD/out
 mkdir -p "$OUT" work/src work/build
 
 # ---------------------------------------------------------------- fetch source
-if [ ! -f "$SRC/configure" ]; then
+# Retry: a big shallow clone can die to a transient network reset.
+fetch_source() {
     rm -rf "$SRC"; mkdir -p "$SRC"
     if [[ "$REF" =~ ^[0-9a-f]{40}$ ]]; then
-        git -C "$SRC" init -q
-        git -C "$SRC" remote add origin "$SCUMMVM_REPO"
-        git -C "$SRC" fetch --depth 1 origin "$REF"
+        git -C "$SRC" init -q &&
+        git -C "$SRC" remote add origin "$SCUMMVM_REPO" &&
+        git -C "$SRC" fetch --depth 1 origin "$REF" &&
         git -C "$SRC" checkout -q FETCH_HEAD
     else
         git clone --depth 1 --branch "$REF" "$SCUMMVM_REPO" "$SRC"
     fi
+}
+if [ ! -f "$SRC/configure" ]; then
+    for attempt in 1 2 3; do
+        fetch_source && break
+        [ "$attempt" -eq 3 ] && { echo "ERROR: could not fetch $REF after 3 attempts"; exit 1; }
+        echo ">>> Fetch failed (attempt $attempt), retrying in 15s..."
+        sleep 15
+    done
 fi
 
 # ---------------------------------------------------------------- compat fixes for old trees
@@ -62,6 +71,19 @@ if [ -f "$PM" ] && grep -q "OSX_STATIC_LIBS" "$PM" && ! grep -q "SONIVOX" "$PM";
 
 ifdef USE_SONIVOX
 OSX_STATIC_LIBS += $(STATICLIBPATH)/lib/libsonivox-static.a
+endif
+EOF
+fi
+
+# Same story for openmpt: a tree whose configure detects libopenmpt but whose
+# ports.mk predates the USE_OPENMPT block would compile it in and fail to link.
+if [ -f "$PM" ] && grep -q "OSX_STATIC_LIBS" "$PM" && ! grep -q "OPENMPT" "$PM" \
+    && grep -q "libopenmpt" "$SRC/configure"; then
+    echo ">>> Adding libopenmpt to ports.mk static-lib list"
+    cat >> "$PM" <<'EOF'
+
+ifdef USE_OPENMPT
+OSX_STATIC_LIBS += $(STATICLIBPATH)/lib/libopenmpt.a $(STATICLIBPATH)/lib/libmpg123.a
 endif
 EOF
 fi

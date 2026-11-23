@@ -36,3 +36,18 @@ RUN set -e; LIBD="${DESTDIR}${PREFIX}/lib"; \
     if [ -f "$LIBD/libsonivox-static.a" ] && [ ! -f "$LIBD/libsonivox.a" ]; then \
         cp "$LIBD/libsonivox-static.a" "$LIBD/libsonivox.a"; fi; \
     ls -la "$LIBD"/libsonivox*
+
+# libopenmpt + mpg123: tracker/MOD music, preferred over libmikmod by
+# ScummVM 2.9+ (ports.mk USE_OPENMPT links libopenmpt.a and libmpg123.a).
+# Added as separate layers to keep the main library rebuild layer cached.
+COPY packages-extra /lib-helpers/packages/
+# .la files record pre-DESTDIR install paths (/opt/local/lib) and make libtool
+# chase nonexistent files when later builds link against these libs. Nothing in
+# the pipeline needs them (ScummVM links explicit .a paths), so drop them
+# before and after each libtool-based build.
+RUN find "${DESTDIR}${PREFIX}/lib" -name '*.la' -delete && \
+    sh /lib-helpers/packages/mpg123/build.sh && \
+    find "${DESTDIR}${PREFIX}/lib" -name '*.la' -delete && \
+    sh /lib-helpers/packages/libopenmpt/build.sh && \
+    find "${DESTDIR}${PREFIX}/lib" -name '*.la' -delete && \
+    ls -la "${DESTDIR}${PREFIX}/lib"/libopenmpt* "${DESTDIR}${PREFIX}/lib"/libmpg123*
